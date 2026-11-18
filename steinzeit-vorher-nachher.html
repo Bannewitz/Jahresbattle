@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vom Jäger zum Bauern – Altsteinzeit und Jungsteinzeit im Vergleich</title>
+<style>
+:root{--dunkel:#2a241d;--braun:#6b4a2a;--ocker:#c98a3a;--ocker2:#e6b45e;--gruen:#4f7d3a;--creme:#f7f0e1;--text:#2a241d;
+  --sans:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;--serif:Georgia,"Palatino Linotype",serif}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{font-family:var(--sans);background:#211c16;color:var(--text);display:flex;flex-direction:column}
+button{font:inherit;cursor:pointer}
+.hidden{display:none!important}
+header{background:var(--dunkel);color:#f3e7d0;display:flex;align-items:center;gap:12px;padding:8px 14px;flex-wrap:wrap;border-bottom:3px solid var(--ocker)}
+header h1{font:normal 1.25rem var(--serif);margin:0;flex:1;min-width:200px}
+header h1 small{display:block;font:.75rem var(--sans);opacity:.7}
+.seg{display:flex;background:#3d342a;border-radius:999px;padding:3px}
+.seg button{border:none;background:transparent;color:#f3e7d0;padding:8px 16px;border-radius:999px;font-weight:600;font-size:.95rem}
+.seg button.aktiv{background:var(--ocker2);color:var(--dunkel)}
+.werkzeuge{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.wbtn{border:1.5px solid #8a7458;background:transparent;color:#f3e7d0;border-radius:999px;padding:6px 13px;font-size:.88rem}
+.wbtn:hover{background:#3d342a}
+.wbtn.an{background:#f3e7d0;color:var(--dunkel);border-color:#f3e7d0}
+.zaehler{font-size:.9rem;background:#3d342a;border-radius:999px;padding:6px 12px;white-space:nowrap}
+.zaehler b{color:var(--ocker2)}
+
+.wrap{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;padding:10px}
+.buehne{position:relative;aspect-ratio:16/9;width:min(100%,calc((100vh - 96px) * 16 / 9));border-radius:12px;overflow:hidden;box-shadow:0 10px 40px rgba(0,0,0,.5);container-type:inline-size;user-select:none;-webkit-user-select:none;touch-action:manipulation}
+.ebene{position:absolute;inset:0}
+.ebene svg,.hs svg{width:100%;height:100%;display:block}
+.ebene.jung{opacity:0;transition:opacity .9s ease}
+.m-jung .ebene.jung{opacity:1}
+.m-vergleich .ebene.jung{opacity:1;transition:none;clip-path:inset(0 0 0 var(--pos,50%))}
+.hs{position:absolute;inset:0}
+.hs circle.flaeche{fill:transparent;cursor:pointer}
+.hs .marke{pointer-events:none;opacity:0;transition:opacity .3s}
+.hinweise .hs .marke{opacity:1}
+.hs .marke circle{fill:rgba(255,255,255,.12);stroke:#fff;stroke-width:4;stroke-dasharray:12 8;animation:dreh 14s linear infinite;transform-box:fill-box;transform-origin:center}
+@keyframes dreh{to{transform:rotate(360deg)}}
+.hs .fund{pointer-events:none}
+.hs .puls{fill:none;stroke:#ffd76a;stroke-width:6;animation:puls 1.4s ease-out infinite;transform-box:fill-box;transform-origin:center}
+@keyframes puls{0%{opacity:1;transform:scale(.8)}100%{opacity:0;transform:scale(1.25)}}
+.badge{position:absolute;top:2.2%;background:rgba(42,36,29,.86);color:#f3e7d0;border-radius:999px;padding:.5cqw 1.4cqw;font-size:clamp(12px,1.35cqw,26px);font-weight:600;pointer-events:none;box-shadow:0 2px 8px rgba(0,0,0,.3)}
+.badge small{font-weight:normal;opacity:.8;margin-left:.5em}
+.badge.l{left:1.6%}.badge.r{right:1.6%}
+.griff{position:absolute;top:0;bottom:0;left:var(--pos,50%);width:0;pointer-events:none}
+.griff::before{content:"";position:absolute;top:0;bottom:0;left:-2px;width:4px;background:#fff;box-shadow:0 0 10px rgba(0,0,0,.5)}
+.griff span{position:absolute;top:50%;left:0;transform:translate(-50%,-50%);width:clamp(40px,4.4cqw,80px);height:clamp(40px,4.4cqw,80px);border-radius:50%;background:#fff;color:var(--dunkel);display:flex;align-items:center;justify-content:center;font-size:clamp(16px,1.8cqw,32px);font-weight:700;box-shadow:0 2px 12px rgba(0,0,0,.4)}
+.m-vergleich{cursor:ew-resize}
+
+.karte{position:absolute;top:12%;width:41%;max-height:85%;overflow:auto;background:rgba(253,248,238,.97);border-radius:1.4cqw;padding:1.4cqw 1.8cqw 1.6cqw;box-shadow:0 8px 30px rgba(0,0,0,.4);font-size:clamp(14px,1.42cqw,28px);line-height:1.45;border-top:.5cqw solid var(--ocker)}
+.karte.links{left:2%}.karte.rechts{right:2%}
+.karte.jung{border-top-color:var(--gruen)}
+.karte-kopf{display:flex;align-items:center;gap:.6em;flex-wrap:wrap}
+.chip{background:#efe2c8;border-radius:999px;padding:.15em .7em;font-weight:600;font-size:.85em}
+.epoche{font-size:.8em;color:#7a6a55;text-transform:uppercase;letter-spacing:.06em;font-weight:600;flex:1}
+.x{border:none;background:#e9dcc2;border-radius:50%;width:1.8em;height:1.8em;font-size:.9em}
+.karte h2{font:normal 1.55em var(--serif);margin:.35em 0 .3em;color:#4a3420}
+.karte p{margin:.4em 0}
+.karte .frage{background:#fff;border:2px dashed var(--ocker);border-radius:.7em;padding:.5em .8em;margin:.8em 0}
+.karte .frage b{color:#8a5a1a}
+.kbtn{border:none;border-radius:999px;background:var(--dunkel);color:#fff;padding:.55em 1.1em;font-weight:600;font-size:.95em;margin-top:.2em}
+.kbtn.jung{background:var(--gruen)}
+.toast{position:absolute;left:50%;bottom:4%;transform:translateX(-50%);background:var(--gruen);color:#fff;border-radius:999px;padding:.8cqw 2cqw;font-size:clamp(14px,1.5cqw,28px);font-weight:600;box-shadow:0 4px 18px rgba(0,0,0,.4);cursor:pointer}
+
+/* Overlays */
+.overlay{position:fixed;inset:0;background:rgba(20,16,12,.82);display:flex;align-items:center;justify-content:center;padding:16px;z-index:40}
+.panel{background:var(--creme);border-radius:16px;max-width:1200px;width:100%;max-height:100%;overflow:auto;padding:22px 28px;font-size:clamp(15px,1.35vw,24px);box-shadow:0 10px 40px rgba(0,0,0,.5)}
+.panel h2{font:normal 1.7em var(--serif);margin:0 0 .3em;color:#4a3420}
+.panel-kopf{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.panel-kopf h2{flex:1}
+table.tafel{width:100%;border-collapse:separate;border-spacing:0 6px}
+.tafel th{text-align:left;padding:.4em .7em;font:normal 1.05em var(--serif);color:#fff}
+.tafel th.a{background:#8a5a1a;border-radius:10px 0 0 10px}.tafel th.j{background:var(--gruen);border-radius:0 10px 10px 0}
+.tafel th.b{background:transparent;color:#4a3420}
+.tafel td{padding:.45em .7em;background:#fff;vertical-align:top}
+.tafel td.b{background:transparent;font-weight:700;color:#4a3420;white-space:nowrap}
+.tafel td.zelle{cursor:pointer;transition:all .2s}
+.tafel td.zelle.zu{color:transparent;background:repeating-linear-gradient(45deg,#efe2c8,#efe2c8 10px,#e7d7b8 10px,#e7d7b8 20px);position:relative}
+.tafel td.zelle.zu::after{content:"antippen";position:absolute;left:.7em;top:.45em;color:#a08a68;font-size:.8em;font-style:italic}
+.merk{background:#fff;border-left:6px solid var(--ocker);border-radius:10px;padding:.6em 1em;margin:.8em 0 0}
+.pbtn{border:1.5px solid #8a7458;background:#fff;border-radius:999px;padding:.35em 1em;font-size:.8em}
+.pbtn.dunkel{background:var(--dunkel);color:#fff;border-color:var(--dunkel)}
+.gleich{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:10px}
+.gleich div{background:#fff;border-radius:12px;padding:.7em 1em}
+.gleich b{display:block;font:normal 1.2em var(--serif);color:#4a3420;margin-bottom:.2em}
+.panel ul{margin:.3em 0;padding-left:1.2em}
+.panel li{margin:.25em 0}
+kbd{background:#fff;border:1px solid #bbb;border-bottom-width:2px;border-radius:5px;padding:0 .4em;font-size:.85em}
+@media (max-width:760px){header h1{font-size:1.05rem}.seg button{padding:6px 10px;font-size:.85rem}.karte{width:62%}.gleich{grid-template-columns:1fr}}
+@media print{header,.wrap,.panel-kopf .pbtn{display:none!important}body{background:#fff}.overlay{position:static;background:none;padding:0}.panel{box-shadow:none;max-height:none}.tafel td.zelle.zu{color:inherit;background:#fff}.tafel td.zelle.zu::after{content:none}}
+</style>
+</head>
+<body>
+<header>
+  <h1>Vom Jäger zum Bauern<small>Altsteinzeit und Jungsteinzeit im Vergleich</small></h1>
+  <div class="seg" role="group" aria-label="Zeit wählen">
+    <button data-m="alt" class="aktiv">Altsteinzeit</button>
+    <button data-m="vergleich">⇆ Vergleich</button>
+    <button data-m="jung">Jungsteinzeit</button>
+  </div>
+  <div class="werkzeuge">
+    <span class="zaehler">Entdeckt: <b id="anzahl">0</b> / 8</span>
+    <button class="wbtn" id="bHinweise" title="Taste H">Hinweise zeigen</button>
+    <button class="wbtn" id="bGleich">Was blieb gleich?</button>
+    <button class="wbtn" id="bTafel" title="Taste T">Tafelbild</button>
+    <button class="wbtn" id="bVoll" title="Vollbild">⛶</button>
+    <button class="wbtn" id="bInfo" title="Hinweise für Lehrkräfte">i</button>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="buehne m-alt" id="buehne">
+    <div class="ebene alt" id="ebAlt"></div>
+    <div class="ebene jung" id="ebJung"></div>
+    <div class="hs" id="hs"></div>
+    <div class="griff hidden" id="griff"><span>⇆</span></div>
+    <div class="badge l" id="badgeL"></div>
+    <div class="badge r hidden" id="badgeR"></div>
+    <div class="karte hidden" id="karte" role="dialog" aria-live="polite">
+      <div class="karte-kopf"><span class="chip" id="kChip"></span><span class="epoche" id="kEpoche"></span><button class="x" id="kZu" aria-label="Schließen">✕</button></div>
+      <h2 id="kTitel"></h2>
+      <p id="kText"></p>
+      <div class="frage"><b>Frage an die Klasse:</b> <span id="kFrage"></span></div>
+      <button class="kbtn" id="kWechsel"></button>
+    </div>
+    <div class="toast hidden" id="toast">Alle 8 Veränderungen entdeckt! → Tafelbild</div>
+  </div>
+</div>
+
+<div class="overlay hidden" id="ovTafel"><div class="panel">
+  <div class="panel-kopf"><h2>Vom Jäger zum Bauern</h2>
+    <button class="pbtn" id="tAlle">Alles aufdecken</button><button class="pbtn" id="tDruck">Drucken</button><button class="pbtn dunkel" data-zu>Schließen</button></div>
+  <table class="tafel" id="tafel"></table>
+  <div class="merk"><b>Merke: Neolithische Revolution</b><br>So nennt man den Übergang vom Leben als <b>Jäger und Sammler</b> zum Leben als <b>sesshafte Bauern</b> mit Ackerbau und Viehzucht. Er begann um 10.000 v. Chr. im „Fruchtbaren Halbmond“ in Vorderasien und erreichte Mitteleuropa – auch Sachsen – um 5500 v. Chr.</div>
+</div></div>
+
+<div class="overlay hidden" id="ovGleich"><div class="panel" style="max-width:1000px">
+  <div class="panel-kopf"><h2>Was blieb gleich?</h2><button class="pbtn dunkel" data-zu>Schließen</button></div>
+  <p>Nicht alles hat sich verändert. Findet ihr diese Dinge in beiden Bildern?</p>
+  <div class="gleich">
+    <div><b>🔥 Das Feuer</b>Zum Wärmen, Kochen, als Licht und zum Schutz vor wilden Tieren – in beiden Zeiten der Mittelpunkt des Lebens.</div>
+    <div><b>🐕 Der Hund</b>Der älteste Begleiter des Menschen. Hunde lebten schon in der Altsteinzeit bei den Menschen – lange vor allen anderen Haustieren.</div>
+    <div><b>🪨 Der Stein</b>Die wichtigsten Werkzeuge waren immer noch aus Stein. Metall kannte man noch nicht. Darum heißen beide Zeiten „Steinzeit“.</div>
+  </div>
+</div></div>
+
+<div class="overlay hidden" id="ovInfo"><div class="panel" style="max-width:900px">
+  <div class="panel-kopf"><h2>Hinweise für Lehrkräfte</h2><button class="pbtn dunkel" data-zu>Schließen</button></div>
+  <ul>
+    <li><b>Am Beamer:</b> Zuerst das Altsteinzeit-Bild zeigen und beschreiben lassen, dann auf „Jungsteinzeit“ umschalten (langsame Überblendung) oder den Vergleichs-Schieber nutzen. Die Klasse nennt Veränderungen – Sie klicken die passende Stelle im Bild an. Die Klickflächen sind unsichtbar, damit die Klasse selbst suchen muss.</li>
+    <li><b>Infokarte:</b> Jede Entdeckung öffnet eine Karte mit kurzem Text und einer Frage an die Klasse. Mit dem Knopf unten springt das Bild zur passenden Stelle in der anderen Zeit.</li>
+    <li><b>An Tablets:</b> SuS erkunden selbst, mit „Hinweise zeigen“ werden alle 8 Stellen markiert.</li>
+    <li><b>Sicherung:</b> „Tafelbild“ zeigt eine Vergleichstabelle, deren Felder einzeln aufgedeckt werden können (z.&nbsp;B. erst Vermutungen sammeln). Druckbar. „Was blieb gleich?“ ergänzt die Gemeinsamkeiten.</li>
+    <li><b>Zeiten:</b> Das Altsteinzeit-Bild zeigt ein Lager von Rentierjägern gegen Ende der letzten Eiszeit (um 15.000 v. Chr.), das Jungsteinzeit-Bild ein Dorf der ersten Bauern (Bandkeramik, um 5000 v. Chr.). Die Zeichnungen sind vereinfacht.</li>
+    <li><b>Tastatur:</b> <kbd>A</kbd> Altsteinzeit · <kbd>J</kbd> Jungsteinzeit · <kbd>V</kbd> Vergleich · <kbd>H</kbd> Hinweise · <kbd>T</kbd> Tafelbild · <kbd>Esc</kbd> schließen</li>
+  </ul>
+</div></div>
+
+<script>
+"use strict";
+/* ================= Hilfen ================= */
+const L=(a,b,t)=>a+(b-a)*t, f1=n=>Math.round(n*10)/10;
+const pts=a=>a.map(p=>f1(p[0])+','+f1(p[1])).join(' ');
+function rng(seed){let s=seed;return()=>{s=(s*16807)%2147483647;return(s-1)/2147483646;};}
+const pick=(r,a)=>a[Math.floor(r()*a.length)];
+const HAUT=['#d9a77c','#c99167','#e3b88f','#b9845a'];
+const HAAR=['#3a2615','#2a1c10','#5b3a1e','#7a5230'];
+const FELL=['#8a6a45','#7a5a3a','#9b7b52','#6b4f33'];
+const LEIN=['#ddd2b4','#cfc29e','#bfae86','#8a6a45'];
+const sAt=y=>L(.55,1.3,Math.max(0,(y-420)/480));
+const tf=(x,y,s,flip)=>`transform="translate(${f1(x)} ${f1(y)}) scale(${flip?-s:s} ${s})"`;
+
+/* ================= Menschen ================= */
+function mensch(x,y,s,o={}){
+  const k=o.kleid||'#8a6a45',h=o.haut||'#d9a77c',hr=o.haar||'#3a2615',fell=o.fell;
+  let g=`<g ${tf(x,y,s,o.flip)}>`;
+  let dy=0;
+  if(o.knie){dy=16;g+=`<path d="M-8 -6 L14 -6 L16 0" stroke="${fell?k:h}" stroke-width="7" stroke-linecap="round" fill="none"/>`;}
+  else g+=`<path d="M-6 0 V-24 M6 0 V-24" stroke="${fell?'#5e4630':h}" stroke-width="6.5" stroke-linecap="round"/>`;
+  g+=`<g transform="translate(0 ${dy})">`;
+  g+=`<path d="M-13 -20 L-10 -50 Q0 -56 10 -50 L13 -20 Z" fill="${k}"/>`;
+  if(fell)g+=`<path d="M-13 -21 L-10 -15 L-7 -21 L-4 -15 L-1 -21 L2 -15 L5 -21 L8 -15 L11 -21 L13 -21 L13 -22 L-13 -22Z" fill="${k}"/><path d="M-10 -50 Q0 -45 10 -50" stroke="#c8b08a" stroke-width="3" fill="none"/>`;
+  else g+=`<path d="M-12.5 -26 H12.5" stroke="#8a6a45" stroke-width="2.4"/>`;
+  const armL=o.armL||'M-9 -47 L-15 -27',armR=o.armR||'M9 -47 L15 -27';
+  g+=`<path d="${armL} ${armR}" stroke="${fell?k:h}" stroke-width="5.5" stroke-linecap="round" fill="none"/>`;
+  g+=`<circle cy="-60" r="8.5" fill="${h}"/>`;
+  g+=o.lang?`<path d="M-9 -60 Q-10 -70 0 -70 Q10 -70 9 -60 L10 -46 Q7 -45 6 -50 L6 -61 Q0 -65 -6 -61 L-6 -50 Q-7 -45 -10 -46Z" fill="${hr}"/>`
+           :`<path d="M-8.8 -60 Q-9 -70 0 -70 Q9 -70 8.8 -60 Q6 -65 0 -65 Q-6 -65 -8.8 -60Z" fill="${hr}"/>`;
+  if(o.prop==='speer')g+=`<path d="M-2 -22 L30 -104" stroke="#7a5a35" stroke-width="3" stroke-linecap="round"/><path d="M27 -100 L34 -114 L33 -98Z" fill="#8f8c84"/>`;
+  if(o.prop==='axt')g+=`<path d="M14 -62 L32 -92" stroke="#7a5a35" stroke-width="3.5" stroke-linecap="round"/><path d="M26 -96 Q34 -102 40 -92 Q34 -88 30 -88Z" fill="#6f7a74" stroke="#4d5550"/>`;
+  if(o.prop==='sichel')g+=`<path d="M15 -27 L20 -20" stroke="#7a5a35" stroke-width="3"/><path d="M20 -20 Q34 -24 32 -38" stroke="#8f8c84" stroke-width="3" fill="none"/>`;
+  if(o.prop==='korb')g+=`<path d="M-26 -32 Q-17 -14 -6 -32Z" fill="#a07a42" stroke="#6b4a2a"/><path d="M-26 -32 H-6" stroke="#6b4a2a" stroke-width="2"/>`;
+  if(o.prop==='eimer')g+=`<path d="M15 -27 V-18" stroke="#6b4a2a" stroke-width="1.5"/><path d="M8 -18 L22 -18 L20 -4 L10 -4Z" fill="#8a6a45" stroke="#5e4630"/>`;
+  if(o.prop==='beutel')g+=`<path d="M12 -28 Q8 -10 18 -8 Q28 -10 24 -28Z" fill="#7a5a3a" stroke="#4e3826"/>`;
+  if(o.prop==='topf')g+=`<path d="M8 -36 Q4 -24 10 -18 L22 -18 Q28 -24 24 -36Z" fill="#b5784a" stroke="#6b4428"/><path d="M8 -30 Q16 -25 24 -30" stroke="#5a3a22" stroke-width="1.4" fill="none"/>`;
+  return g+'</g></g>';
+}
+/* ================= Tiere ================= */
+function rentier(x,y,s,flip){return `<g ${tf(x,y,s,flip)}>
+<path d="M-18 -30 L-20 0 M-10 -30 L-9 0 M14 -30 L13 0 M22 -30 L24 0" stroke="#5e5246" stroke-width="3.6" stroke-linecap="round"/>
+<ellipse cy="-39" rx="28" ry="13" fill="#8c7f6c"/><ellipse cy="-32" rx="19" ry="6" fill="#cfc5b2"/>
+<path d="M16 -48 L25 -64 L36 -61 L31 -38Z" fill="#ddd5c4"/>
+<ellipse cx="38" cy="-63" rx="10" ry="5.4" fill="#7d705e" transform="rotate(22 38 -63)"/>
+<path d="M33 -67 Q26 -85 17 -93 M27 -81 L19 -83 M30 -88 L33 -99 M39 -67 Q43 -87 51 -97 M43 -85 L51 -85 M47 -91 L45 -103" stroke="#e8dcc0" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+<path d="M-27 -44 l-5 4" stroke="#ddd5c4" stroke-width="4"/></g>`;}
+function wildpferd(x,y,s,flip){const f='#b8925e';return `<g ${tf(x,y,s,flip)}>
+<path d="M-22 -26 L-24 0 M-14 -26 L-12 0 M14 -26 L12 0 M22 -26 L24 0" stroke="#4a3a2a" stroke-width="4" stroke-linecap="round"/>
+<path d="M-28 -28 Q-30 -46 -12 -46 L16 -46 Q24 -46 26 -54 L34 -70 Q40 -74 44 -68 L42 -60 Q38 -58 36 -52 L30 -32 Q28 -24 20 -24 L-20 -24 Q-28 -24 -28 -28Z" fill="${f}"/>
+<path d="M27 -55 L35 -71" stroke="#3a2a1a" stroke-width="5" stroke-linecap="round"/><ellipse cy="-30" rx="16" ry="4" fill="#e6d4b0"/>
+<path d="M-28 -40 Q-36 -30 -34 -16" stroke="#3a2a1a" stroke-width="4" fill="none"/></g>`;}
+function rind(x,y,s,f,flip){return `<g ${tf(x,y,s,flip)}>
+<path d="M-22 -26 V0 M-12 -26 V0 M16 -26 V0 M24 -26 V0" stroke="${f}" stroke-width="6" stroke-linecap="round"/>
+<path d="M-30 -30 Q-32 -54 -14 -54 L18 -54 Q30 -54 30 -40 L30 -28 Q28 -22 18 -22 L-20 -22 Q-30 -22 -30 -30Z" fill="${f}"/>
+<path d="M27 -50 L44 -48 Q50 -40 46 -31 L35 -31 Z" fill="${f}" stroke="rgba(0,0,0,.25)"/>
+<path d="M37 -50 Q35 -61 28 -61 M42 -50 Q47 -61 54 -59" stroke="#efe4c8" stroke-width="2.8" fill="none" stroke-linecap="round"/>
+<path d="M-30 -46 Q-37 -34 -35 -18" stroke="${f}" stroke-width="3" fill="none"/><circle cx="41" cy="-42" r="1.6" fill="#111"/></g>`;}
+function schaf(x,y,s,flip){let c='';for(const [cx,cy,r] of [[-14,-30,11],[-2,-35,12],[10,-31,11],[-8,-24,10],[6,-24,10],[16,-27,9]])c+=`<circle cx="${cx}" cy="${cy}" r="${r}" fill="#ede6d6"/>`;
+  return `<g ${tf(x,y,s,flip)}><path d="M-12 -18 V0 M-4 -18 V0 M8 -18 V0 M14 -18 V0" stroke="#3a3028" stroke-width="3.2"/>${c}<ellipse cx="28" cy="-32" rx="8" ry="6" fill="#3a3028"/><ellipse cx="23" cy="-36" rx="4" ry="2" fill="#3a3028"/></g>`;}
+function ziege(x,y,s,flip){const f='#8a6a4a';return `<g ${tf(x,y,s,flip)}><path d="M-14 -20 V0 M-7 -20 V0 M10 -20 V0 M16 -20 V0" stroke="${f}" stroke-width="3.4"/>
+<ellipse cy="-28" rx="20" ry="10" fill="${f}"/><path d="M14 -32 L22 -46 L30 -44 L26 -30Z" fill="${f}"/><ellipse cx="29" cy="-44" rx="7" ry="4.4" fill="#6e5238"/>
+<path d="M24 -48 Q20 -58 14 -58 M27 -48 Q25 -60 20 -61" stroke="#d9cdb2" stroke-width="2.2" fill="none"/><path d="M31 -40 L30 -34" stroke="#4a3a2a" stroke-width="2.4"/><path d="M-20 -30 l-4 -6" stroke="${f}" stroke-width="3"/></g>`;}
+function schwein(x,y,s,flip){const f='#5e4636';return `<g ${tf(x,y,s,flip)}><path d="M-12 -12 V0 M-4 -12 V0 M8 -12 V0 M14 -12 V0" stroke="${f}" stroke-width="4"/>
+<ellipse cy="-22" rx="22" ry="13" fill="${f}"/><path d="M-12 -34 Q0 -40 14 -33" stroke="#3a2a20" stroke-width="3" fill="none"/><rect x="20" y="-26" width="8" height="8" rx="3" fill="#7a5e4a"/><path d="M12 -32 L18 -40 L20 -30Z" fill="#3a2a20"/><circle cx="16" cy="-25" r="1.5" fill="#111"/></g>`;}
+function hund(x,y,s,flip){const f='#7a5a3a';return `<g ${tf(x,y,s,flip)}><path d="M-10 -10 V0 M-5 -10 V0 M7 -10 V0 M11 -10 V0" stroke="${f}" stroke-width="3"/>
+<ellipse cy="-15" rx="15" ry="6.5" fill="${f}"/><circle cx="15" cy="-23" r="6.5" fill="${f}"/><path d="M19 -22 L26 -20 L19 -18Z" fill="${f}"/><path d="M12 -28 L13 -35 L17 -28Z" fill="#5a4028"/><path d="M-14 -17 Q-22 -26 -17 -30" stroke="${f}" stroke-width="3" fill="none"/><circle cx="17" cy="-24" r="1.2" fill="#111"/></g>`;}
+
+/* ================= Dinge ================= */
+function laubbaum(x,y,s,c1='#4f8a3e',c2='#62a04c'){return `<g ${tf(x,y,s)}><rect x="-5" y="-50" width="10" height="50" fill="#6b4a2a"/><circle cx="-18" cy="-64" r="22" fill="${c1}"/><circle cx="16" cy="-66" r="24" fill="${c1}"/><circle cx="0" cy="-86" r="26" fill="${c2}"/><circle cx="-4" cy="-60" r="20" fill="${c2}"/></g>`;}
+function nadelbaum(x,y,s,c='#3f6a45'){return `<g ${tf(x,y,s)}><rect x="-4" y="-22" width="8" height="22" fill="#5a3e24"/><path d="M-28 -18 L0 -62 L28 -18Z M-23 -46 L0 -90 L23 -46Z M-17 -74 L0 -112 L17 -74Z" fill="${c}"/></g>`;}
+function birke(x,y,s){return `<g ${tf(x,y,s)}><rect x="-4" y="-80" width="8" height="80" fill="#efebe2"/><path d="M-4 -60h4M0 -40h4M-4 -22h5M0 -70h4" stroke="#333" stroke-width="2"/><circle cx="-10" cy="-88" r="15" fill="#a9b77a"/><circle cx="10" cy="-96" r="14" fill="#b9c486"/><circle cx="2" cy="-78" r="12" fill="#a9b77a"/></g>`;}
+function stumpf(x,y,s){return `<g ${tf(x,y,s)}><path d="M-10 0 V-14 H10 V0Z" fill="#7a5a35"/><ellipse cy="-14" rx="10" ry="3.5" fill="#d8b98a"/></g>`;}
+function busch(x,y,s,beeren){let b=`<g ${tf(x,y,s)}><circle cx="-16" cy="-16" r="16" fill="#5f7a3e"/><circle cx="14" cy="-18" r="17" fill="#5f7a3e"/><circle cx="0" cy="-30" r="18" fill="#6e8a48"/>`;
+  if(beeren)for(const [bx,by] of [[-14,-20],[-4,-34],[8,-26],[18,-14],[-20,-8],[4,-12],[12,-36]])b+=`<circle cx="${bx}" cy="${by}" r="3" fill="#b5283a"/>`;return b+'</g>';}
+function feuer(x,y,s){return `<g ${tf(x,y,s)}>${[[-26,0],[-14,6],[2,8],[18,6],[28,0],[-20,-6],[22,-6]].map(([a,b])=>`<ellipse cx="${a}" cy="${b}" rx="8" ry="5" fill="#8d8a82"/>`).join('')}
+<path d="M-20 0 L20 -10 M-20 -10 L20 0" stroke="#5a3a20" stroke-width="6" stroke-linecap="round"/>
+<path d="M-14 -6 Q-18 -30 -4 -46 Q-6 -30 4 -26 Q2 -44 12 -56 Q14 -30 16 -8Z" fill="#f08a24"/><path d="M-6 -6 Q-8 -22 2 -32 Q2 -20 8 -16 Q10 -28 12 -30 Q14 -16 10 -6Z" fill="#ffd24a"/>
+<circle cx="4" cy="-74" r="10" fill="#bbb" opacity=".45"/><circle cx="12" cy="-96" r="14" fill="#bbb" opacity=".35"/><circle cx="6" cy="-124" r="18" fill="#bbb" opacity=".25"/></g>`;}
+function zelt(x,y,s){return `<g ${tf(x,y,s)}>
+<path d="M-8 -116 L-24 -150 M4 -118 L16 -152 M0 -118 L-2 -148" stroke="#5a3e24" stroke-width="4" stroke-linecap="round"/>
+<path d="M-74 0 L0 -122 L74 0Z" fill="#8a6a45"/>
+<path d="M-74 0 L-30 -50 L-10 0Z" fill="#7a5a3a"/><path d="M30 -50 L74 0 L40 0Z" fill="#9b7b52"/><path d="M-30 -50 L0 -122 L20 -70Z" fill="#94744c"/>
+<path d="M-30 -50 L30 -50 M-50 -30 L48 -32 M-14 -100 L14 -98" stroke="#5a3e24" stroke-width="1.6" stroke-dasharray="5 4"/>
+<path d="M-22 0 L0 -52 L22 0Z" fill="#3b2a1c"/>
+${[-68,-46,-24,24,46,68].map(a=>`<ellipse cx="${a}" cy="0" rx="9" ry="5" fill="#8d8a82"/>`).join('')}</g>`;}
+function langhaus(x,y,s){
+  const W=120*s,H=70*s,Lg=310*s,dy=-24*s,R=100*s,o=10*s;
+  const top=y-H;let g='';
+  g+=`<polygon points="${pts([[x+W,top],[x+W+Lg,top+dy],[x+W+Lg,y+dy],[x+W,y]])}" fill="#b59a6c"/>`;
+  let p='';for(let i=0;i<=14;i++){const t=i/14,xx=x+W+Lg*t,yt=top+dy*t,yb=y+dy*t;p+=`M${f1(xx)} ${f1(yt)}L${f1(xx)} ${f1(yb)}`;}
+  g+=`<path d="${p}" stroke="#7a5a35" stroke-width="${f1(2.4*s)}"/>`;
+  for(let i=0;i<6;i++){const t=.08+i*.16,xx=x+W+Lg*t;g+=`<ellipse cx="${f1(xx+8*s)}" cy="${f1(top+dy*t+H*.55)}" rx="${f1(16*s)}" ry="${f1(9*s)}" fill="#c8ad7e" opacity=".8"/>`;}
+  g+=`<rect x="${f1(x)}" y="${f1(top)}" width="${f1(W)}" height="${f1(H)}" fill="#a88c5e"/>`;
+  g+=`<path d="M${f1(x+W*.2)} ${f1(top)}V${f1(y)}M${f1(x+W*.8)} ${f1(top)}V${f1(y)}" stroke="#7a5a35" stroke-width="${f1(3*s)}"/>`;
+  g+=`<rect x="${f1(x+W*.38)}" y="${f1(y-H*.75)}" width="${f1(W*.24)}" height="${f1(H*.75)}" fill="#3b2a1c"/>`;
+  g+=`<polygon points="${pts([[x+W/2,top-R],[x+W/2+Lg,top-R+dy],[x+W+Lg+o,top+dy+4*s],[x+W+o,top+4*s]])}" fill="#c9a85a"/>`;
+  let th='';for(let i=0;i<=22;i++){const t=i/22;th+=`M${f1(x+W/2+Lg*t)} ${f1(top-R+dy*t)}L${f1(x+W+o+Lg*t)} ${f1(top+4*s+dy*t)}`;}
+  g+=`<path d="${th}" stroke="#a8883e" stroke-width="${f1(1.6*s)}"/>`;
+  g+=`<polygon points="${pts([[x-o,top+4*s],[x+W/2,top-R],[x+W+o,top+4*s]])}" fill="#d6b768"/>`;
+  g+=`<line x1="${f1(x+W/2)}" y1="${f1(top-R)}" x2="${f1(x+W/2+Lg)}" y2="${f1(top-R+dy)}" stroke="#8a6a35" stroke-width="${f1(4*s)}"/>`;
+  return g;}
+function topf(x,y,s,c='#b5784a'){return `<g ${tf(x,y,s)}><path d="M-15 -28 Q-21 -10 -10 0 L10 0 Q21 -10 15 -28 Z" fill="${c}" stroke="#6b4428" stroke-width="1.2"/><ellipse cy="-28" rx="15" ry="4" fill="#5a3a22"/>
+<path d="M-17 -20 Q-9 -12 0 -20 Q9 -28 17 -20 M-17 -14 Q-9 -6 0 -14 Q9 -22 17 -14" stroke="#4a2e18" stroke-width="1.6" fill="none"/></g>`;}
+function webstuhl(x,y,s){let t='';for(let i=-28;i<=28;i+=4)t+=`M${i} -78 V-30`;let w='';for(let i=-28;i<=28;i+=8)w+=`<circle cx="${i}" cy="-24" r="4" fill="#a07a52"/>`;
+  return `<g ${tf(x,y,s)}><path d="M-40 0 L-32 -128 M40 0 L32 -128" stroke="#6b4a2a" stroke-width="6" stroke-linecap="round"/><rect x="-42" y="-132" width="84" height="9" rx="3" fill="#7a5a35"/>
+<rect x="-30" y="-123" width="60" height="45" fill="#e6dcc0"/><path d="M-30 -116 H30 M-30 -108 H30 M-30 -100 H30 M-30 -92 H30 M-30 -84 H30" stroke="#cdbf9a" stroke-width="1.4"/>
+<path d="${t}" stroke="#e8e0cc" stroke-width="1.2"/>${w}<rect x="-36" y="-52" width="72" height="4" fill="#7a5a35"/></g>`;}
+function fellrahmen(x,y,s){return `<g ${tf(x,y,s)}><path d="M-52 0 L-46 -118 M52 0 L46 -118" stroke="#6b4a2a" stroke-width="6" stroke-linecap="round"/><path d="M-54 -112 H54 M-50 -26 H50" stroke="#6b4a2a" stroke-width="5" stroke-linecap="round"/>
+<path d="M-36 -98 Q-40 -70 -34 -40 Q0 -34 34 -42 Q40 -70 36 -100 Q0 -106 -36 -98Z" fill="#a77d52"/><path d="M-20 -80 Q0 -86 16 -76 M-14 -60 Q4 -56 20 -62" stroke="#8a643c" stroke-width="2" fill="none"/>
+<path d="M-36 -98 L-46 -110 M0 -104 L0 -112 M36 -100 L46 -110 M-38 -70 L-48 -70 M38 -70 L48 -70 M-34 -40 L-46 -28 M34 -42 L46 -28 M0 -37 L0 -26" stroke="#d9c8a8" stroke-width="1.6"/></g>`;}
+function brunnen(x,y,s){return `<g ${tf(x,y,s)}>
+<polygon points="-40,-44 20,-44 44,-60 -16,-60" fill="#2c3a44"/><polygon points="-40,-44 20,-44 44,-60 -16,-60" fill="none" stroke="#7a5a35" stroke-width="7"/>
+<rect x="-40" y="-44" width="60" height="44" fill="#8a6a45"/><polygon points="20,-44 44,-60 44,-16 20,0" fill="#6f5436"/>
+<path d="M-40 -33 H20 M-40 -22 H20 M-40 -11 H20 M20 -33 L44 -49 M20 -22 L44 -38 M20 -11 L44 -27" stroke="#5e4630" stroke-width="2"/>
+<ellipse cx="2" cy="-52" rx="16" ry="4" fill="#5d86a6" opacity=".8"/></g>`;}
+function mahlstein(x,y,s){return `<g ${tf(x,y,s)}><path d="M-34 0 Q-36 -14 -20 -16 L26 -16 Q38 -14 34 0Z" fill="#8f8c84"/><ellipse cx="-2" cy="-20" rx="14" ry="6" fill="#a8a59c"/>${[[-26,-14],[18,-14],[24,-12],[-20,-12],[12,-15]].map(([a,b])=>`<circle cx="${a}" cy="${b}" r="1.8" fill="#e8d28a"/>`).join('')}<ellipse cx="44" cy="-4" rx="12" ry="5" fill="#a07a42"/><ellipse cx="44" cy="-7" rx="10" ry="3" fill="#e8d28a"/></g>`;}
+function garbe(x,y,s){return `<g ${tf(x,y,s)}><path d="M-10 0 L-4 -34 M-4 0 L-1 -36 M2 0 L2 -36 M8 0 L5 -34 M12 0 L7 -32" stroke="#d9b24a" stroke-width="3"/><path d="M-7 -18 H9" stroke="#8a6a35" stroke-width="3"/><path d="M-6 -34 Q2 -44 8 -34" fill="#e6c25a"/></g>`;}
+
+/* ================= Landschaft ================= */
+function landschaft(A,r){
+  const e=A?'a':'j';
+  let s=`<defs><linearGradient id="sky${e}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${A?'#bccbd6':'#7fb8e6'}"/><stop offset="1" stop-color="${A?'#eceee8':'#e6f3ef'}"/></linearGradient>
+<radialGradient id="sun${e}"><stop offset="0" stop-color="${A?'#fbf8ea':'#fff1a8'}"/><stop offset="1" stop-color="${A?'#fbf8ea':'#fff1a8'}" stop-opacity="0"/></radialGradient></defs>`;
+  s+=`<rect width="1600" height="900" fill="url(#sky${e})"/>`;
+  s+=`<circle cx="1300" cy="120" r="${A?110:170}" fill="url(#sun${e})"/><circle cx="1300" cy="120" r="${A?36:46}" fill="${A?'#f4f1e2':'#ffe27a'}"/>`;
+  for(const [cx,cy,rx] of [[260,110,90],[340,90,70],[760,150,110],[1030,80,80],[1520,200,90]])s+=`<ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${rx*.3}" fill="#fff" opacity="${A?.75:.9}"/>`;
+  const far=[[0,300],[120,236],[230,286],[360,200],[480,268],[600,226],[740,290],[880,212],[1010,276],[1150,222],[1290,282],[1420,232],[1600,288],[1600,420],[0,420]];
+  s+=`<polygon points="${pts(far)}" fill="${A?'#a5b2b8':'#7ea38a'}"/>`;
+  if(A){for(const [px,py] of [[120,236],[360,200],[600,226],[880,212],[1150,222],[1420,232]])s+=`<polygon points="${pts([[px,py],[px-46,py+32],[px-18,py+24],[px,py+38],[px+20,py+24],[px+48,py+32]])}" fill="#fbfbf8"/>`;}
+  else{let b='';for(let x=0;x<1600;x+=26){const y=far.reduce((acc,p,i)=>i<12&&x>=p[0]&&x<=far[i+1][0]?L(p[1],far[i+1][1],(x-p[0])/(far[i+1][0]-p[0])):acc,300);b+=`<circle cx="${x}" cy="${f1(y+12)}" r="13" fill="#6f9a7a"/>`;}s+=b;}
+  const near=[[0,356],[200,330],[420,362],[640,336],[880,366],[1100,340],[1350,362],[1600,338],[1600,430],[0,430]];
+  s+=`<polygon points="${pts(near)}" fill="${A?'#bbb48a':'#5f8f4f'}"/>`;
+  s+=`<rect y="392" width="1600" height="508" fill="${A?'#d3c99c':'#93c066'}"/>`;
+  let t='';for(let i=0;i<260;i++){const y=L(400,895,r()),x=r()*1600,k=sAt(y);t+=`M${f1(x)} ${f1(y)}l${f1(-3*k)} ${f1(-9*k)}M${f1(x)} ${f1(y)}l${f1(1*k)} ${f1(-11*k)}M${f1(x)} ${f1(y)}l${f1(4*k)} ${f1(-8*k)}`;}
+  s+=`<path d="${t}" stroke="${A?'#b0a46e':'#6fa34a'}" stroke-width="2" stroke-linecap="round"/>`;
+  if(A){for(let i=0;i<14;i++){const y=L(400,560,r()),x=r()*1600;s+=`<ellipse cx="${f1(x)}" cy="${f1(y)}" rx="${f1(40*sAt(y)+r()*30)}" ry="${f1(7*sAt(y))}" fill="#fbfbf6" opacity=".85"/>`;}}
+  else{let fl='';for(let i=0;i<90;i++){const y=L(640,895,r()),x=r()*1600;fl+=`<circle cx="${f1(x)}" cy="${f1(y)}" r="2.6" fill="${pick(r,['#f4e04d','#fff','#d97ab0'])}"/>`;}s+=fl;}
+  const fl=[[792,392],[720,440],[600,505],[470,590],[330,680],[160,770],[0,840],[0,900],[120,900],[260,800],[410,705],[540,610],[660,520],[760,445],[812,392]];
+  s+=`<polygon points="${pts(fl)}" fill="${A?'#a9c0cc':'#7db1d8'}"/>`;
+  s+=`<path d="M700 470 q20 -6 40 0 M560 560 q30 -8 60 0 M420 660 q40 -10 80 0 M250 760 q50 -12 100 0 M90 850 q50 -10 100 0" stroke="#fff" stroke-width="3" fill="none" opacity=".6"/>`;
+  if(A)for(const [x,y,w] of [[640,520,26],[470,640,34],[300,740,40],[150,830,46]])s+=`<polygon points="${pts([[x,y],[x+w,y-4],[x+w*1.3,y+6],[x+w*.4,y+10]])}" fill="#f4f7f8" opacity=".9"/>`;
+  return s;}
+
+/* ================= Szenen ================= */
+function szeneAlt(){
+  const r=rng(17);let s=landschaft(true,r);const it=[];
+  const add=(y,svg)=>it.push({y,svg});
+  add(402,birke(300,402,.6));add(398,nadelbaum(1180,398,.65,'#4a6a4f'));add(404,nadelbaum(1214,404,.55,'#4a6a4f'));add(408,birke(1500,408,.7));add(400,nadelbaum(80,400,.5,'#4a6a4f'));add(398,birke(1010,398,.5));
+  for(const [x,y,f] of [[372,436,1],[420,444,0],[465,432,1]])add(y,wildpferd(x,y,sAt(y)*.85,f));
+  for(const [x,y,f] of [[70,482,0],[150,468,0],[236,494,1],[118,524,0],[300,512,0],[196,548,1],[40,560,0],[270,460,0]])add(y,rentier(x,y,sAt(y)*.95,f));
+  add(610,mensch(330,610,sAt(610),{prop:'speer',fell:true,kleid:FELL[0],flip:true}));
+  add(586,mensch(385,586,sAt(586),{prop:'speer',fell:true,kleid:FELL[1],flip:true,haut:HAUT[1]}));
+  add(560,mensch(428,560,sAt(560),{prop:'speer',fell:true,kleid:FELL[2],flip:true,lang:true}));
+  add(575,zelt(760,575,1.0));add(545,zelt(905,545,.85));add(585,zelt(1035,585,.95));
+  add(668,feuer(880,668,1));
+  add(692,mensch(815,692,sAt(692),{knie:true,fell:true,kleid:FELL[3],lang:true,haar:HAAR[2]}));
+  add(702,mensch(945,702,sAt(702),{knie:true,fell:true,kleid:FELL[1],flip:true,haut:HAUT[2]}));
+  add(728,mensch(880,728,sAt(728)*.7,{fell:true,kleid:FELL[2],haut:HAUT[0]}));
+  add(752,hund(800,752,sAt(752)*1.4,false));
+  add(706,`<g ${tf(968,706,1.1)}><path d="M-10 0 Q-16 -18 -4 -26 L4 -26 Q16 -18 10 0Z" fill="#7a5a3a" stroke="#4e3826"/><path d="M-4 -26 Q0 -34 4 -26" stroke="#4e3826" stroke-width="2" fill="none"/></g><g ${tf(1000,714,1.1)}><rect x="-9" y="-24" width="18" height="24" rx="3" fill="#efe9dc" stroke="#8a7a60"/><path d="M-9 -18h6M2 -12h6M-6 -6h5M-2 -20h6" stroke="#333" stroke-width="1.6"/></g>`);
+  for(const [x,y] of [[1200,565],[1292,548],[1385,578],[1468,556],[1540,590]])add(y,busch(x,y,sAt(y)*1.3,true));
+  add(608,mensch(1250,608,sAt(608),{prop:'korb',fell:true,kleid:FELL[2],lang:true,haar:HAAR[3]}));
+  add(616,mensch(1430,616,sAt(616),{prop:'korb',fell:true,kleid:FELL[0],lang:true,flip:true}));
+  add(800,fellrahmen(1460,800,1.15));
+  add(815,mensch(1370,815,sAt(815),{fell:true,kleid:FELL[3],armR:'M9 -47 L22 -60',haut:HAUT[1]}));
+  add(842,`<g ${tf(1250,842,1.2)}><ellipse cx="0" cy="-6" rx="26" ry="10" fill="#8d8a82"/><path d="M-8 -16 Q0 -34 8 -16 Q0 -12 -8 -16Z" fill="#a7a49a" stroke="#6f6c64"/>${[[-30,0],[30,-2],[22,6],[-20,8],[36,8]].map(([a,b])=>`<path d="M${a} ${b} l6 -3 l1 5z" fill="#9c998f"/>`).join('')}</g>`);
+  add(845,mensch(1185,845,sAt(845),{knie:true,fell:true,kleid:FELL[1],armR:'M9 -47 L24 -40'}));
+  add(830,mensch(345,830,sAt(830),{knie:true,fell:true,kleid:FELL[0],lang:true,prop:'beutel',flip:true}));
+  s+=it.sort((a,b)=>a.y-b.y).map(o=>o.svg).join('');
+  return `<svg viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Lager von Jägern und Sammlern in der Altsteinzeit">${s}</svg>`;}
+
+function szeneJung(){
+  const r=rng(23);let s=landschaft(false,r);const it=[];
+  const add=(y,svg)=>it.push({y,svg});
+  for(let x=-10;x<1620;x+=46){if(x>720&&x<870)continue;const y=398+r()*26;add(y,r()<.65?laubbaum(x,y,.55+r()*.25):nadelbaum(x,y,.55+r()*.2));}
+  for(const [x,y] of [[1560,620],[1500,480],[30,640]])add(y,laubbaum(x,y,sAt(y)*1.3));
+  for(const [x,y] of [[110,470],[160,482],[70,490],[300,462]])add(y,stumpf(x,y,sAt(y)*1.4));
+  add(500,`<g ${tf(160,500,1)}><rect x="-60" y="-10" width="120" height="14" rx="7" fill="#7a5a35" transform="rotate(-6)"/></g>`);
+  add(478,laubbaum(268,474,.75));
+  add(482,mensch(225,482,sAt(482)*1.05,{prop:'axt',kleid:LEIN[3],armR:'M9 -47 L16 -64'}));
+  const felder=[[[30,520],[300,505],[360,560],[40,585]],[[60,598],[420,575],[392,640],[40,668]],[[320,512],[520,500],[470,560],[372,560]]];
+  for(const f of felder){s+=`<polygon points="${pts(f)}" fill="#d9b85a" stroke="#8a6a35" stroke-width="2"/>`;
+    let rows='';for(let i=1;i<8;i++){const t=i/8;rows+=`M${f1(L(f[0][0],f[3][0],t))} ${f1(L(f[0][1],f[3][1],t))}L${f1(L(f[1][0],f[2][0],t))} ${f1(L(f[1][1],f[2][1],t))}`;}
+    s+=`<path d="${rows}" stroke="#b8963c" stroke-width="2.4"/>`;}
+  add(600,mensch(205,600,sAt(600),{prop:'sichel',kleid:LEIN[0],lang:true,haar:HAAR[2]}));
+  add(570,mensch(318,570,sAt(570),{prop:'sichel',kleid:LEIN[1],haut:HAUT[1]}));
+  for(const [x,y] of [[110,632],[270,640],[150,575],[420,550]])add(y,garbe(x,y,sAt(y)*1.2));
+  add(455,langhaus(1135,455,.42));
+  add(585,langhaus(690,585,1.0));
+  add(672,feuer(905,672,.85));
+  add(740,mahlstein(780,740,1.1));
+  add(735,mensch(755,722,sAt(722),{knie:true,kleid:LEIN[0],lang:true,haar:HAAR[0],armR:'M9 -47 L26 -34'}));
+  add(706,mensch(975,706,sAt(706),{knie:true,kleid:LEIN[3],flip:true,haut:HAUT[2]}));
+  add(712,hund(1030,712,sAt(712)*1.4,true));
+  add(730,mensch(870,730,sAt(730)*.7,{kleid:LEIN[1],haut:HAUT[0]}));
+  const fx0=1140,fx1=1530,fy0=525,fx2=1110,fx3=1565,fy1=652;
+  let zb='';for(let i=0;i<=10;i++){const x=L(fx0,fx1,i/10);zb+=`M${f1(x)} ${fy0}v-30`;}
+  add(fy0,`<path d="${zb}M${fx0} ${fy0-22}H${fx1}M${fx0} ${fy0-10}H${fx1}" stroke="#7a5a35" stroke-width="4"/>`);
+  add(600,`<path d="M${fx0} ${fy0} L${fx2} ${fy1}" stroke="#7a5a35" stroke-width="4"/>`);
+  add(590,rind(1205,590,sAt(590)*1.05,'#6b4a33',false));add(612,rind(1340,612,sAt(612)*1.05,'#a0724a',true));
+  add(578,schaf(1420,578,sAt(578)*1.15,false));add(598,schaf(1468,598,sAt(598)*1.15,true));add(630,schaf(1400,630,sAt(630)*1.15,false));
+  add(634,ziege(1250,634,sAt(634)*1.2,true));add(642,schwein(1165,642,sAt(642)*1.2,false));
+  let zf='';for(let i=0;i<=12;i++){const x=L(fx2,fx3,i/12);zf+=`M${f1(x)} ${fy1}v-36`;}
+  add(fy1+1,`<path d="${zf}M${fx2} ${fy1-26}H${fx3}M${fx2} ${fy1-12}H${fx3}M${fx1} ${fy0}L${fx3} ${fy1}" stroke="#7a5a35" stroke-width="5"/>`);
+  add(808,mensch(1140,808,sAt(808),{knie:true,kleid:LEIN[2],lang:true,prop:'topf',haar:HAAR[1]}));
+  for(const [x,y,c] of [[1200,806,'#b5784a'],[1232,818,'#a86a3e'],[1262,804,'#c08a5a'],[1222,840,'#b5784a']])add(y,topf(x,y,sAt(y)*.85,c));
+  add(835,webstuhl(1505,835,1.2));
+  add(840,mensch(1420,840,sAt(800),{kleid:LEIN[1],lang:true,haar:HAAR[3],armR:'M9 -47 L24 -56',haut:HAUT[1]}));
+  add(792,brunnen(560,792,1.2));
+  add(806,mensch(640,806,sAt(806),{prop:'eimer',kleid:LEIN[0],flip:true,haut:HAUT[2]}));
+  s+=it.sort((a,b)=>a.y-b.y).map(o=>o.svg).join('');
+  return `<svg viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Dorf der ersten Bauern in der Jungsteinzeit">${s}</svg>`;}
+
+/* ================= Inhalte ================= */
+const PAARE=[
+{id:'wohnen',b:'🏠 Wohnen',
+ a:{t:'Zelte aus Stangen und Fellen',x:'Die Menschen wohnten in Zelten aus Holzstangen, die mit Tierfellen bedeckt waren. Sie folgten den Tierherden und bauten ihr Lager immer wieder ab und an einem anderen Ort auf. Menschen, die so umherziehen, nennt man <b>Nomaden</b>.',f:'Warum braucht man kein festes Haus, wenn man ständig umherzieht?',hs:[890,535,120]},
+ j:{t:'Das Langhaus',x:'Die ersten Bauern bauten <b>Langhäuser</b>: ein Gerüst aus Holzpfosten, Wände aus Flechtwerk mit Lehm verschmiert und ein Dach aus Schilf oder Stroh. Die Häuser waren oft 20 bis 30 Meter lang. Darin lebte eine große Familie. Die Menschen blieben jetzt an einem Ort: Sie wurden <b>sesshaft</b>.',f:'Warum lohnt sich so viel Arbeit an einem Haus nur, wenn man an einem Ort bleibt?',hs:[900,500,170]}},
+{id:'nahrung',b:'🌾 Nahrung',
+ a:{t:'Jagen und Sammeln',x:'Die Menschen jagten Rentiere und Wildpferde mit Speeren. Außerdem sammelten sie Beeren, Nüsse, Wurzeln und Pilze. Sie waren <b>Jäger und Sammler</b>. Was es zu essen gab, hing davon ab, was sie fanden.',f:'Was passiert, wenn die Jagd misslingt?',hs:[380,585,78]},
+ j:{t:'Ackerbau: Getreide säen und ernten',x:'Die Menschen säten Getreide wie Emmer und Einkorn und ernteten es mit Sicheln. Die Körner wurden auf einem <b>Mahlstein</b> zu Mehl gemahlen. Die Menschen waren jetzt <b>Bauern</b> und konnten Vorräte für den Winter anlegen.',f:'Was ist besser: jagen oder ein eigenes Feld? Was spricht dagegen?',hs:[260,610,92]}},
+{id:'tiere',b:'🦌 Tiere',
+ a:{t:'Wilde Herden',x:'Rentiere und Wildpferde zogen in großen Herden durch das Land. Sie waren wild – die Menschen mussten ihnen hinterherziehen. Nur ein Tier lebte schon bei den Menschen: der <b>Hund</b>.',f:'Warum mussten die Jäger den Herden folgen?',hs:[180,505,115]},
+ j:{t:'Haustiere im Pferch',x:'Rinder, Schafe, Ziegen und Schweine lebten nun als <b>Haustiere</b> bei den Menschen. Sie lieferten Fleisch, Milch und Leder. Man nennt das <b>Viehzucht</b>.',f:'Welche Vorteile hat es, Tiere zu halten, statt sie zu jagen?',hs:[1330,588,112]}},
+{id:'werkzeug',b:'🪓 Werkzeug',
+ a:{t:'Geschlagene Steinwerkzeuge',x:'Werkzeuge wurden aus Feuerstein <b>geschlagen</b>: Faustkeile, scharfe Klingen und Speerspitzen. Dazu kamen Nadeln und Harpunen aus Knochen und Geweih.',f:'Wofür könnte man einen Faustkeil benutzen?',hs:[1220,830,68]},
+ j:{t:'Das geschliffene Steinbeil',x:'Neu war das <b>geschliffene</b> Steinbeil. Die Steinklinge wurde lange auf einem Sandstein glatt geschliffen und an einem Holzstiel befestigt. Damit konnten die Menschen Bäume fällen – für Häuser, Zäune und um Platz für Felder zu schaffen.',f:'Warum braucht ein Bauer ein Beil, ein Jäger aber eher einen Speer?',hs:[212,452,62]}},
+{id:'gefaesse',b:'🏺 Gefäße und Vorräte',
+ a:{t:'Beutel aus Leder und Birkenrinde',x:'Töpfe gab es noch nicht. Wasser, Beeren und Fleisch trugen die Menschen in <b>Beuteln aus Leder</b> oder in Behältern aus <b>Birkenrinde</b>. Alles musste leicht sein, damit man es beim Weiterziehen tragen konnte.',f:'Warum war leichtes Gepäck für Jäger und Sammler so wichtig?',hs:[982,702,52]},
+ j:{t:'Töpfe aus gebranntem Ton',x:'Die Bauern stellten Gefäße aus <b>gebranntem Ton</b> her. Die ersten Bauern in Mitteleuropa verzierten ihre Töpfe mit Linienbändern – deshalb nennt man sie <b>Bandkeramiker</b>. In Töpfen und Erdgruben bewahrten sie Vorräte auf.',f:'Warum lohnt sich ein schwerer, zerbrechlicher Tontopf nur, wenn man sesshaft ist?',hs:[1220,805,78]}},
+{id:'kleidung',b:'🧵 Kleidung',
+ a:{t:'Kleidung aus Fell und Leder',x:'Kleidung bestand aus <b>Tierfellen und Leder</b>. Die Felle wurden auf Rahmen gespannt, gesäubert und getrocknet. Mit Nadeln aus Knochen und Fäden aus Tiersehnen wurden sie zusammengenäht.',f:'Woher bekamen die Menschen das Material für ihre Kleidung?',hs:[1440,770,85]},
+ j:{t:'Stoff vom Webstuhl',x:'Neben Leder gab es jetzt <b>gewebten Stoff</b>: Aus den Fasern der Flachspflanze wurden Fäden gesponnen und am <b>Webstuhl</b> zu Leinen gewebt. Steine oder Tonstücke unten am Webstuhl hielten die Fäden straff.',f:'Welche Kleidung ist im Sommer angenehmer – Fell oder Leinen?',hs:[1478,770,88]}},
+{id:'wasser',b:'💧 Wasser',
+ a:{t:'Wasser aus dem Fluss',x:'Das Lager lag meist nah an einem Fluss oder einer Quelle. Dort holten die Menschen ihr Wasser direkt mit Lederbeuteln.',f:'Warum schlugen Jäger und Sammler ihr Lager gern an einem Fluss auf?',hs:[340,815,70]},
+ j:{t:'Der Brunnen',x:'Die Bauern bauten <b>Brunnen</b> aus Holz. Bei Leipzig, in Altscherbitz und Eythra, fanden Archäologen solche Brunnen. Sie sind über 7000 Jahre alt und gehören zu den ältesten Holzbauwerken der Welt.',f:'Warum braucht ein Dorf einen eigenen Brunnen?',hs:[580,775,76]}},
+{id:'landschaft',b:'🏔️ Klima und Landschaft',
+ a:{t:'Eiszeit: kalt und weit',x:'Es war das Ende der letzten <b>Eiszeit</b>: kalt, mit weiten Grasflächen und nur wenigen Bäumen. Auf den Bergen lag oft Schnee. Für große Herden von Rentieren und Wildpferden war das ideal.',f:'Was passierte mit den Rentieren, als es wärmer wurde?',hs:[440,285,110]},
+ j:{t:'Warm und bewaldet',x:'Nach der Eiszeit wurde es wärmer, dichte <b>Wälder</b> wuchsen. Die Bauern rodeten Teile des Waldes, um Platz für Felder und Häuser zu schaffen. Zum ersten Mal veränderte der Mensch die Landschaft selbst.',f:'Was mussten die Bauern tun, bevor sie ein Feld anlegen konnten?',hs:[440,285,110]}}
+];
+const TAFEL=[['Wohnen','Zelte aus Stangen und Fellen; umherziehend (Nomaden)','Langhäuser aus Holz und Lehm; sesshaft'],
+ ['Nahrung','Jagen und Sammeln','Ackerbau (Emmer, Einkorn) und Viehzucht'],
+ ['Tiere','wilde Herden (Rentier, Wildpferd); Hund als Begleiter','Haustiere: Rind, Schaf, Ziege, Schwein'],
+ ['Werkzeug','geschlagene Steinwerkzeuge (Faustkeil, Klingen), Knochennadeln','geschliffenes Steinbeil, Sichel, Mahlstein'],
+ ['Gefäße / Vorräte','Beutel aus Leder, Behälter aus Birkenrinde; kaum Vorräte','Tontöpfe (Bandkeramik); Vorräte für den Winter'],
+ ['Kleidung','Fell und Leder','auch gewebter Stoff aus Flachs (Leinen)'],
+ ['Wasser','aus Fluss und Quelle','Brunnen aus Holz'],
+ ['Klima / Landschaft','Eiszeit: kalt, Grasland, wenige Bäume','warm, Wälder; Rodung für Felder']];
+const ZEIT={alt:['Altsteinzeit','um 15.000 v. Chr.'],jung:['Jungsteinzeit','um 5000 v. Chr.']};
+
+/* ================= Zustand & Darstellung ================= */
+let modus='alt',hinweise=false,offen=null,pos=50;const gefunden=new Set();
+const $=q=>document.querySelector(q),B=$('#buehne');
+$('#ebAlt').innerHTML=szeneAlt();$('#ebJung').innerHTML=szeneJung();
+
+function hotspots(){
+  const ep=modus==='jung'?'j':'a';
+  if(modus==='vergleich'){$('#hs').innerHTML='';return;}
+  let s='<svg viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg">';
+  PAARE.forEach((p,i)=>{const [x,y,rr]=p[ep].hs;
+    s+=`<g class="marke"><circle cx="${x}" cy="${y}" r="${rr}"/><circle cx="${x}" cy="${y-rr+4}" r="22" fill="#fff" stroke="none" style="animation:none"/><text x="${x}" y="${y-rr+13}" text-anchor="middle" font-size="26" font-weight="700" font-family="Arial" fill="#2a241d">?</text></g>`;
+    if(gefunden.has(p.id))s+=`<g class="fund"><circle cx="${x+rr*.72}" cy="${y-rr*.72}" r="20" fill="#4f7d3a" stroke="#fff" stroke-width="4"/><path d="M${x+rr*.72-9} ${y-rr*.72} l6 7 l12 -13" stroke="#fff" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></g>`;
+    if(offen&&offen.id===p.id)s+=`<circle class="puls" cx="${x}" cy="${y}" r="${rr}" style="pointer-events:none"/>`;
+    s+=`<circle class="flaeche" data-i="${i}" cx="${x}" cy="${y}" r="${rr}"><title>${p.b.replace(/^\S+\s/,'')}</title></circle>`;});
+  $('#hs').innerHTML=s+'</svg>';
+  $('#hs').querySelectorAll('.flaeche').forEach(c=>c.addEventListener('click',e=>{e.stopPropagation();oeffne(PAARE[+c.dataset.i].id);}));
+}
+function setzeModus(m){
+  modus=m;B.className='buehne m-'+m+(hinweise?' hinweise':'');
+  document.querySelectorAll('.seg button').forEach(b=>b.classList.toggle('aktiv',b.dataset.m===m));
+  $('#griff').classList.toggle('hidden',m!=='vergleich');
+  $('#badgeR').classList.toggle('hidden',m!=='vergleich');
+  const z=m==='vergleich'?ZEIT.alt:ZEIT[m];
+  $('#badgeL').innerHTML=`${z[0]}<small>${z[1]}</small>`;
+  $('#badgeR').innerHTML=`${ZEIT.jung[0]}<small>${ZEIT.jung[1]}</small>`;
+  if(m==='vergleich'){schliesse();setPos(pos);}
+  else if(offen&&offen.ep!==(m==='jung'?'j':'a'))schliesse();
+  hotspots();
+}
+function setPos(p){pos=Math.max(0,Math.min(100,p));B.style.setProperty('--pos',pos+'%');}
+function oeffne(id,ep){
+  ep=ep||(modus==='jung'?'j':'a');
+  const p=PAARE.find(q=>q.id===id),d=p[ep];offen={id,ep};gefunden.add(id);
+  const k=$('#karte');k.classList.remove('hidden','links','rechts','jung');
+  k.classList.add(d.hs[0]>800?'links':'rechts');if(ep==='j')k.classList.add('jung');
+  $('#kChip').textContent=p.b;$('#kEpoche').textContent=ep==='a'?'Altsteinzeit':'Jungsteinzeit';
+  $('#kTitel').textContent=d.t;$('#kText').innerHTML=d.x;$('#kFrage').textContent=d.f;
+  const w=$('#kWechsel');w.textContent=ep==='a'?'Und in der Jungsteinzeit? →':'← Und in der Altsteinzeit?';w.className='kbtn'+(ep==='a'?' jung':'');
+  zaehler();hotspots();
+}
+function schliesse(){offen=null;$('#karte').classList.add('hidden');hotspots();}
+function zaehler(){$('#anzahl').textContent=gefunden.size;if(gefunden.size===8&&!zaehler.fertig){zaehler.fertig=true;$('#toast').classList.remove('hidden');setTimeout(()=>$('#toast').classList.add('hidden'),7000);}}
+
+/* Tafelbild */
+function tafel(){
+  let h='<tr><th class="b"></th><th class="a">Altsteinzeit: Jäger und Sammler</th><th class="j">Jungsteinzeit: Bauern</th></tr>';
+  for(const [b,a,j] of TAFEL)h+=`<tr><td class="b">${b}</td><td class="zelle zu">${a}</td><td class="zelle zu">${j}</td></tr>`;
+  $('#tafel').innerHTML=h;
+  $('#tafel').querySelectorAll('.zelle').forEach(td=>td.addEventListener('click',()=>td.classList.toggle('zu')));
+}
+tafel();
+
+/* Ereignisse */
+document.querySelectorAll('.seg button').forEach(b=>b.addEventListener('click',()=>setzeModus(b.dataset.m)));
+$('#kZu').addEventListener('click',schliesse);
+$('#kWechsel').addEventListener('click',()=>{const o=offen;if(!o)return;const ziel=o.ep==='a'?'j':'a';setzeModus(ziel==='j'?'jung':'alt');setTimeout(()=>oeffne(o.id,ziel),ziel==='j'?450:0);});
+$('#bHinweise').addEventListener('click',()=>{hinweise=!hinweise;$('#bHinweise').classList.toggle('an',hinweise);B.classList.toggle('hinweise',hinweise);});
+const zeige=id=>{$('#'+id).classList.remove('hidden');};
+$('#bTafel').addEventListener('click',()=>zeige('ovTafel'));
+$('#toast').addEventListener('click',()=>{$('#toast').classList.add('hidden');zeige('ovTafel');});
+$('#bGleich').addEventListener('click',()=>zeige('ovGleich'));
+$('#bInfo').addEventListener('click',()=>zeige('ovInfo'));
+document.querySelectorAll('.overlay').forEach(o=>{o.addEventListener('click',e=>{if(e.target===o||e.target.hasAttribute('data-zu'))o.classList.add('hidden');});});
+$('#tAlle').addEventListener('click',()=>{const zu=document.querySelectorAll('#tafel .zelle.zu');document.querySelectorAll('#tafel .zelle').forEach(td=>td.classList.toggle('zu',zu.length===0));$('#tAlle').textContent=zu.length?'Alles verdecken':'Alles aufdecken';});
+$('#tDruck').addEventListener('click',()=>{try{window.print();}catch(e){}});
+$('#bVoll').addEventListener('click',()=>{try{if(document.fullscreenElement)document.exitFullscreen();else document.documentElement.requestFullscreen();}catch(e){}});
+B.addEventListener('click',e=>{if(modus!=='vergleich'&&offen&&!e.target.closest('.karte'))schliesse();});
+let zieht=false;
+const vonEvent=e=>{const rc=B.getBoundingClientRect();setPos((e.clientX-rc.left)/rc.width*100);};
+B.addEventListener('pointerdown',e=>{if(modus!=='vergleich')return;zieht=true;B.setPointerCapture(e.pointerId);vonEvent(e);});
+B.addEventListener('pointermove',e=>{if(zieht)vonEvent(e);});
+B.addEventListener('pointerup',()=>zieht=false);B.addEventListener('pointercancel',()=>zieht=false);
+document.addEventListener('keydown',e=>{
+  const k=e.key.toLowerCase();
+  if(k==='escape'){document.querySelectorAll('.overlay').forEach(o=>o.classList.add('hidden'));schliesse();return;}
+  if(k==='a')setzeModus('alt');if(k==='j')setzeModus('jung');if(k==='v')setzeModus('vergleich');
+  if(k==='h')$('#bHinweise').click();if(k==='t')zeige('ovTafel');
+  if(modus==='vergleich'&&(k==='arrowleft'||k==='arrowright'))setPos(pos+(k==='arrowleft'?-5:5));
+});
+setzeModus('alt');
+</script>
+</body>
+</html>
