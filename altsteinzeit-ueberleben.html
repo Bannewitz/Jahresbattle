@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Überlebst du die Altsteinzeit?</title>
+<style>
+:root{--dunkel:#2a241d;--ocker:#c98a3a;--ocker2:#e6b45e;--gruen:#4f7d3a;--rot:#b0402e;--gelb:#d39a1e;--creme:#f7f0e1;
+  --sans:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;--serif:Georgia,"Palatino Linotype",serif}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{font-family:var(--sans);background:#2a241d;color:var(--dunkel);font-size:18px;line-height:1.5;min-height:100vh}
+button{font:inherit;cursor:pointer}
+.hidden{display:none!important}
+header{background:#1e1914;color:#f3e7d0;display:flex;align-items:center;gap:16px;padding:8px 16px;flex-wrap:wrap;border-bottom:3px solid var(--ocker);position:sticky;top:0;z-index:20}
+header h1{font:normal 1.2rem var(--serif);margin:0;flex:1;min-width:180px}
+.werte{display:flex;gap:14px;flex-wrap:wrap}
+.wert{display:flex;align-items:center;gap:6px;font-size:.85rem;position:relative}
+.wert .ic{font-size:1.25rem}
+.balken{display:flex;gap:2px}
+.balken i{width:11px;height:16px;border-radius:3px;background:#4a4036;transition:background .4s}
+.wert.n .balken i.an{background:#d9893a}.wert.w .balken i.an{background:#e0553a}.wert.g .balken i.an{background:#5aa04a}
+.wert.knapp .balken i.an{animation:blink 1s infinite}
+@keyframes blink{50%{opacity:.35}}
+.delta{position:absolute;right:-6px;top:-14px;font-weight:700;font-size:.95rem;animation:hoch 1.6s ease-out forwards;pointer-events:none}
+.delta.plus{color:#8fd47a}.delta.minus{color:#ff8a7a}
+@keyframes hoch{0%{opacity:0;transform:translateY(8px)}20%{opacity:1}100%{opacity:0;transform:translateY(-18px)}}
+.zeiten{display:flex;gap:4px}
+.zeiten span{padding:3px 9px;border-radius:999px;font-size:.8rem;background:#3a3129;opacity:.55}
+.zeiten span.an{opacity:1;background:var(--ocker2);color:var(--dunkel);font-weight:700}
+
+main{max-width:1100px;margin:0 auto;padding:16px}
+.karte{background:var(--creme);border-radius:16px;overflow:hidden;box-shadow:0 10px 40px rgba(0,0,0,.45)}
+.bild{position:relative;background:#cfc7b0}
+.bild svg{display:block;width:100%;height:auto}
+.bild .chip{position:absolute;left:14px;top:12px;background:rgba(30,25,20,.85);color:#f3e7d0;border-radius:999px;padding:5px 14px;font-weight:600;font-size:.95rem}
+.bild .schritt{position:absolute;right:14px;top:12px;background:rgba(255,255,255,.88);border-radius:999px;padding:5px 12px;font-size:.85rem;font-weight:600}
+.inhalt{padding:18px 26px 24px}
+.inhalt h2{font:normal 1.8rem var(--serif);margin:0 0 .3em;color:#4a3420}
+.inhalt p{margin:.4em 0}
+.optionen{display:grid;gap:10px;margin-top:16px}
+.opt{display:flex;gap:14px;align-items:center;text-align:left;border:2px solid #d9c9a8;background:#fff;border-radius:14px;padding:12px 16px;transition:all .15s}
+.opt:hover{border-color:var(--ocker);background:#fffaf0;transform:translateY(-1px)}
+.opt b{flex:none;width:42px;height:42px;border-radius:50%;background:var(--dunkel);color:var(--ocker2);display:flex;align-items:center;justify-content:center;font:1.3rem var(--serif)}
+.ergebnis{border-radius:14px;padding:14px 18px;margin-top:14px;border-left:7px solid}
+.ergebnis.gut{background:#e6f1e1;border-color:var(--gruen)}
+.ergebnis.mittel{background:#fbf0d8;border-color:var(--gelb)}
+.ergebnis.schlecht{background:#f8e2dc;border-color:var(--rot)}
+.urteil{font:1.35rem var(--serif);margin:0 0 .2em}
+.gut .urteil{color:var(--gruen)}.mittel .urteil{color:#9a6a0e}.schlecht .urteil{color:var(--rot)}
+.wahl{font-size:.9rem;color:#6b5a45;font-style:italic}
+.effekte{display:flex;gap:8px;flex-wrap:wrap;margin:.6em 0 .2em}
+.eff{border-radius:999px;padding:3px 12px;font-weight:700;font-size:.95rem;background:#fff}
+.eff.plus{color:#2f6b26}.eff.minus{color:var(--rot)}
+.fakt{background:#fff;border:2px dashed var(--ocker);border-radius:12px;padding:12px 16px;margin-top:14px}
+.fakt h4{margin:0 0 4px;font-size:.8rem;letter-spacing:.1em;text-transform:uppercase;color:#8a5a1a}
+.weiter{display:flex;justify-content:flex-end;margin-top:16px}
+.btn{border:none;border-radius:999px;background:var(--dunkel);color:#fff;padding:12px 26px;font-weight:700;font-size:1.05rem}
+.btn:hover{background:#4a3f33}
+.btn.ocker{background:var(--ocker2);color:var(--dunkel)}
+.btn.ocker:hover{background:#f0c272}
+.btn.hell{background:#fff;color:var(--dunkel);border:2px solid var(--dunkel)}
+.start-inhalt label{display:block;font-weight:700;margin:16px 0 6px}
+.start-inhalt input{font:inherit;padding:10px 14px;border:2px solid #d9c9a8;border-radius:10px;width:100%;max-width:420px;background:#fff}
+.vorschlaege{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.vorschlaege button{border:1.5px solid #d9c9a8;background:#fff;border-radius:999px;padding:4px 12px;font-size:.88rem}
+.regeln{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:14px 0}
+.regeln div{background:#fff;border-radius:12px;padding:10px 12px;font-size:.92rem}
+.regeln b{display:block;font-size:1.05rem}
+details.lk{margin-top:18px;border-top:1px solid #e3d5b8;padding-top:10px;font-size:.92rem}
+details.lk summary{cursor:pointer;font-weight:700;color:#6b4a2a}
+.urkunde{border:4px double var(--ocker);border-radius:12px;padding:18px 24px;background:#fffdf7;text-align:center;margin-top:10px}
+.urkunde h3{font:normal 2rem var(--serif);margin:0;color:#4a3420}
+.urkunde .sippe{font:1.5rem var(--serif);border-bottom:2px solid var(--ocker);display:inline-block;padding:0 18px;margin:6px 0}
+.urkunde ol{text-align:left;max-width:720px;margin:12px auto 0}
+.urkunde li{margin:.25em 0}
+.sterne{font-size:2rem;letter-spacing:.15em;color:var(--ocker)}
+.tabelle{width:100%;border-collapse:collapse;margin-top:10px;font-size:.92rem;text-align:left}
+.tabelle td{padding:5px 8px;border-bottom:1px solid #eadfca}
+.punkt{display:inline-block;width:12px;height:12px;border-radius:50%;margin-right:6px}
+.aktionen{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:18px}
+@media (max-width:640px){body{font-size:16px}.inhalt{padding:14px 16px 20px}.inhalt h2{font-size:1.4rem}.regeln{grid-template-columns:1fr}.balken i{width:7px;height:13px}.zeiten{display:none}header h1{font-size:1rem}}
+@media print{header,.aktionen,.bild,.nicht-drucken{display:none!important}body{background:#fff}.karte{box-shadow:none}}
+</style>
+</head>
+<body>
+<header>
+  <h1>Überlebst du die Altsteinzeit?</h1>
+  <div class="zeiten" id="zeiten"><span data-z="fr">🌱 Frühling</span><span data-z="so">☀️ Sommer</span><span data-z="he">🍂 Herbst</span><span data-z="wi">❄️ Winter</span></div>
+  <div class="werte" id="werte">
+    <div class="wert n" id="wN"><span class="ic" title="Nahrung">🍖</span><span class="balken"></span></div>
+    <div class="wert w" id="wW"><span class="ic" title="Wärme">🔥</span><span class="balken"></span></div>
+    <div class="wert g" id="wG"><span class="ic" title="Gesundheit">❤️</span><span class="balken"></span></div>
+  </div>
+</header>
+<main><div class="karte" id="karte"></div></main>
+
+<script>
+"use strict";
+/* ================= Hilfen und Figuren ================= */
+const L=(a,b,t)=>a+(b-a)*t, f1=n=>Math.round(n*10)/10;
+const pts=a=>a.map(p=>f1(p[0])+','+f1(p[1])).join(' ');
+function rng(seed){let s=seed;return()=>{s=(s*16807)%2147483647;return(s-1)/2147483646;};}
+const pick=(r,a)=>a[Math.floor(r()*a.length)];
+const HAUT=['#d9a77c','#c99167','#e3b88f','#b9845a'];
+const HAAR=['#3a2615','#2a1c10','#5b3a1e','#7a5230'];
+const FELL=['#8a6a45','#7a5a3a','#9b7b52','#6b4f33'];
+const tf=(x,y,s,flip)=>`transform="translate(${f1(x)} ${f1(y)}) scale(${flip?-s:s} ${s})"`;
+/* ================= Menschen ================= */
+function mensch(x,y,s,o={}){
+  const k=o.kleid||'#8a6a45',h=o.haut||'#d9a77c',hr=o.haar||'#3a2615',fell=o.fell;
+  let g=`<g ${tf(x,y,s,o.flip)}>`;
+  let dy=0;
+  if(o.knie){dy=16;g+=`<path d="M-8 -6 L14 -6 L16 0" stroke="${fell?k:h}" stroke-width="7" stroke-linecap="round" fill="none"/>`;}
+  else g+=`<path d="M-6 0 V-24 M6 0 V-24" stroke="${fell?'#5e4630':h}" stroke-width="6.5" stroke-linecap="round"/>`;
+  g+=`<g transform="translate(0 ${dy})">`;
+  g+=`<path d="M-13 -20 L-10 -50 Q0 -56 10 -50 L13 -20 Z" fill="${k}"/>`;
+  if(fell)g+=`<path d="M-13 -21 L-10 -15 L-7 -21 L-4 -15 L-1 -21 L2 -15 L5 -21 L8 -15 L11 -21 L13 -21 L13 -22 L-13 -22Z" fill="${k}"/><path d="M-10 -50 Q0 -45 10 -50" stroke="#c8b08a" stroke-width="3" fill="none"/>`;
+  else g+=`<path d="M-12.5 -26 H12.5" stroke="#8a6a45" stroke-width="2.4"/>`;
+  const armL=o.armL||'M-9 -47 L-15 -27',armR=o.armR||'M9 -47 L15 -27';
+  g+=`<path d="${armL} ${armR}" stroke="${fell?k:h}" stroke-width="5.5" stroke-linecap="round" fill="none"/>`;
+  g+=`<circle cy="-60" r="8.5" fill="${h}"/>`;
+  g+=o.lang?`<path d="M-9 -60 Q-10 -70 0 -70 Q10 -70 9 -60 L10 -46 Q7 -45 6 -50 L6 -61 Q0 -65 -6 -61 L-6 -50 Q-7 -45 -10 -46Z" fill="${hr}"/>`
+           :`<path d="M-8.8 -60 Q-9 -70 0 -70 Q9 -70 8.8 -60 Q6 -65 0 -65 Q-6 -65 -8.8 -60Z" fill="${hr}"/>`;
+  if(o.prop==='speer')g+=`<path d="M-2 -22 L30 -104" stroke="#7a5a35" stroke-width="3" stroke-linecap="round"/><path d="M27 -100 L34 -114 L33 -98Z" fill="#8f8c84"/>`;
+  if(o.prop==='axt')g+=`<path d="M14 -62 L32 -92" stroke="#7a5a35" stroke-width="3.5" stroke-linecap="round"/><path d="M26 -96 Q34 -102 40 -92 Q34 -88 30 -88Z" fill="#6f7a74" stroke="#4d5550"/>`;
+  if(o.prop==='sichel')g+=`<path d="M15 -27 L20 -20" stroke="#7a5a35" stroke-width="3"/><path d="M20 -20 Q34 -24 32 -38" stroke="#8f8c84" stroke-width="3" fill="none"/>`;
+  if(o.prop==='korb')g+=`<path d="M-26 -32 Q-17 -14 -6 -32Z" fill="#a07a42" stroke="#6b4a2a"/><path d="M-26 -32 H-6" stroke="#6b4a2a" stroke-width="2"/>`;
+  if(o.prop==='eimer')g+=`<path d="M15 -27 V-18" stroke="#6b4a2a" stroke-width="1.5"/><path d="M8 -18 L22 -18 L20 -4 L10 -4Z" fill="#8a6a45" stroke="#5e4630"/>`;
+  if(o.prop==='beutel')g+=`<path d="M12 -28 Q8 -10 18 -8 Q28 -10 24 -28Z" fill="#7a5a3a" stroke="#4e3826"/>`;
+  if(o.prop==='topf')g+=`<path d="M8 -36 Q4 -24 10 -18 L22 -18 Q28 -24 24 -36Z" fill="#b5784a" stroke="#6b4428"/><path d="M8 -30 Q16 -25 24 -30" stroke="#5a3a22" stroke-width="1.4" fill="none"/>`;
+  return g+'</g></g>';
+}
+/* ================= Tiere ================= */
+function rentier(x,y,s,flip){return `<g ${tf(x,y,s,flip)}>
+<path d="M-18 -30 L-20 0 M-10 -30 L-9 0 M14 -30 L13 0 M22 -30 L24 0" stroke="#5e5246" stroke-width="3.6" stroke-linecap="round"/>
+<ellipse cy="-39" rx="28" ry="13" fill="#8c7f6c"/><ellipse cy="-32" rx="19" ry="6" fill="#cfc5b2"/>
+<path d="M16 -48 L25 -64 L36 -61 L31 -38Z" fill="#ddd5c4"/>
+<ellipse cx="38" cy="-63" rx="10" ry="5.4" fill="#7d705e" transform="rotate(22 38 -63)"/>
+<path d="M33 -67 Q26 -85 17 -93 M27 -81 L19 -83 M30 -88 L33 -99 M39 -67 Q43 -87 51 -97 M43 -85 L51 -85 M47 -91 L45 -103" stroke="#e8dcc0" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+<path d="M-27 -44 l-5 4" stroke="#ddd5c4" stroke-width="4"/></g>`;}
+function wildpferd(x,y,s,flip){const f='#b8925e';return `<g ${tf(x,y,s,flip)}>
+<path d="M-22 -26 L-24 0 M-14 -26 L-12 0 M14 -26 L12 0 M22 -26 L24 0" stroke="#4a3a2a" stroke-width="4" stroke-linecap="round"/>
+<path d="M-28 -28 Q-30 -46 -12 -46 L16 -46 Q24 -46 26 -54 L34 -70 Q40 -74 44 -68 L42 -60 Q38 -58 36 -52 L30 -32 Q28 -24 20 -24 L-20 -24 Q-28 -24 -28 -28Z" fill="${f}"/>
+<path d="M27 -55 L35 -71" stroke="#3a2a1a" stroke-width="5" stroke-linecap="round"/><ellipse cy="-30" rx="16" ry="4" fill="#e6d4b0"/>
+<path d="M-28 -40 Q-36 -30 -34 -16" stroke="#3a2a1a" stroke-width="4" fill="none"/></g>`;}
+function rind(x,y,s,f,flip){return `<g ${tf(x,y,s,flip)}>
+<path d="M-22 -26 V0 M-12 -26 V0 M16 -26 V0 M24 -26 V0" stroke="${f}" stroke-width="6" stroke-linecap="round"/>
+<path d="M-30 -30 Q-32 -54 -14 -54 L18 -54 Q30 -54 30 -40 L30 -28 Q28 -22 18 -22 L-20 -22 Q-30 -22 -30 -30Z" fill="${f}"/>
+<path d="M27 -50 L44 -48 Q50 -40 46 -31 L35 -31 Z" fill="${f}" stroke="rgba(0,0,0,.25)"/>
+<path d="M37 -50 Q35 -61 28 -61 M42 -50 Q47 -61 54 -59" stroke="#efe4c8" stroke-width="2.8" fill="none" stroke-linecap="round"/>
+<path d="M-30 -46 Q-37 -34 -35 -18" stroke="${f}" stroke-width="3" fill="none"/><circle cx="41" cy="-42" r="1.6" fill="#111"/></g>`;}
+function schaf(x,y,s,flip){let c='';for(const [cx,cy,r] of [[-14,-30,11],[-2,-35,12],[10,-31,11],[-8,-24,10],[6,-24,10],[16,-27,9]])c+=`<circle cx="${cx}" cy="${cy}" r="${r}" fill="#ede6d6"/>`;
+  return `<g ${tf(x,y,s,flip)}><path d="M-12 -18 V0 M-4 -18 V0 M8 -18 V0 M14 -18 V0" stroke="#3a3028" stroke-width="3.2"/>${c}<ellipse cx="28" cy="-32" rx="8" ry="6" fill="#3a3028"/><ellipse cx="23" cy="-36" rx="4" ry="2" fill="#3a3028"/></g>`;}
+function ziege(x,y,s,flip){const f='#8a6a4a';return `<g ${tf(x,y,s,flip)}><path d="M-14 -20 V0 M-7 -20 V0 M10 -20 V0 M16 -20 V0" stroke="${f}" stroke-width="3.4"/>
+<ellipse cy="-28" rx="20" ry="10" fill="${f}"/><path d="M14 -32 L22 -46 L30 -44 L26 -30Z" fill="${f}"/><ellipse cx="29" cy="-44" rx="7" ry="4.4" fill="#6e5238"/>
+<path d="M24 -48 Q20 -58 14 -58 M27 -48 Q25 -60 20 -61" stroke="#d9cdb2" stroke-width="2.2" fill="none"/><path d="M31 -40 L30 -34" stroke="#4a3a2a" stroke-width="2.4"/><path d="M-20 -30 l-4 -6" stroke="${f}" stroke-width="3"/></g>`;}
+function schwein(x,y,s,flip){const f='#5e4636';return `<g ${tf(x,y,s,flip)}><path d="M-12 -12 V0 M-4 -12 V0 M8 -12 V0 M14 -12 V0" stroke="${f}" stroke-width="4"/>
+<ellipse cy="-22" rx="22" ry="13" fill="${f}"/><path d="M-12 -34 Q0 -40 14 -33" stroke="#3a2a20" stroke-width="3" fill="none"/><rect x="20" y="-26" width="8" height="8" rx="3" fill="#7a5e4a"/><path d="M12 -32 L18 -40 L20 -30Z" fill="#3a2a20"/><circle cx="16" cy="-25" r="1.5" fill="#111"/></g>`;}
+function hund(x,y,s,flip){const f='#7a5a3a';return `<g ${tf(x,y,s,flip)}><path d="M-10 -10 V0 M-5 -10 V0 M7 -10 V0 M11 -10 V0" stroke="${f}" stroke-width="3"/>
+<ellipse cy="-15" rx="15" ry="6.5" fill="${f}"/><circle cx="15" cy="-23" r="6.5" fill="${f}"/><path d="M19 -22 L26 -20 L19 -18Z" fill="${f}"/><path d="M12 -28 L13 -35 L17 -28Z" fill="#5a4028"/><path d="M-14 -17 Q-22 -26 -17 -30" stroke="${f}" stroke-width="3" fill="none"/><circle cx="17" cy="-24" r="1.2" fill="#111"/></g>`;}
+
+/* ================= Dinge ================= */
+function laubbaum(x,y,s,c1='#4f8a3e',c2='#62a04c'){return `<g ${tf(x,y,s)}><rect x="-5" y="-50" width="10" height="50" fill="#6b4a2a"/><circle cx="-18" cy="-64" r="22" fill="${c1}"/><circle cx="16" cy="-66" r="24" fill="${c1}"/><circle cx="0" cy="-86" r="26" fill="${c2}"/><circle cx="-4" cy="-60" r="20" fill="${c2}"/></g>`;}
+function nadelbaum(x,y,s,c='#3f6a45'){return `<g ${tf(x,y,s)}><rect x="-4" y="-22" width="8" height="22" fill="#5a3e24"/><path d="M-28 -18 L0 -62 L28 -18Z M-23 -46 L0 -90 L23 -46Z M-17 -74 L0 -112 L17 -74Z" fill="${c}"/></g>`;}
+function birke(x,y,s){return `<g ${tf(x,y,s)}><rect x="-4" y="-80" width="8" height="80" fill="#efebe2"/><path d="M-4 -60h4M0 -40h4M-4 -22h5M0 -70h4" stroke="#333" stroke-width="2"/><circle cx="-10" cy="-88" r="15" fill="#a9b77a"/><circle cx="10" cy="-96" r="14" fill="#b9c486"/><circle cx="2" cy="-78" r="12" fill="#a9b77a"/></g>`;}
+function stumpf(x,y,s){return `<g ${tf(x,y,s)}><path d="M-10 0 V-14 H10 V0Z" fill="#7a5a35"/><ellipse cy="-14" rx="10" ry="3.5" fill="#d8b98a"/></g>`;}
+function busch(x,y,s,beeren){let b=`<g ${tf(x,y,s)}><circle cx="-16" cy="-16" r="16" fill="#5f7a3e"/><circle cx="14" cy="-18" r="17" fill="#5f7a3e"/><circle cx="0" cy="-30" r="18" fill="#6e8a48"/>`;
+  if(beeren)for(const [bx,by] of [[-14,-20],[-4,-34],[8,-26],[18,-14],[-20,-8],[4,-12],[12,-36]])b+=`<circle cx="${bx}" cy="${by}" r="3" fill="#b5283a"/>`;return b+'</g>';}
+function feuer(x,y,s){return `<g ${tf(x,y,s)}>${[[-26,0],[-14,6],[2,8],[18,6],[28,0],[-20,-6],[22,-6]].map(([a,b])=>`<ellipse cx="${a}" cy="${b}" rx="8" ry="5" fill="#8d8a82"/>`).join('')}
+<path d="M-20 0 L20 -10 M-20 -10 L20 0" stroke="#5a3a20" stroke-width="6" stroke-linecap="round"/>
+<path d="M-14 -6 Q-18 -30 -4 -46 Q-6 -30 4 -26 Q2 -44 12 -56 Q14 -30 16 -8Z" fill="#f08a24"/><path d="M-6 -6 Q-8 -22 2 -32 Q2 -20 8 -16 Q10 -28 12 -30 Q14 -16 10 -6Z" fill="#ffd24a"/>
+<circle cx="4" cy="-74" r="10" fill="#bbb" opacity=".45"/><circle cx="12" cy="-96" r="14" fill="#bbb" opacity=".35"/><circle cx="6" cy="-124" r="18" fill="#bbb" opacity=".25"/></g>`;}
+function zelt(x,y,s){return `<g ${tf(x,y,s)}>
+<path d="M-8 -116 L-24 -150 M4 -118 L16 -152 M0 -118 L-2 -148" stroke="#5a3e24" stroke-width="4" stroke-linecap="round"/>
+<path d="M-74 0 L0 -122 L74 0Z" fill="#8a6a45"/>
+<path d="M-74 0 L-30 -50 L-10 0Z" fill="#7a5a3a"/><path d="M30 -50 L74 0 L40 0Z" fill="#9b7b52"/><path d="M-30 -50 L0 -122 L20 -70Z" fill="#94744c"/>
+<path d="M-30 -50 L30 -50 M-50 -30 L48 -32 M-14 -100 L14 -98" stroke="#5a3e24" stroke-width="1.6" stroke-dasharray="5 4"/>
+<path d="M-22 0 L0 -52 L22 0Z" fill="#3b2a1c"/>
+${[-68,-46,-24,24,46,68].map(a=>`<ellipse cx="${a}" cy="0" rx="9" ry="5" fill="#8d8a82"/>`).join('')}</g>`;}
+function langhaus(x,y,s){
+  const W=120*s,H=70*s,Lg=310*s,dy=-24*s,R=100*s,o=10*s;
+  const top=y-H;let g='';
+  g+=`<polygon points="${pts([[x+W,top],[x+W+Lg,top+dy],[x+W+Lg,y+dy],[x+W,y]])}" fill="#b59a6c"/>`;
+  let p='';for(let i=0;i<=14;i++){const t=i/14,xx=x+W+Lg*t,yt=top+dy*t,yb=y+dy*t;p+=`M${f1(xx)} ${f1(yt)}L${f1(xx)} ${f1(yb)}`;}
+  g+=`<path d="${p}" stroke="#7a5a35" stroke-width="${f1(2.4*s)}"/>`;
+  for(let i=0;i<6;i++){const t=.08+i*.16,xx=x+W+Lg*t;g+=`<ellipse cx="${f1(xx+8*s)}" cy="${f1(top+dy*t+H*.55)}" rx="${f1(16*s)}" ry="${f1(9*s)}" fill="#c8ad7e" opacity=".8"/>`;}
+  g+=`<rect x="${f1(x)}" y="${f1(top)}" width="${f1(W)}" height="${f1(H)}" fill="#a88c5e"/>`;
+  g+=`<path d="M${f1(x+W*.2)} ${f1(top)}V${f1(y)}M${f1(x+W*.8)} ${f1(top)}V${f1(y)}" stroke="#7a5a35" stroke-width="${f1(3*s)}"/>`;
+  g+=`<rect x="${f1(x+W*.38)}" y="${f1(y-H*.75)}" width="${f1(W*.24)}" height="${f1(H*.75)}" fill="#3b2a1c"/>`;
+  g+=`<polygon points="${pts([[x+W/2,top-R],[x+W/2+Lg,top-R+dy],[x+W+Lg+o,top+dy+4*s],[x+W+o,top+4*s]])}" fill="#c9a85a"/>`;
+  let th='';for(let i=0;i<=22;i++){const t=i/22;th+=`M${f1(x+W/2+Lg*t)} ${f1(top-R+dy*t)}L${f1(x+W+o+Lg*t)} ${f1(top+4*s+dy*t)}`;}
+  g+=`<path d="${th}" stroke="#a8883e" stroke-width="${f1(1.6*s)}"/>`;
+  g+=`<polygon points="${pts([[x-o,top+4*s],[x+W/2,top-R],[x+W+o,top+4*s]])}" fill="#d6b768"/>`;
+  g+=`<line x1="${f1(x+W/2)}" y1="${f1(top-R)}" x2="${f1(x+W/2+Lg)}" y2="${f1(top-R+dy)}" stroke="#8a6a35" stroke-width="${f1(4*s)}"/>`;
+  return g;}
+function topf(x,y,s,c='#b5784a'){return `<g ${tf(x,y,s)}><path d="M-15 -28 Q-21 -10 -10 0 L10 0 Q21 -10 15 -28 Z" fill="${c}" stroke="#6b4428" stroke-width="1.2"/><ellipse cy="-28" rx="15" ry="4" fill="#5a3a22"/>
+<path d="M-17 -20 Q-9 -12 0 -20 Q9 -28 17 -20 M-17 -14 Q-9 -6 0 -14 Q9 -22 17 -14" stroke="#4a2e18" stroke-width="1.6" fill="none"/></g>`;}
+function webstuhl(x,y,s){let t='';for(let i=-28;i<=28;i+=4)t+=`M${i} -78 V-30`;let w='';for(let i=-28;i<=28;i+=8)w+=`<circle cx="${i}" cy="-24" r="4" fill="#a07a52"/>`;
+  return `<g ${tf(x,y,s)}><path d="M-40 0 L-32 -128 M40 0 L32 -128" stroke="#6b4a2a" stroke-width="6" stroke-linecap="round"/><rect x="-42" y="-132" width="84" height="9" rx="3" fill="#7a5a35"/>
+<rect x="-30" y="-123" width="60" height="45" fill="#e6dcc0"/><path d="M-30 -116 H30 M-30 -108 H30 M-30 -100 H30 M-30 -92 H30 M-30 -84 H30" stroke="#cdbf9a" stroke-width="1.4"/>
+<path d="${t}" stroke="#e8e0cc" stroke-width="1.2"/>${w}<rect x="-36" y="-52" width="72" height="4" fill="#7a5a35"/></g>`;}
+function fellrahmen(x,y,s){return `<g ${tf(x,y,s)}><path d="M-52 0 L-46 -118 M52 0 L46 -118" stroke="#6b4a2a" stroke-width="6" stroke-linecap="round"/><path d="M-54 -112 H54 M-50 -26 H50" stroke="#6b4a2a" stroke-width="5" stroke-linecap="round"/>
+<path d="M-36 -98 Q-40 -70 -34 -40 Q0 -34 34 -42 Q40 -70 36 -100 Q0 -106 -36 -98Z" fill="#a77d52"/><path d="M-20 -80 Q0 -86 16 -76 M-14 -60 Q4 -56 20 -62" stroke="#8a643c" stroke-width="2" fill="none"/>
+<path d="M-36 -98 L-46 -110 M0 -104 L0 -112 M36 -100 L46 -110 M-38 -70 L-48 -70 M38 -70 L48 -70 M-34 -40 L-46 -28 M34 -42 L46 -28 M0 -37 L0 -26" stroke="#d9c8a8" stroke-width="1.6"/></g>`;}
+function brunnen(x,y,s){return `<g ${tf(x,y,s)}>
+<polygon points="-40,-44 20,-44 44,-60 -16,-60" fill="#2c3a44"/><polygon points="-40,-44 20,-44 44,-60 -16,-60" fill="none" stroke="#7a5a35" stroke-width="7"/>
+<rect x="-40" y="-44" width="60" height="44" fill="#8a6a45"/><polygon points="20,-44 44,-60 44,-16 20,0" fill="#6f5436"/>
+<path d="M-40 -33 H20 M-40 -22 H20 M-40 -11 H20 M20 -33 L44 -49 M20 -22 L44 -38 M20 -11 L44 -27" stroke="#5e4630" stroke-width="2"/>
+<ellipse cx="2" cy="-52" rx="16" ry="4" fill="#5d86a6" opacity=".8"/></g>`;}
+function mahlstein(x,y,s){return `<g ${tf(x,y,s)}><path d="M-34 0 Q-36 -14 -20 -16 L26 -16 Q38 -14 34 0Z" fill="#8f8c84"/><ellipse cx="-2" cy="-20" rx="14" ry="6" fill="#a8a59c"/>${[[-26,-14],[18,-14],[24,-12],[-20,-12],[12,-15]].map(([a,b])=>`<circle cx="${a}" cy="${b}" r="1.8" fill="#e8d28a"/>`).join('')}<ellipse cx="44" cy="-4" rx="12" ry="5" fill="#a07a42"/><ellipse cx="44" cy="-7" rx="10" ry="3" fill="#e8d28a"/></g>`;}
+function garbe(x,y,s){return `<g ${tf(x,y,s)}><path d="M-10 0 L-4 -34 M-4 0 L-1 -36 M2 0 L2 -36 M8 0 L5 -34 M12 0 L7 -32" stroke="#d9b24a" stroke-width="3"/><path d="M-7 -18 H9" stroke="#8a6a35" stroke-width="3"/><path d="M-6 -34 Q2 -44 8 -34" fill="#e6c25a"/></g>`;}
+
+
+
+/* ================= Welt ================= */
+const sAt=y=>L(.6,1.35,Math.max(0,(y-300)/400));
+const PAL={fr:{h1:'#b9cfe0',h2:'#eef2e6',berg:'#a8b6bc',nah:'#b9b88e',boden:'#c9c79a',gras:'#a9a56e',schnee:5,sonne:'#f7f2dc'},
+ so:{h1:'#86bfe8',h2:'#eef6ea',berg:'#9fb0b0',nah:'#b3ad78',boden:'#c6c27a',gras:'#9f9a52',schnee:0,sonne:'#ffe27a'},
+ he:{h1:'#c3b49a',h2:'#f2e4c8',berg:'#a69c8e',nah:'#b59a68',boden:'#c9a96c',gras:'#a98a4e',schnee:2,sonne:'#f6d38a'},
+ wi:{h1:'#b8c5d0',h2:'#f1f4f6',berg:'#b7c2c9',nah:'#dfe5ea',boden:'#eef2f5',gras:'#aeb6bd',schnee:0,sonne:'#f4f4ee'},
+ na:{h1:'#0b1430',h2:'#283453',berg:'#39445f',nah:'#4a556f',boden:'#5a6580',gras:'#6b7690',schnee:0,sonne:'#f4f1dc'}};
+function welt(jz,o={}){
+  const p=PAL[jz],r=rng(o.seed||7);
+  let s=`<defs><linearGradient id="h${jz}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${p.h1}"/><stop offset="1" stop-color="${p.h2}"/></linearGradient></defs><rect width="1600" height="700" fill="url(#h${jz})"/>`;
+  if(jz==='na'){let st='';for(let i=0;i<90;i++)st+=`<circle cx="${f1(r()*1600)}" cy="${f1(r()*240)}" r="${f1(1+r()*1.8)}" fill="#fff" opacity="${f1(.5+r()*.5)}"/>`;s+=st+`<circle cx="1320" cy="90" r="34" fill="${p.sonne}"/><circle cx="1336" cy="80" r="30" fill="${p.h1}"/>`;}
+  else s+=`<circle cx="1320" cy="95" r="${o.aufgang?60:40}" fill="${p.sonne}" opacity=".95"/>`;
+  if(jz!=='na')for(const [cx,cy,rx] of [[240,90,90],[320,72,64],[760,120,110],[1060,62,74]])s+=`<ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${rx*.3}" fill="#fff" opacity="${jz==='he'?.5:.8}"/>`;
+  const far=[[0,230],[120,170],[230,215],[360,140],[480,200],[600,160],[740,222],[880,148],[1010,206],[1150,156],[1290,212],[1420,166],[1600,220],[1600,320],[0,320]];
+  s+=`<polygon points="${pts(far)}" fill="${p.berg}"/>`;
+  for(const [px,py] of [[120,170],[360,140],[600,160],[880,148],[1150,156],[1420,166]])s+=`<polygon points="${pts([[px,py],[px-44,py+30],[px-17,py+22],[px,py+36],[px+19,py+22],[px+46,py+30]])}" fill="${jz==='na'?'#c9d0dc':'#fbfbf8'}"/>`;
+  s+=`<polygon points="${pts([[0,286],[200,262],[420,292],[640,266],[880,296],[1100,270],[1350,292],[1600,268],[1600,330],[0,330]])}" fill="${p.nah}"/>`;
+  s+=`<rect y="300" width="1600" height="400" fill="${p.boden}"/>`;
+  let t='';for(let i=0;i<200;i++){const y=L(308,695,r()),x=r()*1600,k=sAt(y);t+=`M${f1(x)} ${f1(y)}l${f1(-3*k)} ${f1(-9*k)}M${f1(x)} ${f1(y)}l${f1(1*k)} ${f1(-11*k)}M${f1(x)} ${f1(y)}l${f1(4*k)} ${f1(-8*k)}`;}
+  s+=`<path d="${t}" stroke="${p.gras}" stroke-width="2" stroke-linecap="round"/>`;
+  for(let i=0;i<p.schnee*3;i++){const y=L(310,480,r()),x=r()*1600;s+=`<ellipse cx="${f1(x)}" cy="${f1(y)}" rx="${f1(40*sAt(y)+r()*30)}" ry="${f1(7*sAt(y))}" fill="#fbfbf6" opacity=".85"/>`;}
+  if(o.fluss){const fl=[[900,300],[780,360],[600,450],[380,560],[120,680],[0,700],[300,700],[500,590],[700,470],[860,370],[930,300]];
+    s+=`<polygon points="${pts(fl)}" fill="${jz==='wi'?'#9fb8c8':jz==='na'?'#3d4c6a':'#8fb6d0'}"/>`;
+    s+=`<path d="M800 360 q20 -6 40 0 M640 450 q30 -8 60 0 M470 540 q40 -10 80 0 M270 640 q50 -12 100 0" stroke="#fff" stroke-width="3" fill="none" opacity=".6"/>`;
+    if(o.eis)for(const [x,y,w] of [[830,330,40],[700,400,60],[560,470,80],[300,610,110],[140,670,90],[440,540,40]])s+=`<polygon points="${pts([[x,y],[x+w,y-6],[x+w*1.25,y+8],[x+w*.3,y+14]])}" fill="#f4f8fa"/>`;}
+  if(o.flocken){let fl='';for(let i=0;i<120;i++)fl+=`<circle cx="${f1(r()*1600)}" cy="${f1(r()*700)}" r="${f1(1.5+r()*2.5)}" fill="#fff" opacity=".85"/>`;o.oben=(o.oben||'')+fl;}
+  return s;}
+const svg=(inner,label)=>`<svg viewBox="0 0 1600 700" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${label}">${inner}</svg>`;
+function szene(hinter,items,oben=''){return hinter+items.sort((a,b)=>a.y-b.y).map(o=>o.svg).join('')+oben;}
+const M=(x,y,o={},k=1)=>({y,svg:mensch(x,y,sAt(y)*k,Object.assign({fell:true,kleid:FELL[Math.abs(Math.round(x))%4],haut:HAUT[Math.abs(Math.round(y))%4]},o))});
+const bündel=(x,y,k=1)=>({y:y-.1,svg:`<g ${tf(x,y,sAt(y)*k)}><rect x="-22" y="-60" width="16" height="30" rx="6" fill="#6b4f33" stroke="#4a3626"/><path d="M-20 -50 h12 M-20 -40 h12" stroke="#4a3626"/></g>`});
+function rentierLiegt(x,y,s){return `<g ${tf(x,y,s)}><ellipse cx="0" cy="-14" rx="40" ry="15" fill="#8c7f6c"/><ellipse cx="-4" cy="-8" rx="28" ry="6" fill="#cfc5b2"/><ellipse cx="46" cy="-8" rx="13" ry="7" fill="#7d705e"/>
+<path d="M44 -14 Q40 -36 30 -44 M38 -30 L30 -30 M50 -14 Q58 -36 66 -42 M56 -28 L64 -26" stroke="#e8dcc0" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M-30 -6 L-48 0 M-20 -4 L-36 4 M20 -4 L34 4" stroke="#5e5246" stroke-width="4" stroke-linecap="round"/></g>`;}
+function felsdach(x,y,s){return `<g ${tf(x,y,s)}><path d="M-260 0 L-250 -150 Q-220 -250 -80 -270 Q120 -280 230 -210 Q280 -150 270 0 Z" fill="#8f877c"/><path d="M-250 -150 Q-120 -175 40 -170 Q170 -165 260 -130 L270 -110 Q130 -150 -20 -150 Q-150 -150 -248 -120Z" fill="#6f685f"/>
+<path d="M-200 -150 Q-200 -40 -180 0 H220 Q240 -60 230 -130 Q120 -152 -20 -150 Q-120 -150 -200 -150Z" fill="#5b544c"/><path d="M-120 -230 l40 10 M60 -250 l30 20 M150 -200 l40 12" stroke="#6f685f" stroke-width="5"/></g>`;}
+function hoehle(x,y,s){return `<g ${tf(x,y,s)}><path d="M-230 0 L-200 -170 Q-120 -280 40 -270 Q190 -250 230 -140 L240 0Z" fill="#8f877c"/><path d="M-80 0 Q-90 -120 0 -140 Q90 -120 80 0Z" fill="#15120f"/><path d="M-60 0 Q-64 -90 0 -104 Q60 -90 60 0Z" fill="#000"/></g>`;}
+function gestell(x,y,s){let st='';for(let i=0;i<7;i++){const xx=-70+i*22;st+=`<path d="M${xx} -96 q4 30 -2 52" stroke="#8a3a2a" stroke-width="7" stroke-linecap="round"/>`;}
+  return `<g ${tf(x,y,s)}><path d="M-90 0 L-84 -110 M90 0 L84 -110" stroke="#6b4a2a" stroke-width="7" stroke-linecap="round"/><path d="M-92 -100 H92" stroke="#6b4a2a" stroke-width="6"/>${st}<circle cx="0" cy="-10" r="22" fill="#bbb" opacity=".35"/></g>`;}
+function fliegenpilz(x,y,s){return `<g ${tf(x,y,s)}><rect x="-4" y="-16" width="8" height="16" fill="#f4efe4"/><path d="M-16 -14 Q0 -34 16 -14Z" fill="#c8282e"/><circle cx="-6" cy="-21" r="2" fill="#fff"/><circle cx="5" cy="-24" r="2" fill="#fff"/><circle cx="9" cy="-17" r="1.6" fill="#fff"/></g>`;}
+function fisch(x,y,s,rot=0){return `<g transform="translate(${x} ${y}) rotate(${rot}) scale(${s})"><ellipse rx="22" ry="8" fill="#a9b6c0"/><path d="M18 0 L32 -10 L32 10Z" fill="#8e9ba6"/><circle cx="-12" cy="-2" r="2" fill="#222"/></g>`;}
+function funken(x,y){let s='';for(let i=0;i<8;i++){const a=i*Math.PI/4;s+=`M${f1(x+8*Math.cos(a))} ${f1(y+8*Math.sin(a))}L${f1(x+20*Math.cos(a))} ${f1(y+20*Math.sin(a))}`;}return `<path d="${s}" stroke="#ffd24a" stroke-width="3" stroke-linecap="round"/><circle cx="${x}" cy="${y}" r="5" fill="#fff3b0"/>`;}
+function badge(x,y,t){return `<g><circle cx="${x}" cy="${y}" r="34" fill="#2a241d" stroke="#e6b45e" stroke-width="5"/><text x="${x}" y="${y+13}" text-anchor="middle" font-family="Georgia" font-size="38" fill="#e6b45e">${t}</text></g>`;}
+
+/* ================= Szenen ================= */
+const SZ={
+herde(){const r=rng(3);const it=[];
+  for(const [x,y] of [[1100,350],[1170,338],[1240,356],[1300,342],[1370,360],[1440,348],[1210,376],[1330,384],[1500,370]])it.push({y,svg:rentier(x,y,sAt(y)*.9,false)});
+  it.push({y:470,svg:zelt(450,470,.95)},{y:450,svg:zelt(640,450,.8)});
+  it.push(M(820,540,{armR:'M9 -47 L30 -66'}),M(880,560,{lang:true}),M(760,590,{},.7),{y:600,svg:hund(940,600,1.2)});
+  it.push({y:560,svg:feuer(560,560,.9)});
+  return svg(szene(welt('fr',{seed:3}),it),'Rentierherde zieht weiter, Lager der Sippe');},
+packen(){const it=[];
+  it.push({y:470,svg:`<g ${tf(380,470,1)}><path d="M-60 0 L0 -120 L60 0 M-20 0 L0 -120 L22 0 M0 -120 L-8 -150 M0 -120 L12 -150" stroke="#5a3e24" stroke-width="5" fill="none"/></g>`});
+  for(const [x,y,k] of [[700,500,1],[830,520,1],[960,505,1],[1090,530,.75]]){it.push(bündel(x,y,k));it.push(M(x,y,{prop:x===830?'speer':null,lang:x===960},k));}
+  it.push({y:610,svg:`<g ${tf(300,610,1.2)}><ellipse cx="0" cy="-12" rx="40" ry="14" fill="#7a5a3a"/><ellipse cx="-36" cy="-12" rx="6" ry="14" fill="#a07a52"/><ellipse cx="70" cy="-10" rx="30" ry="11" fill="#8a6a45"/><ellipse cx="44" cy="-10" rx="5" ry="11" fill="#a07a52"/></g>`});
+  it.push({y:640,svg:`<g ${tf(560,640,1.2)}><path d="M-60 -6 L60 -20 M-50 4 L70 -12" stroke="#7a5a35" stroke-width="4"/><path d="M60 -20 l12 -2 l-10 8z M70 -12 l12 -2 l-10 8z" fill="#8f8c84"/></g>`});
+  it.push({y:660,svg:`<g ${tf(1180,660,1.2)}><ellipse cx="-20" cy="-8" rx="14" ry="9" fill="#9c998f"/><ellipse cx="6" cy="-6" rx="10" ry="7" fill="#c9b04a"/><path d="M30 -2 Q30 -24 52 -22 Q62 -10 52 -2Z" fill="#8a5a2a"/></g>`});
+  it.push({y:650,svg:`<g ${tf(1400,650,1)}><rect x="-60" y="-40" width="120" height="40" rx="6" fill="#8f877c"/><rect x="-40" y="-70" width="90" height="30" rx="6" fill="#a39b90"/></g>`});
+  return svg(szene(welt('fr',{seed:5}),it),'Die Sippe packt und zieht weiter');},
+jagd(){const it=[];
+  for(const [x,y,f] of [[700,420,0],[630,460,1],[560,500,0],[760,390,1],[500,540,0]])it.push({y,svg:rentier(x,y,sAt(y),f)});
+  for(const [x,y] of [[230,350],[300,340],[360,360]])it.push(M(x,y,{armR:'M9 -47 L22 -68',armL:'M-9 -47 L-22 -68'},.9));
+  it.push({y:560,svg:busch(1060,560,1.5,false)},{y:590,svg:busch(1220,590,1.6,false)},{y:520,svg:`<g ${tf(940,520,1.3)}><path d="M-50 0 Q-50 -40 -10 -46 Q40 -44 50 0Z" fill="#8f877c"/></g>`});
+  it.push(M(1000,565,{prop:'speer',flip:true}),M(1150,600,{prop:'speer',flip:true,lang:true}),M(900,530,{prop:'speer',flip:true}));
+  return svg(szene(welt('so',{fluss:true,seed:9}),it),'Rentiere durchqueren den Fluss, Jäger warten versteckt');},
+beute(){const it=[];
+  it.push({y:540,svg:rentierLiegt(800,540,1.6)});
+  it.push(M(690,560,{knie:true}),M(920,575,{knie:true,flip:true,lang:true}),M(1000,520,{}));
+  it.push({y:560,svg:feuer(420,560,1)},{y:620,svg:fellrahmen(1250,620,1.1)});
+  it.push({y:660,svg:`<g ${tf(620,660,1.3)}><path d="M-40 -6 Q-30 -40 -10 -50 M-30 -26 L-46 -30 M-20 -38 L-30 -50" stroke="#e8dcc0" stroke-width="5" fill="none" stroke-linecap="round"/><path d="M10 -4 L60 -12" stroke="#f1ead8" stroke-width="3"/><circle cx="58" cy="-12" r="2.4" fill="none" stroke="#a89878"/><ellipse cx="100" cy="-6" rx="18" ry="7" fill="#8f8c84"/><path d="M96 -12 Q100 -26 104 -12Z" fill="#ffb92e"/></g>`});
+  return svg(szene(welt('so',{seed:11}),it),'Ein erlegtes Rentier wird verwertet');},
+sammeln(){const it=[];
+  for(const [x,y] of [[380,470],[520,500],[660,480]])it.push({y,svg:busch(x,y,1.6,true)});
+  for(const [x,y] of [[300,560],[460,580]]){it.push({y,svg:`<g ${tf(x,y,1.5)}><circle cx="-14" cy="-14" r="14" fill="#4f7a3e"/><circle cx="12" cy="-16" r="15" fill="#4f7a3e"/><circle cx="0" cy="-26" r="14" fill="#5d8a48"/>${[[-12,-18],[2,-28],[10,-12],[16,-22],[-4,-10]].map(([a,b])=>`<circle cx="${a}" cy="${b}" r="3" fill="#3b4f9e"/>`).join('')}</g>`});}
+  for(const [x,y] of [[760,600],[800,616],[720,624]])it.push({y,svg:fliegenpilz(x,y,1.6)});
+  it.push(M(600,600,{prop:'korb'},.7),M(860,580,{prop:'korb',lang:true},.7));
+  it.push(M(1060,560,{lang:true,haar:'#bdb6aa',prop:'korb'}),M(1160,570,{}),{y:590,svg:hund(1250,590,1.1,true)});
+  return svg(szene(welt('so',{seed:13}),it),'Kinder zeigen Beeren und Pilze');},
+herbst(){const it=[];
+  for(const [x,y] of [[160,330],[1450,340],[1300,320],[260,345]])it.push({y,svg:birke(x,y,.9).replace(/#a9b77a/g,'#d9a640').replace(/#b9c486/g,'#e8b84a')});
+  it.push({y:520,svg:gestell(480,520,1.1)},{y:520,svg:fellrahmen(800,520,1)},{y:560,svg:feuer(640,580,.9)});
+  it.push(M(940,590,{knie:true,lang:true,armR:'M9 -47 L22 -40'}),M(720,600,{knie:true}));
+  it.push(M(1150,575,{armR:'M9 -47 L20 -58',armL:'M-9 -47 L4 -58'}));
+  it.push({y:576,svg:`<path d="M${1150+2*sAt(575)} ${575-58*sAt(575)} l${f1(26*sAt(575))} ${f1(-4*sAt(575))}" stroke="#f1ead8" stroke-width="5" stroke-linecap="round"/>`});
+  return svg(szene(welt('he',{seed:15}),it),'Herbst: Fleisch trocknen, Felle nähen, Musik');},
+lager(){const it=[];
+  it.push({y:500,svg:zelt(280,500,.9)},{y:470,svg:`<path d="M80 400 q60 -10 120 0 M60 440 q80 -12 160 0 M120 360 q50 -8 100 0" stroke="#fff" stroke-width="5" fill="none" stroke-linecap="round"/>`});
+  it.push({y:520,svg:felsdach(770,520,.85)},{y:521,svg:zelt(770,520,.6)});
+  it.push({y:500,svg:hoehle(1330,500,.85)});
+  return svg(szene(welt('he',{seed:17}),it,badge(280,620,'A')+badge(770,620,'B')+badge(1330,620,'C')),'Drei mögliche Winterlager: offene Ebene, Felsdach, Höhle');},
+winter(){const o={flocken:true,seed:19};const h=welt('wi',o);const it=[];
+  for(const [x,y] of [[1100,380],[1180,392],[1260,384]])it.push({y,svg:rentier(x,y,sAt(y)*.85,true)});
+  it.push({y:500,svg:zelt(560,500,1)},M(760,560,{lang:true}),M(820,580,{}));
+  return svg(szene(h,it,o.oben),'Schneesturm: Der Winter beginnt');},
+nacht(){const it=[];
+  it.push({y:470,svg:zelt(640,470,1).replace(/#8a6a45|#7a5a3a|#9b7b52|#94744c/g,'#4a3d30')});
+  it.push({y:560,svg:`<g ${tf(820,560,1)}>${[[-26,0],[-14,6],[2,8],[18,6],[28,0]].map(([a,b])=>`<ellipse cx="${a}" cy="${b}" rx="8" ry="5" fill="#6b6f7a"/>`).join('')}<path d="M-20 0 L20 -10 M-20 -10 L20 0" stroke="#2a1e14" stroke-width="6" stroke-linecap="round"/><circle cx="2" cy="-40" r="12" fill="#9aa0ad" opacity=".45"/><circle cx="10" cy="-70" r="16" fill="#9aa0ad" opacity=".3"/></g>`});
+  it.push(M(720,590,{knie:true,kleid:'#4a3d30'}),M(930,600,{knie:true,flip:true,lang:true,kleid:'#4a3d30'}),M(860,630,{knie:true,armR:'M9 -47 L24 -52',armL:'M-9 -47 L6 -52',kleid:'#4a3d30'}));
+  return svg(szene(welt('na',{seed:21}),it,funken(888,630-60*sAt(630)+16*sAt(630))),'Nacht: Das Feuer ist ausgegangen');},
+verletzt(){const o={flocken:true,seed:23};const h=welt('wi',o);const it=[];
+  it.push({y:470,svg:zelt(480,470,1)},{y:560,svg:feuer(880,560,.9)});
+  it.push({y:600,svg:`<g ${tf(640,600,1.2)}><ellipse cx="0" cy="-6" rx="70" ry="14" fill="#7a5a3a"/></g>`});
+  it.push({y:601,svg:`<g transform="translate(700 ${600-14})"><g transform="rotate(-90)">${mensch(0,0,1.05,{fell:true,kleid:FELL[2],haut:HAUT[0]})}</g></g><path d="M688 578 h32 M688 594 h32" stroke="#6b4a2a" stroke-width="4"/>`});
+  it.push(M(600,620,{knie:true,lang:true,armR:'M9 -47 L24 -40'}),M(760,640,{knie:true,flip:true}));
+  return svg(szene(h,it,o.oben),'Ein verletzter Jäger wird gepflegt');},
+fischen(){const it=[];
+  it.push(M(520,560,{prop:'speer',flip:true}),M(610,600,{knie:true,lang:true,prop:'korb'}));
+  it.push({y:520,svg:fisch(420,520,1.2,-20)+fisch(360,575,1,15)});
+  it.push(M(1150,560,{armR:'M9 -47 L18 -30'}),M(1260,580,{knie:true,lang:true}));
+  it.push({y:480,svg:zelt(1000,470,.9)});
+  return svg(szene(welt('wi',{fluss:true,eis:true,seed:25}),it),'Fischen an offenen Stellen im Fluss');},
+ende(){const it=[];
+  for(const [x,y] of [[1100,350],[1180,340],[1260,356],[1340,344],[1420,360],[1210,378]])it.push({y,svg:rentier(x,y,sAt(y)*.9,true)});
+  it.push({y:470,svg:zelt(450,470,.95)},{y:450,svg:zelt(640,450,.8)},{y:560,svg:feuer(560,560,.9)});
+  for(const [x,y,k,o] of [[780,560,1,{armR:'M9 -47 L22 -70'}],[850,575,1,{lang:true,armL:'M-9 -47 L-22 -70'}],[920,560,1,{}],[990,580,.7,{armR:'M9 -47 L22 -70'}],[1050,570,1,{lang:true,haar:'#bdb6aa'}]])it.push(M(x,y,o,k));
+  it.push({y:600,svg:hund(1120,600,1.2)});
+  return svg(szene(welt('fr',{seed:27,aufgang:true}),it),'Frühling: Die Rentiere kehren zurück, die Sippe hat überlebt');}
+};
+
+/* ================= Spielablauf ================= */
+const SCHRITTE=[
+{typ:'wahl',zeit:'fr',bild:'herde',titel:'Die Herde zieht weiter',
+ text:'Der Schnee schmilzt. Die Rentierherden, von denen eure Sippe lebt, ziehen weiter nach Norden zu frischen Weiden. Euer Winterlager ist gemütlich – aber bald gibt es hier kaum noch Tiere.',
+ opt:[{t:'Wir bauen die Zelte ab und folgen der Herde.',v:'gut',e:{n:2,g:-1},f:'Der Weg ist anstrengend, aber ihr bleibt in der Nähe der Rentiere. Die Jäger haben bald wieder Beute im Blick.'},
+      {t:'Wir bleiben hier und warten, bis die Tiere zurückkommen.',v:'schlecht',e:{n:-3},f:'Die Herde ist fort. Wochenlang findet ihr kaum etwas zu essen. Die Vorräte schrumpfen.'}],
+ fakt:'Die Menschen der Altsteinzeit waren <b>Nomaden</b>: Sie hatten keinen festen Wohnort, sondern zogen mit den Jahreszeiten den Tierherden hinterher.'},
+{typ:'wahl',zeit:'fr',bild:'packen',titel:'Was nehmt ihr mit?',
+ text:'Alles, was ihr besitzt, müsst ihr selbst tragen – Wagen oder Lasttiere gibt es noch nicht. Was packt ihr ein?',
+ opt:[{t:'Alles! Auch die schweren Steinplatten, alle Vorräte und jedes Fell.',v:'schlecht',e:{g:-2,w:1},f:'Ihr kommt nur langsam voran. Einige bekommen Rückenschmerzen und Blasen an den Füßen.'},
+      {t:'Nur das Wichtigste: Werkzeuge, Speere, die Zeltfelle sowie Feuerstein und Zunder zum Feuermachen.',v:'gut',e:{w:1},f:'Mit leichtem Gepäck seid ihr schnell unterwegs. Und das „Feuerzeug“ der Steinzeit habt ihr auch dabei.'},
+      {t:'Möglichst wenig: nur die Speere. Zelte bauen wir später neu.',v:'mittel',e:{w:-2},f:'Ihr seid schnell – aber nachts friert ihr ohne Zeltfelle erbärmlich.'}],
+ fakt:'Nomaden besaßen nur, was sie tragen konnten. Deshalb waren ihre Dinge leicht: Beutel aus Leder, Werkzeuge aus Stein und Knochen, Zeltfelle zum Zusammenrollen.'},
+{typ:'wahl',zeit:'so',bild:'jagd',titel:'Die Jagd am Fluss',
+ text:'Am Fluss entdeckt ihr eine große Rentierherde. Die Tiere wollen an einer flachen Stelle, einer Furt, durch das Wasser. Wie jagt ihr?',
+ opt:[{t:'Jeder rennt sofort mit seinem Speer los!',v:'schlecht',e:{g:-2},f:'Die Herde flieht in alle Richtungen. Ein Jäger wird von einem Geweih verletzt. Ihr geht leer aus.'},
+      {t:'Wir jagen gemeinsam: Einige treiben die Herde zur Furt, die anderen warten versteckt mit Speer und Speerschleuder.',v:'gut',e:{n:3},f:'Im Wasser sind die Rentiere langsam. Eure Jäger treffen – ihr erlegt mehrere Tiere!'},
+      {t:'Zu gefährlich. Wir stellen lieber Schlingen für Schneehasen auf.',v:'mittel',e:{n:1},f:'Ein paar Hasen landen in den Schlingen. Satt werden davon aber nicht alle.'}],
+ fakt:'Große Tiere konnte man nur <b>gemeinsam</b> jagen. Mit der <b>Speerschleuder</b>, einem Wurfholz aus Holz oder Geweih, flog der Speer weiter und mit mehr Kraft.'},
+{typ:'wahl',zeit:'so',bild:'beute',titel:'Ein Rentier – und jetzt?',
+ text:'Die Jagd war erfolgreich. Vor euch liegt ein erlegtes Rentier. Was macht ihr daraus?',
+ opt:[{t:'Wir essen das Fleisch. Der Rest ist unwichtig.',v:'mittel',e:{n:1,w:-1},f:'Ihr seid satt. Aber Fell, Knochen und Geweih verrotten – Material, das euch später fehlt.'},
+      {t:'Wir verwerten alles: Fleisch, Fell, Knochen, Geweih, Sehnen und Fett.',v:'gut',e:{n:2,w:2},f:'Aus dem Fell werden Kleidung und Zeltdecken, aus Knochen Nadeln, aus Geweih Harpunen, aus Sehnen Fäden – und aus Fett Brennstoff für Steinlampen.'}],
+ fakt:'Die Menschen verschwendeten nichts. Ein Rentier war für sie Supermarkt, Baumarkt und Kleiderladen in einem.'},
+{typ:'wahl',zeit:'so',bild:'sammeln',titel:'Beeren und Pilze',
+ text:'Die Kinder kommen aufgeregt vom Sammeln zurück. Sie haben Heidelbeeren, leuchtend rote Beeren und Pilze gefunden, die sie nicht kennen.',
+ opt:[{t:'Lecker! Wir essen sofort alles auf.',v:'schlecht',e:{g:-3},f:'Einige Beeren und Pilze waren giftig. Mehreren aus der Sippe wird furchtbar übel.'},
+      {t:'Wir werfen alles weg. Sicher ist sicher.',v:'mittel',e:{},f:'Niemand wird krank – aber ihr verschenkt gutes Essen.'},
+      {t:'Wir fragen die Ältesten, was man essen kann.',v:'gut',e:{n:1},f:'Die Großmutter sortiert aus: Die Heidelbeeren sind gut, die roten Beeren und der rote Pilz mit den weißen Punkten sind giftig.'}],
+ fakt:'Es gab noch keine Schrift. Wissen über essbare Pflanzen, Heilkräuter und Tierwanderungen gaben die Älteren <b>mündlich</b> an die Jüngeren weiter.'},
+{typ:'wahl',zeit:'he',bild:'herbst',titel:'Bald kommt der Winter',
+ text:'Die Tage werden kürzer, die ersten Nächte sind frostig. Ihr habt nur noch wenig Zeit. Worum kümmert ihr euch zuerst?',
+ opt:[{t:'Felle bearbeiten und warme Kleidung nähen.',v:'gut',e:{w:3},f:'Mit Knochennadeln und Fäden aus Tiersehnen näht ihr Jacken, Hosen und Fellschuhe.'},
+      {t:'Fleisch in Streifen schneiden, trocknen und räuchern.',v:'gut',e:{n:3},f:'Getrocknetes Fleisch verdirbt nicht so schnell. Ihr habt einen Vorrat für den Winter.'},
+      {t:'Ein großes Fest feiern – mit Tanz und Musik auf der Knochenflöte.',v:'mittel',e:{g:1,n:-1},f:'Das Fest stärkt den Zusammenhalt und macht Mut. Aber es kostet Zeit und Vorräte.'}],
+ fakt:'Die ältesten Musikinstrumente der Welt sind Flöten aus Vogelknochen und Mammut-Elfenbein. Sie wurden auf der Schwäbischen Alb gefunden und sind über 35.000 Jahre alt.'},
+{typ:'wahl',zeit:'he',bild:'lager',titel:'Wo verbringt ihr den Winter?',
+ text:'Ihr braucht einen guten Platz für das Winterlager. Drei Orte kommen in Frage – schaut euch das Bild genau an.',
+ opt:[{t:'Auf der offenen Ebene – dort sieht man die Tiere schon von Weitem.',v:'schlecht',e:{w:-3},f:'Der eisige Wind pfeift ungebremst durch die Zelte. Das Feuer wird immer wieder ausgeblasen.'},
+      {t:'Unter einem Felsdach am Hang, geschützt vor dem Wind. Die Zelte bekommen doppelte Felle.',v:'gut',e:{w:2},f:'Der Fels hält Wind und Schnee ab und speichert etwas Wärme vom Feuer.'},
+      {t:'Tief hinein in eine dunkle Höhle!',v:'mittel',e:{g:-2},f:'In der Höhle ist es stockdunkel, feucht und kalt. Der Rauch vom Feuer zieht nicht ab. Und vielleicht wohnt dort schon ein Höhlenbär …'}],
+ fakt:'„Höhlenmenschen“ ist eigentlich ein Irrtum: Die Menschen lebten meist in <b>Zelten</b>, unter <b>Felsdächern</b> oder am <b>Eingang</b> von Höhlen – nicht tief drinnen. In manche Höhlen gingen sie aber hinein, um Bilder an die Wände zu malen.'},
+{typ:'ereignis',zeit:'wi',bild:'winter',titel:'Der Winter beginnt',
+ text:'Schneestürme fegen über das Land. Die Rentiere scharren nach Flechten unter dem Schnee. Die Jagd wird schwer, und es ist bitterkalt.',e:{w:-2,n:-1},
+ fakt:'Am Ende der letzten Eiszeit waren die Winter in Mitteleuropa viel länger und kälter als heute. Gute Vorbereitung im Herbst entschied über das Überleben.'},
+{typ:'wahl',zeit:'wi',bild:'nacht',titel:'Das Feuer ist aus!',
+ text:'Mitten in der eiskalten Nacht ist euer Feuer ausgegangen. Auch die Glut ist erloschen. Was tut ihr?',
+ opt:[{t:'Wir schlagen Feuerstein gegen Pyrit, fangen die Funken mit trockenem Zunder auf und pusten vorsichtig.',v:'gut',e:{w:2},f:'Nach vielen Versuchen glimmt der Zunder – dann brennt das Feuer wieder.',
+        ohneZunder:{v:'mittel',e:{w:1,g:-1},f:'Leider habt ihr beim Weiterziehen keinen Zunder mitgenommen. Mit trockenem Gras dauert es ewig, bis endlich ein Funke zündet – bis dahin friert ihr lange.'}},
+      {t:'Wir kuscheln uns in die Felle und warten bis zum Morgen.',v:'schlecht',e:{w:-3},f:'Die Nacht ist endlos. Am Morgen sind alle steif gefroren, und die Kinder husten.'},
+      {t:'Jemand läuft durch den Schneesturm zur Nachbarsippe und holt Glut.',v:'mittel',e:{w:1,g:-2},f:'Die Glut kommt in einem Behälter an – aber der Läufer hat sich Erfrierungen an den Fingern geholt.'}],
+ fakt:'Feuer war überlebenswichtig: Es wärmte, gab Licht, hielt wilde Tiere fern und machte Fleisch weich. Schlägt man <b>Feuerstein</b> gegen <b>Pyrit</b> (Schwefelkies), entstehen Funken. <b>Zunder</b>, etwa ein getrockneter Baumpilz, fängt sie auf.'},
+{typ:'wahl',zeit:'wi',bild:'verletzt',titel:'Ein Jäger ist verletzt',
+ text:'Bei der Winterjagd ist ein Jäger auf dem Eis ausgerutscht und hat sich das Bein gebrochen. Er kann nicht mehr laufen.',
+ opt:[{t:'Er muss trotzdem weiter mitjagen – wir brauchen jeden Jäger.',v:'schlecht',e:{g:-3},f:'Die Verletzung wird schlimmer, er bekommt Fieber. Und die Jagd wird ohne gesunde Beine nicht besser.'},
+      {t:'Wir schienen das Bein, pflegen ihn und teilen unser Essen mit ihm.',v:'gut',e:{g:1,n:-1},f:'Es dauert Wochen, aber das Bein heilt. Bis dahin stellt er im Lager Werkzeuge her.'}],
+ fakt:'Archäologen haben Skelette aus der Steinzeit gefunden, an denen schwere Verletzungen <b>verheilt</b> sind. Das zeigt: Kranke und Verletzte wurden von ihrer Gruppe gepflegt.'},
+{typ:'wahl',zeit:'wi',bild:'fischen',titel:'Hunger im Spätwinter',
+ text:'Die Vorräte sind fast aufgebraucht, die Rentiere sind weit weg. Im Fluss gibt es aber noch offene Stellen ohne Eis. Was tut ihr?',
+ opt:[{t:'Wir graben unter dem Schnee nach Wurzeln.',v:'mittel',e:{n:1},f:'Mühsam – aber ein paar essbare Wurzeln findet ihr.'},
+      {t:'Wir essen die letzten Vorräte auf einmal – dann sind wir wenigstens einmal satt.',v:'schlecht',e:{n:-2},f:'Ein Festmahl – und danach ist nichts mehr da. Die nächsten Wochen werden hart.'},
+      {t:'Wir fischen an den offenen Stellen mit Harpunen aus Rentiergeweih.',v:'gut',e:{n:3},f:'Fische! Die Harpunen mit ihren Widerhaken halten die glitschige Beute fest.'}],
+ fakt:'Neben der Jagd war auch das <b>Fischen</b> wichtig. Harpunen mit Widerhaken schnitzten die Menschen aus Rentiergeweih.'}
+];
+const NAMEN={n:'Nahrung',w:'Wärme',g:'Gesundheit'},ICON={n:'🍖',w:'🔥',g:'❤️'};
+const URTEIL={gut:'Kluge Entscheidung!',mittel:'Geht so …',schlecht:'Das war gefährlich!'};
+const SCHEITERN={n:'Eure Sippe hat zu lange Hunger gelitten. Ohne Nahrung fehlte die Kraft für Jagd und Wanderung.',
+ w:'Eure Sippe hat zu sehr gefroren. In der Eiszeit war Kälte eine der größten Gefahren.',
+ g:'Zu viele aus eurer Sippe sind krank oder verletzt. Ohne gesunde Jäger und Sammler geht es nicht weiter.'};
+
+let S,verlauf;
+function neu(){S={n:5,w:5,g:5,i:0,wahlen:[],name:S?S.name:''};verlauf=[];}
+const $=q=>document.querySelector(q);
+const K=$('#karte');
+function werte(alt){
+  for(const k of ['n','w','g']){const el=$('#w'+k.toUpperCase());
+    el.querySelector('.balken').innerHTML=Array.from({length:10},(_,i)=>`<i class="${i<S[k]?'an':''}"></i>`).join('');
+    el.classList.toggle('knapp',S[k]<=2);el.title=`${NAMEN[k]}: ${S[k]} von 10`;
+    if(alt&&alt[k]!==S[k]){const d=document.createElement('span');const x=S[k]-alt[k];d.className='delta '+(x>0?'plus':'minus');d.textContent=(x>0?'+':'')+x;el.appendChild(d);setTimeout(()=>d.remove(),1700);}}
+}
+function zeit(z){document.querySelectorAll('#zeiten span').forEach(s=>s.classList.toggle('an',s.dataset.z===z));}
+const ZNAME={fr:'🌱 Frühling',so:'☀️ Sommer',he:'🍂 Herbst',wi:'❄️ Winter'};
+const effChips=e=>Object.keys(e).filter(k=>e[k]).map(k=>`<span class="eff ${e[k]>0?'plus':'minus'}">${ICON[k]} ${e[k]>0?'+':''}${e[k]} ${NAMEN[k]}</span>`).join('')||'<span class="eff">keine Veränderung</span>';
+function anwenden(e){const alt={n:S.n,w:S.w,g:S.g};for(const k in e)S[k]=Math.max(0,Math.min(10,S[k]+e[k]));werte(alt);}
+const wahlNr=i=>SCHRITTE.slice(0,i+1).filter(s=>s.typ==='wahl').length;
+
+function start(){
+  neu();werte();zeit('');
+  K.innerHTML=`<div class="bild">${SZ.ende()}</div><div class="inhalt start-inhalt">
+<h2>Überlebst du die Altsteinzeit?</h2>
+<p>Wir schreiben das Jahr 15.000 vor Christus. Es ist das Ende der letzten Eiszeit. Eure Sippe – etwa 20 Menschen – lebt von der Jagd auf Rentiere und vom Sammeln. Schafft ihr es durch ein ganzes Jahr?</p>
+<div class="regeln"><div><b>🍖 Nahrung</b>Ohne Essen keine Kraft.</div><div><b>🔥 Wärme</b>Die Eiszeit ist bitterkalt.</div><div><b>❤️ Gesundheit</b>Krankheit und Verletzungen sind gefährlich.</div></div>
+<p>Ihr trefft <b>10 Entscheidungen</b>. Fällt ein Wert auf null, hat eure Sippe es nicht geschafft.</p>
+<label for="sippe">Wie heißt eure Sippe?</label>
+<input id="sippe" maxlength="40" placeholder="z. B. Die Wolfsjäger" value="${esc(S.name)}">
+<div class="vorschlaege">${['Die Wolfsjäger','Die Rentierläufer','Die Feuerhüter','Die Flussleute','Die Bärenfelle'].map(n=>`<button type="button">${n}</button>`).join('')}</div>
+<div class="weiter"><button class="btn ocker" id="los">Los geht’s →</button></div>
+<details class="lk"><summary>Hinweise für Lehrkräfte</summary><ul>
+<li><b>Einsatz:</b> Klasse 5, Altsteinzeit. Ca. 15–20 Minuten. Einzeln oder zu zweit am Tablet – oder gemeinsam am Beamer: Die Klasse stimmt bei jeder Frage per Handzeichen oder A/B/C-Karten ab.</li>
+<li><b>Ablauf:</b> 10 Entscheidungen über ein Jahr (Frühling bis Winter) plus ein Ereignis. Jede Entscheidung verändert Nahrung, Wärme und Gesundheit und wird mit einem Sachtext „So war es in der Altsteinzeit“ erklärt. Eine Entscheidung im Frühling (Zunder mitnehmen) wirkt im Winter nach.</li>
+<li><b>Scheitern ist gewollt:</b> Fällt ein Wert auf null, kann die letzte Entscheidung geändert oder neu begonnen werden. Gut für das Gespräch: Warum war das Leben so gefährlich?</li>
+<li><b>Sicherung:</b> Am Ende gibt es eine Urkunde mit Rückblick auf alle Entscheidungen und 5 Merksätzen (druckbar). Gut als Anschluss: das Vorher-Nachher-Bild „Vom Jäger zum Bauern“.</li>
+<li>Läuft offline, keine Anmeldung, es wird nichts gespeichert.</li></ul></details></div>`;
+  const inp=$('#sippe');inp.addEventListener('input',()=>S.name=inp.value.trim());
+  K.querySelectorAll('.vorschlaege button').forEach(b=>b.addEventListener('click',()=>{inp.value=b.textContent;S.name=b.textContent;}));
+  $('#los').addEventListener('click',()=>{S.name=inp.value.trim()||'Die Namenlosen';schritt();});
+}
+function esc(t){return String(t||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+function kopfBild(st){return `<div class="bild">${SZ[st.bild]()}<span class="chip">${ZNAME[st.zeit]}</span>${st.typ==='wahl'?`<span class="schritt">Entscheidung ${wahlNr(S.i)} von 10</span>`:''}</div>`;}
+function schritt(){
+  if(S.i>=SCHRITTE.length)return ende();
+  const st=SCHRITTE[S.i];zeit(st.zeit);window.scrollTo({top:0,behavior:'smooth'});
+  verlauf[S.i]={n:S.n,w:S.w,g:S.g,wahlen:S.wahlen.slice()};
+  if(st.typ==='ereignis'){
+    K.innerHTML=kopfBild(st)+`<div class="inhalt"><h2>${st.titel}</h2><p>${st.text}</p><div class="ergebnis schlecht"><div class="effekte">${effChips(st.e)}</div></div><div class="fakt"><h4>So war es in der Altsteinzeit</h4><p>${st.fakt}</p></div><div class="weiter"><button class="btn" id="weiter">Weiter →</button></div></div>`;
+    anwenden(st.e);
+    $('#weiter').addEventListener('click',()=>{if(tot())return;S.i++;schritt();});
+    return;}
+  K.innerHTML=kopfBild(st)+`<div class="inhalt"><h2>${st.titel}</h2><p>${st.text}</p><div class="optionen">${st.opt.map((o,j)=>`<button class="opt" data-j="${j}"><b>${'ABC'[j]}</b><span>${o.t}</span></button>`).join('')}</div><div id="erg"></div></div>`;
+  K.querySelectorAll('.opt').forEach(b=>b.addEventListener('click',()=>waehle(+b.dataset.j)));
+}
+function waehle(j){
+  const st=SCHRITTE[S.i];let o=st.opt[j];
+  if(o.ohneZunder&&S.wahlen[1]!==1)o=Object.assign({},o,o.ohneZunder);
+  S.wahlen[S.i]=j;S.urteile=S.urteile||{};S.urteile[S.i]=o.v;
+  K.querySelector('.optionen').outerHTML=`<p class="wahl">Eure Wahl: ${'ABC'[j]} – ${st.opt[j].t}</p>`;
+  $('#erg').innerHTML=`<div class="ergebnis ${o.v}"><p class="urteil">${URTEIL[o.v]}</p><p>${o.f}</p><div class="effekte">${effChips(o.e)}</div></div><div class="fakt"><h4>So war es in der Altsteinzeit</h4><p>${st.fakt}</p></div><div class="weiter"><button class="btn" id="weiter">${S.i===SCHRITTE.length-1?'Wie geht es aus? →':'Weiter →'}</button></div>`;
+  anwenden(o.e);
+  $('#weiter').addEventListener('click',()=>{if(tot())return;S.i++;schritt();});
+  $('#erg').scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+function tot(){
+  const k=['n','w','g'].find(k=>S[k]<=0);if(!k)return false;
+  const st=SCHRITTE[S.i];
+  K.innerHTML=`<div class="bild">${SZ.winter()}</div><div class="inhalt"><h2>Eure Sippe hat es diesmal nicht geschafft</h2>
+<div class="ergebnis schlecht"><p class="urteil">${ICON[k]} ${NAMEN[k]}: 0</p><p>${SCHEITERN[k]}</p></div>
+<div class="fakt"><h4>Darüber könnt ihr nachdenken</h4><p>So hart war das Leben in der Altsteinzeit: Schon wenige falsche Entscheidungen konnten gefährlich werden. Welche Entscheidung hat euch am meisten geschadet? Was hättet ihr anders machen können?</p></div>
+<div class="aktionen"><button class="btn ocker" id="nochmal">${st.typ==='ereignis'?'Vorherige Entscheidung ändern':'Letzte Entscheidung ändern'}</button><button class="btn hell" id="vorn">Von vorn beginnen</button></div></div>`;
+  $('#nochmal').addEventListener('click',()=>{let i=S.i;if(SCHRITTE[i].typ==='ereignis')i--;const v=verlauf[i];Object.assign(S,{n:v.n,w:v.w,g:v.g,wahlen:v.wahlen.slice(),i});werte();schritt();});
+  $('#vorn').addEventListener('click',start);
+  return true;}
+function ende(){
+  zeit('fr');window.scrollTo({top:0,behavior:'smooth'});
+  const gut=Object.values(S.urteile||{}).filter(v=>v==='gut').length;
+  const summe=S.n+S.w+S.g,sterne=summe>=22?3:summe>=14?2:1;
+  const FARBE={gut:'#4f7d3a',mittel:'#d39a1e',schlecht:'#b0402e'};
+  const rows=SCHRITTE.map((st,i)=>st.typ!=='wahl'?'':`<tr><td><span class="punkt" style="background:${FARBE[S.urteile[i]]}"></span>${st.titel}</td><td>${'ABC'[S.wahlen[i]]}: ${st.opt[S.wahlen[i]].t}</td></tr>`).join('');
+  K.innerHTML=`<div class="bild">${SZ.ende()}<span class="chip">🌱 Frühling – ein Jahr ist vorbei</span></div><div class="inhalt">
+<h2>Geschafft! Die Rentiere kehren zurück.</h2>
+<p>Der Schnee schmilzt, die Herden ziehen wieder heran. Eure Sippe hat ein ganzes Jahr in der Altsteinzeit überlebt.</p>
+<div class="urkunde"><h3>Urkunde</h3><div>Die Sippe</div><div class="sippe">${esc(S.name)}</div><div>hat ein Jahr in der Altsteinzeit überlebt.</div>
+<div class="sterne">${'★'.repeat(sterne)}${'☆'.repeat(3-sterne)}</div>
+<div>${gut} von 10 klugen Entscheidungen · Am Ende: 🍖 ${S.n} · 🔥 ${S.w} · ❤️ ${S.g} · ${new Date().toLocaleDateString('de-DE')}</div>
+<ol><li>Die Menschen der Altsteinzeit waren <b>Jäger und Sammler</b>.</li>
+<li>Sie lebten als <b>Nomaden</b> und folgten den Tierherden. Sie besaßen nur, was sie tragen konnten.</li>
+<li>Vom erlegten Tier wurde <b>alles verwertet</b>: Fleisch, Fell, Knochen, Geweih, Sehnen und Fett.</li>
+<li>Das <b>Feuer</b> gab Wärme, Licht und Schutz. Man entfachte es mit Feuerstein, Pyrit und Zunder.</li>
+<li>Nur <b>gemeinsam</b> konnte die Gruppe überleben: bei der Jagd, beim Teilen und bei der Pflege von Kranken.</li></ol></div>
+<h3 style="font-family:var(--serif);font-weight:normal;margin:20px 0 4px">Rückblick auf eure Entscheidungen</h3>
+<table class="tabelle">${rows}</table>
+<p style="font-size:.85rem;color:#6b5a45"><span class="punkt" style="background:#4f7d3a"></span>klug <span class="punkt" style="background:#d39a1e;margin-left:10px"></span>geht so <span class="punkt" style="background:#b0402e;margin-left:10px"></span>gefährlich</p>
+<div class="aktionen"><button class="btn" id="druck">Urkunde drucken</button><button class="btn hell" id="vorn">Nochmal spielen</button></div></div>`;
+  $('#druck').addEventListener('click',()=>{try{window.print();}catch(e){}});
+  $('#vorn').addEventListener('click',start);
+}
+document.addEventListener('keydown',e=>{const k=e.key.toUpperCase();const b=K.querySelectorAll('.opt');
+  if(b.length&&'ABC'.includes(k)&&k.length===1){const i='ABC'.indexOf(k);if(b[i])b[i].click();}
+  if(e.key==='Enter'){const w=$('#weiter');if(w&&document.activeElement.tagName!=='INPUT')w.click();}});
+start();
+</script>
+</body>
+</html>
