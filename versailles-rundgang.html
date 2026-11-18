@@ -1,0 +1,1074 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Zu Gast beim Sonnenkönig – Ein Rundgang durch Versailles</title>
+<style>
+:root{
+  --blau:#1d2b53; --blau2:#2c3e74; --gold:#c9a227; --gold2:#e6c65c; --gold-d:#9a7b16;
+  --creme:#fbf6ea; --papier:#f4ecd8; --text:#2a2520; --muted:#6b6255; --rot:#8f1d2c;
+  --ok:#2f7d4a; --bad:#b03a2e;
+  --serif: Georgia, "Palatino Linotype", "Book Antiqua", Palatino, serif;
+  --sans: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{font-family:var(--sans);color:var(--text);background:var(--creme);line-height:1.55;font-size:17px}
+h1,h2,h3{font-family:var(--serif);font-weight:normal;line-height:1.2}
+button{font:inherit;cursor:pointer}
+.hidden{display:none!important}
+
+/* Kopfzeile */
+header.top{background:var(--blau);color:#fff;display:flex;align-items:center;gap:14px;padding:10px 18px;position:sticky;top:0;z-index:30;box-shadow:0 2px 10px rgba(0,0,0,.25)}
+header.top svg.logo{width:36px;height:36px;flex:none}
+header.top h1{font-size:1.15rem;margin:0;flex:1;min-width:0}
+header.top h1 small{display:block;font-family:var(--sans);font-size:.75rem;opacity:.75;letter-spacing:.03em}
+.fortschritt{display:flex;align-items:center;gap:10px;font-size:.85rem;white-space:nowrap}
+.sonnen{display:flex;gap:3px}
+.sonnen span{width:13px;height:13px;border-radius:50%;border:1.5px solid var(--gold2);display:inline-block}
+.sonnen span.an{background:var(--gold2);box-shadow:0 0 6px var(--gold2)}
+.btn{border:none;border-radius:999px;padding:9px 18px;background:var(--gold);color:var(--blau);font-weight:600;transition:background .15s}
+.btn:hover{background:var(--gold2)}
+.btn.ghost{background:transparent;color:inherit;border:1.5px solid currentColor}
+.btn.ghost:hover{background:rgba(255,255,255,.12)}
+.btn.klein{padding:6px 13px;font-size:.85rem}
+.btn.gross{padding:13px 30px;font-size:1.1rem}
+.btn.blau{background:var(--blau);color:#fff}
+.btn.blau:hover{background:var(--blau2)}
+
+/* Startseite */
+.start{min-height:calc(100vh - 60px);display:flex;align-items:center;justify-content:center;padding:28px 16px;background:radial-gradient(circle at 50% 0%,#fff7da 0%,var(--creme) 60%)}
+.start-karte{max-width:720px;width:100%;background:#fff;border-radius:18px;box-shadow:0 10px 40px rgba(29,43,83,.15);overflow:hidden}
+.start-karte .hero{background:linear-gradient(#1d2b53,#2c3e74);display:block}
+.start-karte .hero svg{display:block;width:100%;height:auto}
+.start-inhalt{padding:22px 30px 30px}
+.start-inhalt .ueber{text-transform:uppercase;letter-spacing:.12em;font-size:.78rem;color:var(--gold-d);margin:0 0 4px;font-weight:600}
+.start-inhalt h2{font-size:2rem;margin:0 0 4px;color:var(--blau)}
+.start-inhalt .unter{margin:0 0 16px;color:var(--muted)}
+.start-inhalt label{display:block;font-weight:600;margin:18px 0 6px}
+.start-inhalt input{width:100%;max-width:360px;font:inherit;padding:10px 14px;border:1.5px solid #d8cfbd;border-radius:10px;background:#fdfaf3}
+.start-aktionen{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-top:18px}
+.so-gehts{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:16px 0 4px}
+.so-gehts div{background:var(--papier);border-radius:10px;padding:10px 12px;font-size:.88rem}
+.so-gehts b{display:block;color:var(--blau);font-family:var(--serif);font-weight:normal;font-size:1.05rem}
+details.lk{margin-top:22px;border-top:1px solid #eee3cc;padding-top:12px;font-size:.92rem}
+details.lk summary{cursor:pointer;color:var(--blau);font-weight:600}
+details.lk ul{padding-left:20px;margin:8px 0}
+
+/* Rundgang */
+main.rundgang{display:grid;grid-template-columns:minmax(290px,400px) 1fr;gap:22px;max-width:1300px;margin:0 auto;padding:18px}
+.karte{position:sticky;top:78px;align-self:start;background:#fff;border-radius:14px;padding:12px 12px 10px;box-shadow:0 4px 18px rgba(29,43,83,.1)}
+.karte h3{margin:2px 4px 8px;font-size:1.05rem;color:var(--blau)}
+.karte svg{width:100%;height:auto;display:block;border-radius:8px}
+.karte .legende{display:flex;gap:12px;flex-wrap:wrap;font-size:.75rem;color:var(--muted);margin:8px 4px 0}
+.karte .legende i{display:inline-block;width:11px;height:11px;border-radius:50%;vertical-align:-1px;margin-right:4px;border:1.5px solid var(--blau)}
+.marker{cursor:pointer}
+.marker circle.punkt{fill:#fff;stroke:var(--blau);stroke-width:2;transition:all .2s}
+.marker text{font:700 10px var(--sans);fill:var(--blau);pointer-events:none}
+.marker.besucht circle.punkt{fill:var(--gold2)}
+.marker.aktiv circle.punkt{fill:var(--blau);stroke:var(--gold)}
+.marker.aktiv text{fill:#fff}
+.marker .ring{fill:none;stroke:var(--gold);stroke-width:2;opacity:0}
+.marker.aktiv .ring{animation:puls 1.8s infinite}
+@keyframes puls{0%{r:9;opacity:.9}100%{r:18;opacity:0}}
+.marker:hover circle.punkt{stroke-width:3}
+.stationsliste{list-style:none;margin:10px 0 0;padding:0;font-size:.85rem;columns:2;column-gap:10px}
+.stationsliste li{padding:3px 6px;border-radius:6px;cursor:pointer;break-inside:avoid}
+.stationsliste li:hover{background:var(--papier)}
+.stationsliste li.aktiv{background:var(--blau);color:#fff}
+.stationsliste li .ok{color:var(--gold-d);font-weight:700}
+.stationsliste li.aktiv .ok{color:var(--gold2)}
+
+.station{background:#fff;border-radius:14px;box-shadow:0 4px 18px rgba(29,43,83,.1);overflow:hidden;min-width:0}
+.bild{position:relative;background:#e9e2d0}
+.bild svg{display:block;width:100%;height:auto}
+.zeitschalter{position:absolute;top:10px;right:10px;display:flex;background:rgba(29,43,83,.88);border-radius:999px;padding:3px;box-shadow:0 2px 8px rgba(0,0,0,.25)}
+.zeitschalter button{border:none;background:transparent;color:#fff;padding:6px 15px;border-radius:999px;font-size:.88rem}
+.zeitschalter button.aktiv{background:var(--gold);color:var(--blau);font-weight:700}
+.bildlabel{position:absolute;left:10px;bottom:10px;background:rgba(255,255,255,.92);border-radius:8px;padding:4px 10px;font-size:.8rem;color:var(--blau);max-width:75%;box-shadow:0 1px 4px rgba(0,0,0,.15)}
+.bildhinweis{position:absolute;left:10px;top:10px;background:rgba(255,255,255,.85);border-radius:999px;padding:3px 10px;font-size:.72rem;color:var(--muted)}
+.inhalt{padding:18px 24px 24px}
+.kopf{display:flex;gap:14px;align-items:flex-start;margin-bottom:6px}
+.nr{flex:none;width:44px;height:44px;border-radius:50%;background:var(--blau);color:var(--gold2);display:flex;align-items:center;justify-content:center;font:1.3rem var(--serif);box-shadow:0 0 0 3px var(--gold2) inset}
+.kopf h2{margin:0;font-size:1.6rem;color:var(--blau)}
+.kopf .ort{font-style:italic;color:var(--muted);font-size:.92rem}
+.kopf .jahr{display:inline-block;background:var(--papier);border-radius:999px;padding:1px 10px;font-size:.8rem;font-style:normal;margin-left:6px;color:var(--text)}
+.intro p{margin:.6em 0}
+.kasten{border-radius:12px;padding:12px 16px;margin:14px 0}
+.kasten h4{margin:0 0 4px;font-size:.8rem;letter-spacing:.1em;text-transform:uppercase}
+.kasten p{margin:.3em 0}
+.kasten.damals{background:#fbf3dc;border-left:5px solid var(--gold)}
+.kasten.damals h4{color:var(--gold-d)}
+.kasten.heute{background:#e9eef7;border-left:5px solid var(--blau2)}
+.kasten.heute h4{color:var(--blau2)}
+.kasten.wusstest{background:#fff;border:2px dashed var(--gold);}
+.kasten.wusstest h4{color:var(--gold-d)}
+.kasten.beobachte{background:#eef5ee;border-left:5px solid #4f8a5b}
+.kasten.beobachte h4{color:#3b6e46}
+.umschalt-hinweis{font-size:.82rem;color:var(--muted);margin-top:-6px}
+.stimmen{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:10px 0}
+.stimme{background:var(--papier);border-radius:12px;padding:10px 14px;font-size:.93rem}
+.stimme b{display:block;color:var(--blau);font-size:.85rem}
+.stimme q{font-style:italic;quotes:"„" "“"}
+.fiktiv{font-size:.8rem;color:var(--muted)}
+.frage{background:var(--papier);border-radius:12px;padding:14px 16px;margin:16px 0}
+.frage h4{margin:0 0 6px;color:var(--blau);font-family:var(--serif);font-weight:normal;font-size:1.15rem}
+.optionen button{display:block;width:100%;text-align:left;border:1.5px solid #d8cfbd;background:#fff;border-radius:10px;padding:10px 14px;margin:7px 0;transition:all .15s}
+.optionen button:hover:not(:disabled){border-color:var(--gold);background:#fffaf0}
+.optionen button.richtig{border-color:var(--ok);background:#e6f3ea;font-weight:600}
+.optionen button.falsch{border-color:var(--bad);background:#f8e5e2;text-decoration:line-through;color:#7a5a55}
+.optionen button:disabled{cursor:default}
+.rueckmeldung{margin-top:8px;font-size:.95rem}
+.rueckmeldung.gut{color:var(--ok)}
+.rueckmeldung.schlecht{color:var(--bad)}
+.notiz label{display:block;font-weight:600;color:var(--blau);margin:16px 0 6px}
+.notiz label span{font-weight:normal;color:var(--muted);font-size:.85rem}
+.notiz textarea{width:100%;min-height:62px;font:inherit;padding:10px 12px;border:1.5px solid #d8cfbd;border-radius:10px;background:#fdfaf3;resize:vertical}
+.navzeile{display:flex;justify-content:space-between;gap:10px;margin-top:20px;flex-wrap:wrap}
+
+/* Glossar */
+.g{border-bottom:2px dotted var(--gold-d);cursor:help}
+#tip{position:fixed;z-index:50;max-width:280px;background:var(--blau);color:#fff;padding:9px 12px;border-radius:10px;font-size:.88rem;box-shadow:0 6px 20px rgba(0,0,0,.3)}
+#tip b{color:var(--gold2)}
+
+/* Besucherpass */
+.pass-seite{max-width:860px;margin:0 auto;padding:22px 16px 40px}
+.pass{background:#fff;border-radius:16px;box-shadow:0 8px 30px rgba(29,43,83,.15);padding:28px 32px;border:3px double var(--gold)}
+.pass h2{text-align:center;color:var(--blau);font-size:2rem;margin:0}
+.pass .unter{text-align:center;color:var(--muted);margin:2px 0 18px}
+.pass-name{text-align:center;font:1.4rem var(--serif);border-bottom:1.5px solid var(--gold);width:max-content;min-width:260px;margin:0 auto 6px;padding:0 20px 2px}
+.pass-zeile{display:grid;grid-template-columns:34px 1fr;gap:10px;padding:9px 0;border-bottom:1px solid #efe6d2;align-items:start}
+.pass-zeile .stempel{width:30px;height:30px}
+.pass-zeile b{color:var(--blau)}
+.pass-zeile .n{color:var(--muted);font-size:.9rem;white-space:pre-wrap}
+.merksaetze{background:var(--papier);border-radius:12px;padding:12px 18px;margin:20px 0}
+.merksaetze h3{margin:0 0 6px;color:var(--blau)}
+.merksaetze ol{margin:0;padding-left:20px}
+.abschluss textarea{width:100%;min-height:120px;font:inherit;padding:10px 12px;border:1.5px solid #d8cfbd;border-radius:10px;background:#fdfaf3}
+.pass-aktionen{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:20px}
+.druck-text{display:none;white-space:pre-wrap}
+
+@media (max-width:900px){
+  main.rundgang{grid-template-columns:1fr}
+  .karte{position:static;order:2}
+  .stationsliste{columns:2}
+}
+@media (max-width:560px){
+  body{font-size:16px}
+  header.top h1 small{display:none}
+  header.top h1{font-size:1rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  header.top{gap:10px;padding:8px 12px}
+  .sonnen{display:none}
+  .so-gehts,.stimmen{grid-template-columns:1fr}
+  .inhalt{padding:14px 16px 20px}
+  .kopf h2{font-size:1.3rem}
+  .start-inhalt{padding:18px 18px 24px}
+  .zeitschalter button{padding:5px 11px}
+}
+@media print{
+  header.top,#start,main.rundgang,.pass-aktionen,#tip{display:none!important}
+  body{background:#fff}
+  .pass{box-shadow:none}
+  .pass-seite{padding:0}
+  .abschluss textarea{display:none}
+  .druck-text{display:block;border:1px solid #ccc;border-radius:8px;padding:8px;min-height:120px}
+}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <svg class="logo" viewBox="0 0 40 40" aria-hidden="true"><g stroke="#e6c65c" stroke-width="2.4" stroke-linecap="round"><path d="M20 2v6M20 32v6M2 20h6M32 20h6M7.3 7.3l4.2 4.2M28.5 28.5l4.2 4.2M7.3 32.7l4.2-4.2M28.5 11.5l4.2-4.2"/></g><circle cx="20" cy="20" r="8.5" fill="#e6c65c"/><circle cx="17" cy="18.5" r="1.1" fill="#1d2b53"/><circle cx="23" cy="18.5" r="1.1" fill="#1d2b53"/><path d="M16.5 22.5q3.5 3 7 0" stroke="#1d2b53" stroke-width="1.3" fill="none"/></svg>
+  <h1>Zu Gast beim Sonnenkönig<small>Ein virtueller Rundgang durch Versailles zur Zeit Ludwigs XIV.</small></h1>
+  <div class="fortschritt hidden" id="fortschritt">
+    <div class="sonnen" id="sonnen"></div>
+    <span id="fortschrittText">0 / 10</span>
+    <button class="btn klein ghost" id="zumPass">Besucherpass</button>
+  </div>
+</header>
+
+<!-- STARTSEITE -->
+<section id="start" class="start">
+  <div class="start-karte">
+    <div class="hero" id="hero"></div>
+    <div class="start-inhalt">
+      <p class="ueber">Virtueller Rundgang · Geschichte Klasse 7</p>
+      <h2>Zu Gast beim Sonnenkönig</h2>
+      <p class="unter">Wie sah das Schloss Versailles zur Zeit Ludwigs XIV. aus?</p>
+      <p>Stell dir vor, du darfst an den Hof des mächtigsten Königs Europas reisen. Ludwig XIV. regierte Frankreich von 1661 bis 1715 selbst. 1682 machte er Versailles zum Sitz seines Hofes und seiner Regierung. Auf diesem Rundgang besuchst du 10 Stationen – und erfährst, wie es dort <b>damals</b> aussah und was davon <b>heute</b> noch übrig ist.</p>
+      <div class="so-gehts">
+        <div><b>1 · Erkunden</b>Wähle eine Station auf dem Lageplan oder gehe der Reihe nach.</div>
+        <div><b>2 · Vergleichen</b>Schalte im Bild zwischen „Damals“ und „Heute“ um.</div>
+        <div><b>3 · Sammeln</b>Für jede richtige Antwort bekommst du eine Sonne in deinen Besucherpass.</div>
+      </div>
+      <label for="name">Dein Name für den Besucherpass</label>
+      <input id="name" type="text" maxlength="40" placeholder="Vorname" autocomplete="off">
+      <div class="start-aktionen">
+        <button class="btn gross blau" id="los">Rundgang starten</button>
+        <button class="btn klein ghost hidden" id="weiter" style="color:var(--blau)">Weitermachen, wo ich war</button>
+      </div>
+      <details class="lk">
+        <summary>Hinweise für Lehrkräfte</summary>
+        <ul>
+          <li><b>Einsatz:</b> Absolutismus / Ludwig XIV., Klasse 7. Einzel- oder Partnerarbeit am Tablet/PC, ca. 30–40 Minuten; Stationen auch einzeln am Beamer nutzbar.</li>
+          <li><b>Aufbau:</b> 10 Stationen mit Damals-/Heute-Vergleich, Beobachtungsauftrag, Quizfrage und Notizfeld „Woran erkennt man hier die Macht des Königs?“. Station 10 bietet einen Perspektivwechsel (Höfling, Bauarbeiter, Bäuerin, Gesandter – ausgedachte Stimmen, als solche gekennzeichnet).</li>
+          <li><b>Ergebnissicherung:</b> Der Besucherpass sammelt Antworten und Notizen und enthält Merksätze sowie eine Abschlussaufgabe. Er kann gedruckt bzw. als PDF gespeichert werden.</li>
+          <li><b>Hinweis zu den Bildern:</b> Die Zeichnungen sind vereinfachte Darstellungen, keine maßstabsgetreuen Rekonstruktionen. Für Originalansichten eignen sich z.&nbsp;B. die Website des Schlosses Versailles und Google Arts &amp; Culture.</li>
+          <li><b>Technik:</b> Läuft offline, keine Anmeldung. Fortschritt wird nur lokal im Browser des Geräts gespeichert. Passt als Einstieg oder Vertiefung zum Escape-Room „Flucht aus Versailles“.</li>
+        </ul>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- RUNDGANG -->
+<main class="rundgang hidden" id="rundgang">
+  <aside class="karte" id="karte">
+    <h3>Lageplan von Versailles</h3>
+    <div id="plan"></div>
+    <div class="legende"><span><i></i>noch offen</span><span><i style="background:#e6c65c"></i>besucht</span><span><i style="background:#1d2b53;border-color:#c9a227"></i>du bist hier</span></div>
+    <ul class="stationsliste" id="liste"></ul>
+  </aside>
+  <article class="station" id="station">
+    <div class="bild">
+      <div id="bild"></div>
+      <span class="bildhinweis">vereinfachte Zeichnung</span>
+      <div class="zeitschalter" id="zeitschalter" role="group" aria-label="Zeit wählen">
+        <button data-modus="damals" class="aktiv" aria-pressed="true">Damals</button>
+        <button data-modus="heute" aria-pressed="false">Heute</button>
+      </div>
+      <div class="bildlabel" id="bildlabel"></div>
+    </div>
+    <div class="inhalt">
+      <div class="kopf">
+        <div class="nr" id="nr">1</div>
+        <div>
+          <h2 id="titel"></h2>
+          <div class="ort"><span id="ort"></span><span class="jahr" id="jahr"></span></div>
+        </div>
+      </div>
+      <div class="intro" id="intro"></div>
+      <div class="kasten damals" id="kastenDamals"><h4>So sah es damals aus</h4><div id="txtDamals"></div></div>
+      <div class="kasten heute hidden" id="kastenHeute"><h4>Und heute?</h4><div id="txtHeute"></div></div>
+      <p class="umschalt-hinweis" id="umschaltHinweis">Tipp: Schalte oben im Bild auf „Heute“ um und vergleiche.</p>
+      <div id="extra"></div>
+      <div class="kasten beobachte"><h4>Schau genau hin</h4><p id="beobachte"></p></div>
+      <div class="kasten wusstest"><h4>Wusstest du?</h4><p id="wusstest"></p></div>
+      <div class="frage">
+        <h4 id="frage"></h4>
+        <div class="optionen" id="optionen"></div>
+        <div class="rueckmeldung" id="rueckmeldung"></div>
+      </div>
+      <div class="notiz">
+        <label for="notiz">Machtzeichen: Woran erkennt man hier die Macht des Königs? <span>(1–2 Sätze, erscheint in deinem Besucherpass)</span></label>
+        <textarea id="notiz" placeholder="Hier sieht man die Macht des Königs, weil …"></textarea>
+      </div>
+      <div class="navzeile">
+        <button class="btn klein ghost" id="zurueck" style="color:var(--blau)">← Vorherige Station</button>
+        <button class="btn" id="vor">Nächste Station →</button>
+      </div>
+    </div>
+  </article>
+</main>
+
+<!-- BESUCHERPASS -->
+<section class="pass-seite hidden" id="passSeite">
+  <div class="pass" id="pass"></div>
+  <div class="pass-aktionen">
+    <button class="btn blau" id="drucken">Drucken / als PDF speichern</button>
+    <button class="btn ghost" id="zurRundgang" style="color:var(--blau)">Zurück zum Rundgang</button>
+    <button class="btn ghost" id="neustart" style="color:var(--bad)">Alles zurücksetzen</button>
+  </div>
+</section>
+
+<div id="tip" class="hidden"></div>
+
+<script>
+"use strict";
+/* =========================================================
+   Hilfsfunktionen für die Zeichnungen
+   ========================================================= */
+const G='#c9a227', GD='#9a7b16', GL='#ecd27a';
+const L=(a,b,t)=>a+(b-a)*t;
+const f1=n=>Math.round(n*10)/10;
+const pts=a=>a.map(p=>f1(p[0])+','+f1(p[1])).join(' ');
+function rng(seed){let s=seed;return()=>{s=(s*16807)%2147483647;return(s-1)/2147483646;};}
+const pick=(r,arr)=>arr[Math.floor(r()*arr.length)];
+const HAUT=['#f1d4b4','#e6bf98','#c99167','#8e5b38'];
+const HAAR=['#2b2118','#5b3a1e','#a0672f','#d9b26a','#1a1a1a','#8a8a8a'];
+const PERUECKE=['#5b3a1e','#3a2615','#8a6a3e','#6b4423'];
+const BUNT=['#d9534f','#3a7bd5','#f0ad4e','#5cb85c','#8e44ad','#16a085','#e67e22','#34495e','#e84393','#2d98da','#e8c547','#ffffff'];
+const ROECKE=['#24346a','#7a1f2b','#4d2f6b','#2f6b56','#5a4632','#3d3d3d','#8a5a1e','#1f5f6b'];
+const KLEIDER=['#7b2d43','#2f6b56','#c58b2c','#3d5a9e','#8a4f7d','#b04a3a'];
+
+function svgWrap(inner,label){return `<svg viewBox="0 0 480 270" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${label}">${inner}</svg>`;}
+function verlauf(id,c1,c2,x2=0,y2=1){return `<linearGradient id="${id}" x1="0" y1="0" x2="${x2}" y2="${y2}"><stop offset="0" stop-color="${c1}"/><stop offset="1" stop-color="${c2}"/></linearGradient>`;}
+function himmel(id,c1,c2,h=270){return `<defs>${verlauf(id,c1,c2)}</defs><rect width="480" height="${h}" fill="url(#${id})"/>`;}
+
+/* Figuren (y = Fußpunkt) */
+function hoefling(x,y,s=1,rock='#24346a',haut='#f1d4b4',perue='#5b3a1e'){
+  return `<g transform="translate(${f1(x)} ${f1(y)}) scale(${s.toFixed(3)})">
+<path d="M-2.6 0v-7M2.6 0v-7" stroke="#d6cdbb" stroke-width="2"/>
+<path d="M-4.5 0h3.5M1 0h3.5" stroke="#222" stroke-width="1.4"/>
+<path d="M-7 -6 L-5.5 -21 Q0 -24 5.5 -21 L7 -6 Z" fill="${rock}"/>
+<path d="M0 -22 V-6.5M-7 -6.5h14" stroke="${G}" stroke-width="0.9"/>
+<circle cx="0" cy="-25.5" r="4" fill="${haut}"/>
+<path d="M-4.6 -26 Q-5 -31.6 0 -31.6 Q5 -31.6 4.6 -26 L5.8 -18.3 Q4.3 -16.8 3 -18.8 L3.2 -25 Q0 -27.6 -3.2 -25 L-3 -18.8 Q-4.3 -16.8 -5.8 -18.3 Z" fill="${perue}"/>
+</g>`;}
+function dame(x,y,s=1,kleid='#7b2d43',haut='#f1d4b4'){
+  return `<g transform="translate(${f1(x)} ${f1(y)}) scale(${s.toFixed(3)})">
+<path d="M-10 0 Q-9 -9 -3.6 -15 L3.6 -15 Q9 -9 10 0 Z" fill="${kleid}"/>
+<path d="M-9 -1 Q0 -3 9 -1" stroke="${G}" stroke-width=".9" fill="none"/>
+<path d="M-3.6 -15 L-3 -21 Q0 -22.5 3 -21 L3.6 -15 Z" fill="${kleid}"/>
+<path d="M-1.6 -15 L0 -21 L1.6 -15Z" fill="#f3e6c8"/>
+<circle cx="0" cy="-25" r="3.8" fill="${haut}"/>
+<path d="M-4 -24.6 Q-4.2 -29.6 0 -29.6 Q4.2 -29.6 4 -24.6 Q3 -27 0 -27 Q-3 -27 -4 -24.6Z" fill="#4a2e18"/>
+<path d="M-2.4 -29 Q-2.2 -33 0 -33.4 Q2.2 -33 2.4 -29 Z" fill="#fbf8f0" stroke="#d9cfbf" stroke-width=".4"/>
+</g>`;}
+function tourist(x,y,s=1,farbe='#3a7bd5',haut='#f1d4b4',handy=false,haar='#2b2118',hose='#2f3f5f'){
+  return `<g transform="translate(${f1(x)} ${f1(y)}) scale(${s.toFixed(3)})">
+<rect x="-4.6" y="-10" width="3.7" height="10" fill="${hose}"/><rect x="0.9" y="-10" width="3.7" height="10" fill="${hose}"/>
+<path d="M-6 -9 L-5.6 -20.5 Q0 -23 5.6 -20.5 L6 -9 Z" fill="${farbe}" stroke="rgba(0,0,0,.15)" stroke-width=".5"/>
+<circle cx="0" cy="-25" r="4" fill="${haut}"/>
+<path d="M-4.1 -25.3 Q-4.1 -29.6 0 -29.6 Q4.1 -29.6 4.1 -25.3 Q2 -27.4 0 -27.4 Q-2 -27.4 -4.1 -25.3Z" fill="${haar}"/>
+${handy?`<path d="M5 -19.5 L8.5 -29" stroke="${haut}" stroke-width="2.2" stroke-linecap="round"/><rect x="6.4" y="-35" width="4.4" height="6.6" rx="1" fill="#111"/>`:''}
+</g>`;}
+function arbeiter(x,y,s=1,haut='#e6bf98',rock='#7a5a3a',last=false){
+  return `<g transform="translate(${f1(x)} ${f1(y)}) scale(${s.toFixed(3)})">
+<path d="M-2.6 0v-8M2.6 0v-8" stroke="#5a4632" stroke-width="2.2"/>
+<path d="M-6 -7 L-5.2 -20 Q0 -22.5 5.2 -20 L6 -7 Z" fill="${rock}"/>
+<circle cx="0" cy="-24.5" r="3.8" fill="${haut}"/>
+<path d="M-4.2 -25.5 Q0 -31 4.2 -25.5 Z" fill="#8c8270"/>
+${last?`<rect x="-9" y="-28" width="11" height="7" fill="#d9ccb0" stroke="#a89878" stroke-width=".6" transform="rotate(-8)"/>`:''}
+</g>`;}
+function pferd(x,y,s=1,f='#6b4226',flip=false){
+  return `<g transform="translate(${f1(x)} ${f1(y)}) scale(${flip?-s:s} ${s})">
+<path d="M-11 -12 L-12 0 M-7 -12 L-6 0 M7 -12 L6 0 M11 -12 L12 0" stroke="${f}" stroke-width="2.4" stroke-linecap="round"/>
+<path d="M-14 -13 Q-15 -21 -6 -21.5 L8 -21.5 Q12 -21.5 13 -25 L17 -33 Q20 -35.5 22.5 -32.5 L21.5 -28.5 Q19.5 -27.5 18.5 -24.5 L15.5 -14.5 Q14.5 -11 10 -11 L-10 -11 Q-14 -11 -14 -13Z" fill="${f}"/>
+<path d="M-14 -18 Q-19 -14 -18.5 -6" stroke="${f}" stroke-width="2.2" fill="none"/>
+<path d="M13 -26 L18 -34" stroke="#2a1a0c" stroke-width="1.6"/>
+</g>`;}
+function kutsche(x,y,s=1){
+  return pferd(x-50*s,y-1,s*1.05,'#5b3a22',true)+pferd(x-32*s,y+2,s*1.05,'#3b2414',true)+
+`<g transform="translate(${f1(x)} ${f1(y)}) scale(${s})">
+<path d="M-22 -12 L-24 -30 Q-24 -36 -18 -36 L18 -36 Q24 -36 24 -30 L22 -12 Z" fill="#24346a" stroke="${G}" stroke-width="1.6"/>
+<rect x="-8" y="-31" width="16" height="11" fill="#cfe0ee" stroke="${G}"/>
+<path d="M-18 -36 L-14 -42 L14 -42 L18 -36Z" fill="${G}"/>
+<circle cx="-14" cy="-6" r="7" fill="none" stroke="#7a1f2b" stroke-width="2.2"/><circle cx="16" cy="-7.5" r="8" fill="none" stroke="#7a1f2b" stroke-width="2.2"/>
+<path d="M-14 -13v14M-21 -6h14M16 -15.5v16M8 -7.5h16" stroke="#7a1f2b" stroke-width="1"/>
+</g>`;}
+function touristen(r,n,x0,x1,y0,y1,s0,s1,handyQuote=.3){
+  const a=[];for(let i=0;i<n;i++){const t=r();const y=L(y0,y1,t);
+    a.push({y,svg:tourist(L(x0,x1,r()),y,L(s0,s1,t),pick(r,BUNT),pick(r,HAUT),r()<handyQuote,pick(r,HAAR),r()<.55?'#2f3f5f':'#55555f')});}
+  return a;}
+function hofstaat(r,n,x0,x1,y0,y1,s0,s1){
+  const a=[];for(let i=0;i<n;i++){const t=r();const y=L(y0,y1,t);const x=L(x0,x1,r());const s=L(s0,s1,t);
+    a.push({y,svg:r()<.35?dame(x,y,s,pick(r,KLEIDER),r()<.85?HAUT[0]:HAUT[1]):hoefling(x,y,s,pick(r,ROECKE),r()<.85?HAUT[0]:HAUT[1],pick(r,PERUECKE))});}
+  return a;}
+const sortiert=a=>a.sort((p,q)=>p.y-q.y).map(o=>o.svg).join('');
+function fenster(x,y,w,h){return `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="#5d7088" stroke="#f1e8d6" stroke-width="1.5"/><path d="M${x+w/2} ${y}v${h}M${x} ${y+h/2}h${w}" stroke="#f1e8d6" stroke-width=".7"/>`;}
+function seil(x0,x1,y){let s=`<path d="M${x0} ${y-14} Q${(x0+x1)/2} ${y-6} ${x1} ${y-14}" stroke="#a3263a" stroke-width="2.4" fill="none"/>`;
+  for(const x of [x0,x1]) s+=`<rect x="${x-1.5}" y="${y-18}" width="3" height="18" fill="${G}"/><ellipse cx="${x}" cy="${y}" rx="5" ry="1.8" fill="${GD}"/>`;return s;}
+function parkett(y0,c='#a0703f'){let s=`<rect x="0" y="${y0}" width="480" height="${270-y0}" fill="${c}"/><g stroke="rgba(60,30,10,.35)" stroke-width="1">`;
+  for(let x=-300;x<480;x+=26){s+=`<line x1="${x}" y1="${y0}" x2="${x+270-y0}" y2="270"/><line x1="${x+270-y0}" y1="${y0}" x2="${x}" y2="270"/>`;}
+  return s+'</g>';}
+
+/* ---------- Station 1: Ehrenhof ---------- */
+function trapGrid(xl0,xr0,xl1,xr1,y0,y1,cols,rows,farben){
+  let s='';for(let r=0;r<rows;r++)for(let c=0;c<cols;c++){
+    const t0=r/rows,t1=(r+1)/rows,ya=L(y0,y1,t0),yb=L(y0,y1,t1);
+    const la=L(xl0,xl1,t0),ra=L(xr0,xr1,t0),lb=L(xl0,xl1,t1),rb=L(xr0,xr1,t1);
+    s+=`<polygon points="${pts([[L(la,ra,c/cols),ya],[L(la,ra,(c+1)/cols),ya],[L(lb,rb,(c+1)/cols),yb],[L(lb,rb,c/cols),yb]])}" fill="${farben[(r+c)%2]}"/>`;}
+  return s;}
+function fluegel(left){
+  const nx=left?40:440, fx=left?190:290, tn=58, tf=96, bn=212, bf=176;
+  const P=(u,f)=>[L(nx,fx,u),L(L(tn,tf,u),L(bn,bf,u),f)];
+  let s=`<polygon points="${pts([[nx,tn],[fx,tf],[fx,bf],[nx,bn]])}" fill="#b45f3e"/>`;
+  const n=6;
+  for(let i=0;i<n;i++)for(const [a,b] of [[.2,.42],[.56,.82]]){
+    const u0=(i+.28)/n,u1=(i+.72)/n;
+    s+=`<polygon points="${pts([P(u0,a),P(u1,a),P(u1,b),P(u0,b)])}" fill="#5d7088" stroke="#efe5d0" stroke-width="1.4"/>`;}
+  s+=`<polygon points="${pts([P(0,.48),P(1,.48),P(1,.51),P(0,.51)])}" fill="#efe5d0"/>`;
+  s+=`<polygon points="${pts([[nx,tn],[fx,tf],[fx,tf+3],[nx,tn+5]])}" fill="#efe5d0"/>`;
+  s+=`<polygon points="${pts([[nx,tn],[fx,tf],[fx,tf-20],[nx,tn-32]])}" fill="#4b5569"/>`;
+  s+=`<line x1="${nx}" y1="${tn-32}" x2="${fx}" y2="${tf-20}" stroke="${G}" stroke-width="2.6"/>`;
+  for(let i=0;i<n;i++){const u=(i+.5)/n,x=L(nx,fx,u),top=L(tn,tf,u),k=L(1,.65,u);
+    s+=`<rect x="${f1(x-4*k)}" y="${f1(top-16*k)}" width="${f1(8*k)}" height="${f1(11*k)}" fill="#ece2cc" stroke="${G}" stroke-width=".9"/>`;}
+  s+=`<rect x="${left?nx:nx-6}" y="${tn}" width="6" height="${bn-tn}" fill="#efe5d0"/>`;
+  return s;}
+function gitter(){
+  const y0=165,y1=214;let s=`<g stroke="${G}" stroke-width="1.6">`;
+  for(let x=4;x<480;x+=9){if(x>205&&x<275)continue;s+=`<line x1="${x}" y1="${y0}" x2="${x}" y2="${y1}"/>`;}
+  for(let x=218;x<265;x+=7)s+=`<line x1="${x}" y1="${y0-22}" x2="${x}" y2="${y1}"/>`;
+  s+='</g>';
+  s+=`<rect x="0" y="${y0+6}" width="480" height="2.5" fill="${G}"/><rect x="0" y="${y1-12}" width="480" height="2.5" fill="${G}"/>`;
+  let tips='';for(let x=4;x<480;x+=9){if(x>205&&x<275)continue;tips+=`M${x-2.2} ${y0}L${x} ${y0-6}L${x+2.2} ${y0}Z`;}
+  s+=`<path d="${tips}" fill="${G}"/>`;
+  s+=`<path d="M214 ${y0-22} Q240 ${y0-36} 266 ${y0-22}" stroke="${G}" stroke-width="3" fill="none"/>`;
+  s+=`<rect x="204" y="150" width="11" height="${y1-150}" fill="#e7dcc6" stroke="#cbbd9f"/><rect x="265" y="150" width="11" height="${y1-150}" fill="#e7dcc6" stroke="#cbbd9f"/>`;
+  s+=`<path d="M228 ${y0-40} L231 ${y0-52} L236 ${y0-44} L240 ${y0-56} L244 ${y0-44} L249 ${y0-52} L252 ${y0-40} Z" fill="${G}" stroke="${GD}" stroke-width=".8"/>`;
+  return s;}
+function szHof(m){
+  const r=rng(11);let s=himmel('hofH','#b7d3ec','#f4ead5');
+  s+=`<rect x="0" y="180" width="480" height="90" fill="${m==='d'?'#cbb894':'#c6bfae'}"/>`;
+  s+=trapGrid(190,290,150,330,176,198,10,3,['#f3efe6','#2e2e2e']);
+  s+=`<rect x="190" y="96" width="100" height="80" fill="#b45f3e"/>`;
+  for(let i=0;i<5;i++){const x=196+i*19;s+=fenster(x,106,10,22)+fenster(x,142,10,26);}
+  s+=`<rect x="190" y="132" width="100" height="3" fill="#efe5d0"/><rect x="224" y="136" width="32" height="4" fill="${G}"/>`;
+  s+=`<polygon points="186,97 294,97 282,73 198,73" fill="#4b5569"/><rect x="198" y="71" width="84" height="3" fill="${G}"/>`;
+  for(const x of [203,217,255,269])s+=`<rect x="${x}" y="80" width="8" height="11" fill="#ece2cc" stroke="${G}" stroke-width=".9"/>`;
+  s+=`<circle cx="240" cy="86" r="7" fill="#f7f2e4" stroke="${G}" stroke-width="2"/><path d="M240 86v-4.5M240 86h3.5" stroke="#333" stroke-width="1"/>`;
+  s+=fluegel(true)+fluegel(false);
+  s+=gitter();
+  if(m==='d'){
+    s+=kutsche(118,252,1.15);
+    s+=hoefling(196,228,1.05,'#1d3a8a')+`<line x1="205" y1="228" x2="205" y2="186" stroke="#6b4a2a" stroke-width="1.6"/><path d="M203 188 L205 181 L207 188Z" fill="#aaa"/>`;
+    s+=hoefling(286,228,1.05,'#1d3a8a')+`<line x1="295" y1="228" x2="295" y2="186" stroke="#6b4a2a" stroke-width="1.6"/><path d="M293 188 L295 181 L297 188Z" fill="#aaa"/>`;
+    s+=sortiert(hofstaat(r,6,320,450,236,262,1.15,1.4));
+  }else{
+    let a=touristen(r,16,20,460,226,262,1,1.35,.35);
+    a.push({y:240,svg:tourist(300,240,1.2,'#c0392b','#e6bf98',false,'#2b2118')+`<line x1="306" y1="218" x2="306" y2="200" stroke="#333" stroke-width="1.2"/><path d="M296 202 Q306 190 316 202Z" fill="#e8c547"/>`});
+    s+=sortiert(a);
+  }
+  return svgWrap(s,m==='d'?'Ehrenhof mit goldenem Gitter, Kutsche und Höflingen um 1685':'Ehrenhof heute mit Touristen');}
+
+/* ---------- Station 2: Gesandtentreppe ---------- */
+function treppeKern(){
+  const r=rng(5);let s=`<rect width="480" height="270" fill="#ead9bf"/>`;
+  s+=`<rect width="480" height="42" fill="#d4ebf7"/>`;
+  let gl='';for(let x=0;x<=480;x+=30)gl+=`M${x} 0v42`;s+=`<path d="${gl}M0 21h480" stroke="${G}" stroke-width="1.5"/>`;
+  s+=`<rect y="40" width="480" height="11" fill="${G}"/><path d="${Array.from({length:40},(_,i)=>`M${i*12+3} 51h6v4h-6z`).join('')}" fill="${GD}"/>`;
+  for(const [x0,x1] of [[0,150],[330,480]]){
+    s+=`<rect x="${x0}" y="55" width="${x1-x0}" height="120" fill="#a9c6e0"/>`;
+    for(let x=x0;x<=x1;x+=50)s+=`<rect x="${Math.min(x,x1-7)}" y="55" width="7" height="120" fill="#d9c39a"/>`;
+    const a=[];for(let i=0;i<5;i++){const x=L(x0+12,x1-12,(i+.5)/5)+r()*6;a.push(r()<.4?dame(x,152,.85,pick(r,KLEIDER),pick(r,HAUT)):hoefling(x,152,.85,pick(r,BUNT.slice(0,9)),pick(r,HAUT),pick(r,PERUECKE)));}
+    s+=a.join('');
+    s+=`<rect x="${x0}" y="140" width="${x1-x0}" height="35" fill="#e3d2b0"/>`;
+    let b='';for(let x=x0+4;x<x1;x+=8)b+=`M${x} 144v28`;s+=`<path d="${b}" stroke="#c9b48c" stroke-width="3"/>`;
+    s+=`<rect x="${x0}" y="138" width="${x1-x0}" height="5" fill="#cdb48a"/>`;
+  }
+  s+=`<rect x="150" y="55" width="180" height="120" fill="#d9c7a8"/><rect x="150" y="55" width="8" height="120" fill="#c4a988"/><rect x="322" y="55" width="8" height="120" fill="#c4a988"/>`;
+  s+=`<path d="M214 150 V92 Q240 66 266 92 V150Z" fill="#b49a74"/>`;
+  s+=`<rect x="229" y="128" width="22" height="22" fill="${G}"/>`;
+  s+=`<path d="M226 129 Q228 116 240 115 Q252 116 254 129Z" fill="#f2eee5"/><circle cx="240" cy="108" r="7" fill="#f6f3ec"/><path d="M232 108 Q232 98 240 98 Q248 98 248 108 L249 118 Q246 120 245 114 L245 106 Q240 103 235 106 L235 114 Q234 120 231 118Z" fill="#e3ddd0"/>`;
+  s+=`<polygon points="150,175 202,175 162,128 112,128" fill="#efe6d6"/><polygon points="330,175 278,175 318,128 368,128" fill="#efe6d6"/>`;
+  let st='';for(let k=1;k<8;k++){const t=k/8;st+=`M${f1(L(150,112,t))} ${f1(L(175,128,t))}L${f1(L(202,162,t))} ${f1(L(175,128,t))}M${f1(L(330,368,t))} ${f1(L(175,128,t))}L${f1(L(278,318,t))} ${f1(L(175,128,t))}`;}
+  s+=`<path d="${st}" stroke="#c75b4c" stroke-width="1.6"/>`;
+  s+=`<path d="M112 128 L150 175 M202 175 L162 128 M368 128 L330 175 M278 175 L318 128" stroke="${G}" stroke-width="3"/>`;
+  s+=`<rect x="148" y="168" width="184" height="14" fill="#c4574a"/><rect x="148" y="166" width="184" height="3" fill="${G}"/>`;
+  for(let k=0;k<12;k++){
+    const t0=k/12,t1=(k+1)/12,ya=L(270,182,t0),yb=L(270,182,t1),ym=L(ya,yb,.62);
+    const xl=t=>L(108,176,t),xr=t=>L(372,304,t),tm=L(t0,t1,.62);
+    s+=`<polygon points="${pts([[xl(t0),ya],[xr(t0),ya],[xr(tm),ym],[xl(tm),ym]])}" fill="${k%2?'#f1e9da':'#ece2cf'}"/>`;
+    s+=`<polygon points="${pts([[xl(tm),ym],[xr(tm),ym],[xr(t1),yb],[xl(t1),yb]])}" fill="#c75b4c"/>`;}
+  s+=`<path d="M108 270 L176 182 M372 270 L304 182" stroke="${G}" stroke-width="5"/>`;
+  let bl='';for(let k=0;k<10;k++){const t=k/10;bl+=`M${f1(L(98,170,t))} ${f1(L(270,182,t))}v${f1(-L(26,12,t))}M${f1(L(382,310,t))} ${f1(L(270,182,t))}v${f1(-L(26,12,t))}`;}
+  s+=`<path d="${bl}" stroke="${GD}" stroke-width="2.4"/><path d="M98 244 L170 170 M382 244 L310 170" stroke="${G}" stroke-width="3.2"/>`;
+  return s;}
+function szTreppe(m){
+  let s;
+  if(m==='d'){
+    s=treppeKern();
+    s+=hoefling(170,180,.95,'#1d3a8a')+`<line x1="178" y1="180" x2="178" y2="142" stroke="#6b4a2a" stroke-width="1.5"/>`;
+    s+=hoefling(310,180,.95,'#1d3a8a')+`<line x1="302" y1="180" x2="302" y2="142" stroke="#6b4a2a" stroke-width="1.5"/>`;
+    s+=hoefling(222,216,1.25,'#1f5f6b','#c99167','#2b2118')+hoefling(250,226,1.35,'#7a1f2b')+dame(276,240,1.45,'#2f6b56')+hoefling(204,252,1.6,'#4d2f6b');
+  }else{
+    const r=rng(9);
+    s=`<rect width="480" height="270" fill="#efe7d8"/>`+parkett(205,'#a8794d');
+    s+=`<rect y="198" width="480" height="8" fill="#d8ccb6"/><rect x="50" y="80" width="70" height="120" fill="#d9cdb7"/><rect x="60" y="92" width="50" height="108" fill="#8e7a5c"/>`;
+    s+=`<rect x="380" y="56" width="62" height="110" fill="#cfe5f3" stroke="#d8ccb6" stroke-width="5"/><path d="M411 56v110M380 111h62" stroke="#d8ccb6" stroke-width="3"/>`;
+    s+=`<rect x="196" y="60" width="88" height="26" fill="#fff" stroke="#bbb"/><path d="M204 69h60M204 75h72M204 80h48" stroke="#aaa" stroke-width="2"/>`;
+    s+=`<rect x="170" y="160" width="140" height="56" fill="#e0d6c4" stroke="#c9bca4"/>`;
+    s+=`<g transform="translate(176 104) scale(.267 .2)">${treppeKern()}</g>`;
+    s+=`<rect x="174" y="100" width="132" height="60" fill="rgba(215,235,245,.28)" stroke="#9fb3c0" stroke-width="1.6"/>`;
+    s+=sortiert(touristen(r,5,110,400,232,262,1.25,1.55,.4));
+  }
+  return svgWrap(s,m==='d'?'Gesandtentreppe aus buntem Marmor mit Glasdach und Wandmalereien':'Raum heute mit einem Modell der verschwundenen Treppe');}
+
+/* ---------- Station 3: Thronsaal ---------- */
+function szThron(m){
+  const r=rng(21);
+  let s=`<defs>${verlauf('dk','#e8c96a','#b38d1c')}<linearGradient id="silber" x1="0" x2="1"><stop offset="0" stop-color="#f4f6f8"/><stop offset=".5" stop-color="#aab3bb"/><stop offset="1" stop-color="#e5e9ed"/></linearGradient></defs>`;
+  s+=`<rect width="480" height="270" fill="#8a1c2b"/>`;
+  for(const [x,w] of [[22,112],[346,112]])s+=`<rect x="${x}" y="72" width="${w}" height="140" fill="none" stroke="${G}" stroke-width="2.2"/><rect x="${x+8}" y="80" width="${w-16}" height="124" fill="none" stroke="${G}" stroke-width=".8"/>`;
+  for(const x of [10,150,330,466])s+=`<rect x="${x-4}" y="66" width="8" height="160" fill="${G}" opacity=".85"/>`;
+  s+=`<rect width="480" height="60" fill="url(#dk)"/><rect y="58" width="480" height="9" fill="${GD}"/>`;
+  s+=`<ellipse cx="240" cy="30" rx="96" ry="22" fill="#8fb3d6" stroke="#f3dc8a" stroke-width="3"/><ellipse cx="200" cy="34" rx="22" ry="6" fill="#fff" opacity=".8"/><ellipse cx="285" cy="26" rx="18" ry="5" fill="#fff" opacity=".8"/>`;
+  let ray='';for(let i=0;i<12;i++){const a=i*Math.PI/6;ray+=`M${f1(240+12*Math.cos(a))} ${f1(30+12*Math.sin(a)*.8)}L${f1(240+19*Math.cos(a))} ${f1(30+19*Math.sin(a)*.8)}`;}
+  s+=`<path d="${ray}" stroke="#ffcf3a" stroke-width="2.4"/><circle cx="240" cy="30" r="10" fill="#ffd54a"/>`;
+  s+=parkett(225,'#9c6b3f');
+  s+=`<rect x="185" y="80" width="110" height="125" fill="#701626"/>`;
+  let dots='';for(let i=0;i<6;i++)for(let j=0;j<7;j++)dots+=`M${193+i*19} ${90+j*17}h.1`;s+=`<path d="${dots}" stroke="${G}" stroke-width="3" stroke-linecap="round" opacity=".75"/>`;
+  s+=`<rect x="150" y="205" width="180" height="22" fill="#6b1220" stroke="${G}" stroke-width="1.5"/><rect x="140" y="224" width="200" height="7" fill="#5a0f1b" stroke="${G}"/>`;
+  s+=`<path d="M172 82 Q158 140 166 206 L182 206 Q176 140 188 82Z" fill="#9b2234" stroke="${G}" stroke-width="1.4"/><path d="M308 82 Q322 140 314 206 L298 206 Q304 140 292 82Z" fill="#9b2234" stroke="${G}" stroke-width="1.4"/>`;
+  s+=`<rect x="170" y="63" width="140" height="19" fill="${G}" stroke="${GD}"/>`;
+  let fr='';for(let x=170;x<310;x+=7)fr+=`M${x} 82l3.5 6l3.5 -6`;s+=`<path d="${fr}" fill="${GD}"/><path d="M228 63 L234 52 L240 60 L246 52 L252 63Z" fill="${G}" stroke="${GD}"/>`;
+  if(m==='d'){
+    s+=`<g stroke="#7f8890" stroke-width="1"><path d="M214 182 L214 122 Q214 106 240 102 Q266 106 266 122 L266 182Z" fill="url(#silber)"/>`;
+    s+=`<rect x="221" y="124" width="38" height="52" rx="3" fill="#a3263a"/><rect x="204" y="150" width="11" height="28" fill="url(#silber)"/><rect x="265" y="150" width="11" height="28" fill="url(#silber)"/>`;
+    s+=`<rect x="205" y="176" width="70" height="10" fill="url(#silber)"/><rect x="209" y="186" width="6" height="19" fill="url(#silber)"/><rect x="265" y="186" width="6" height="19" fill="url(#silber)"/>`;
+    s+=`<circle cx="240" cy="100" r="8" fill="url(#silber)"/></g>`;
+    let sr='';for(let i=0;i<10;i++){const a=i*Math.PI/5;sr+=`M${f1(240+9*Math.cos(a))} ${f1(100+9*Math.sin(a))}L${f1(240+14*Math.cos(a))} ${f1(100+14*Math.sin(a))}`;}
+    s+=`<path d="${sr}" stroke="#c9d0d6" stroke-width="2"/>`;
+    for(const x of [116,364]){s+=`<rect x="${x-3}" y="150" width="6" height="74" fill="url(#silber)"/><ellipse cx="${x}" cy="224" rx="12" ry="4" fill="#aab3bb"/><rect x="${x-16}" y="146" width="32" height="5" fill="url(#silber)"/>`;
+      for(const d of [-11,0,11])s+=`<circle cx="${x+d}" cy="134" r="10" fill="#ffe9a0" opacity=".35"/><rect x="${x+d-1.5}" y="136" width="3" height="10" fill="#fffaf0"/><ellipse cx="${x+d}" cy="133" rx="1.8" ry="3" fill="#ffb92e"/>`;}
+    s+=hoefling(92,258,1.55,'#24346a')+`<g transform="rotate(-7 372 258)">${hoefling(372,258,1.55,'#4d2f6b')}</g>`+dame(410,262,1.55,'#2f6b56');
+  }else{
+    s+=`<rect x="211" y="100" width="58" height="84" fill="#3a2a22" stroke="${G}" stroke-width="5"/><path d="M225 182 Q228 140 240 132 Q252 140 255 182Z" fill="#6a5040"/><circle cx="240" cy="124" r="7" fill="#c9a98a"/><path d="M231 122 Q232 110 240 110 Q248 110 249 122 L251 136 Q247 138 246 130 L246 120 Q240 116 234 120 L234 130 Q233 138 229 136Z" fill="#4a3424"/>`;
+    s+=seil(110,240,250)+seil(240,370,250);
+    s+=sortiert(touristen(r,7,40,440,252,266,1.35,1.6,.5));
+  }
+  return svgWrap(s,m==='d'?'Thronsaal mit silbernem Thron unter dem Baldachin':'Thronsaal heute ohne Thron, mit Bildnis und Absperrung');}
+
+/* ---------- Station 4: Spiegelsaal ---------- */
+function szSpiegel(m){
+  const r=rng(m==='d'?31:37);
+  const fx0=205,fx1=275,fy0=108,fy1=162;
+  const Lx=u=>L(0,fx0,u),Rx=u=>L(480,fx1,u),Ty=u=>L(0,fy0,u),By=u=>L(270,fy1,u);
+  const U=[];for(let i=0;i<=17;i++)U.push(1-1/(1+i*.32));
+  const wp=(side,u,f)=>[side<0?Lx(u):Rx(u),L(Ty(u),By(u),f)];
+  let s=`<defs><linearGradient id="spg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e9eef3"/><stop offset=".55" stop-color="#b7c6d3"/><stop offset="1" stop-color="#d7dfe6"/></linearGradient></defs>`;
+  s+=`<polygon points="0,0 480,0 ${fx1},${fy0} ${fx0},${fy0}" fill="#d6b14a"/>`;
+  for(let i=0;i<16;i++){const ua=U[i]+(U[i+1]-U[i])*.08,ub=U[i+1]-(U[i+1]-U[i])*.08;
+    const c=(u,f)=>[L(Lx(u),Rx(u),f),Ty(u)];
+    s+=`<polygon points="${pts([c(ua,.2),c(ua,.8),c(ub,.8),c(ub,.2)])}" fill="${i%2?'#b9824e':'#7d97b8'}" stroke="#f3dc8a" stroke-width="1"/>`;}
+  for(const side of [-1,1]){
+    const near=side<0?0:480,far=side<0?fx0:fx1;
+    s+=`<polygon points="${pts([[near,0],[far,fy0],[far,fy1],[near,270]])}" fill="#cfae94"/>`;
+    s+=`<polygon points="${pts([wp(side,0,0),wp(side,1,0),wp(side,1,.07),wp(side,0,.07)])}" fill="${GD}"/>`;
+    s+=`<polygon points="${pts([wp(side,0,.86),wp(side,1,.86),wp(side,1,1),wp(side,0,1)])}" fill="#a98a5c"/>`;
+    for(let i=0;i<17;i++){const d=U[i+1]-U[i],ua=U[i]+d*.2,ub=U[i+1]-d*.2,um=(ua+ub)/2;
+      s+=`<polygon points="${pts([wp(side,ua,.25),wp(side,um,.15),wp(side,ub,.25),wp(side,ub,.83),wp(side,ua,.83)])}" fill="${side<0?'#c7e0f2':'url(#spg)'}" stroke="${G}" stroke-width="${f1(L(2.2,.6,U[i]))}"/>`;
+      if(side>0){s+=`<path d="M${pts([wp(1,um,.16),wp(1,um,.83)]).replace(' ','L')}M${pts([wp(1,ua,.45),wp(1,ub,.45)]).replace(' ','L')}M${pts([wp(1,ua,.64),wp(1,ub,.64)]).replace(' ','L')}" stroke="#97a5b1" stroke-width=".7"/>`;
+        s+=`<polygon points="${pts([wp(1,L(ua,ub,.2),.55),wp(1,L(ua,ub,.5),.55),wp(1,L(ua,ub,.5),.8),wp(1,L(ua,ub,.2),.8)])}" fill="#9bc29a" opacity=".35"/>`;}
+      else{s+=`<path d="M${pts([wp(-1,um,.16),wp(-1,um,.83)]).replace(' ','L')}" stroke="#f1e8d6" stroke-width="1"/>`;
+        s+=`<polygon points="${pts([wp(-1,ua,.62),wp(-1,ub,.62),wp(-1,ub,.83),wp(-1,ua,.83)])}" fill="#8fbf86" opacity=".6"/>`;}
+      const pa=U[i+1]-d*.12,pb=U[i+1]+d*.06;
+      s+=`<polygon points="${pts([wp(side,pa,.2),wp(side,pb,.2),wp(side,pb,.23),wp(side,pa,.23)])}" fill="${G}"/>`;}
+  }
+  s+=`<polygon points="0,270 480,270 ${fx1},${fy1} ${fx0},${fy1}" fill="#8b5a2b"/>`;
+  let pl='';for(let x=0;x<=480;x+=34)pl+=`M${x} 270L${f1(L(fx0,fx1,x/480))} ${fy1}`;
+  for(let i=1;i<17;i++)pl+=`M${f1(Lx(U[i]))} ${f1(By(U[i]))}H${f1(Rx(U[i]))}`;
+  s+=`<path d="${pl}" stroke="rgba(50,25,8,.4)" stroke-width="1"/>`;
+  s+=`<rect x="${fx0}" y="${fy0}" width="${fx1-fx0}" height="${fy1-fy0}" fill="#cfb58c"/><path d="M228 ${fy1} V136 Q240 124 252 136 V${fy1}Z" fill="#6f5434" stroke="${G}" stroke-width="1.2"/>`;
+  for(let i=1;i<16;i+=2)for(const fq of [.3,.7]){const u=(U[i]+U[i+1])/2,k=(By(u)-Ty(u))/270,cy=Ty(u)+(By(u)-Ty(u))*.22,cx=L(Lx(u),Rx(u),fq),ty=Ty(u);
+    if(m==='d')s+=`<circle cx="${f1(cx)}" cy="${f1(cy)}" r="${f1(24*k)}" fill="#ffe9a0" opacity=".3"/>`;
+    s+=`<line x1="${f1(cx)}" y1="${f1(ty)}" x2="${f1(cx)}" y2="${f1(cy-6*k)}" stroke="${GD}" stroke-width="${f1(1.2*k+.3)}"/>`;
+    s+=`<path d="M${f1(cx-11*k)} ${f1(cy)} Q${f1(cx)} ${f1(cy+12*k)} ${f1(cx+11*k)} ${f1(cy)}" fill="#f4f0e4" stroke="${G}" stroke-width="${f1(1.2*k+.3)}"/>`;
+    for(let c=-2;c<=2;c++)s+=`<rect x="${f1(cx+c*4.4*k-.9*k)}" y="${f1(cy-6*k)}" width="${f1(1.8*k)}" height="${f1(6*k)}" fill="#fffaf0"/>`+(m==='d'?`<circle cx="${f1(cx+c*4.4*k)}" cy="${f1(cy-7.4*k)}" r="${f1(1.5*k)}" fill="#ffb92e"/>`:'');}
+  const items=[];
+  const sAt=u=>(By(u)-Ty(u))*.0047;
+  if(m==='d'){
+    for(const side of [-1,1])for(const u of [.06,.3,.46,.58,.67]){
+      const k=(By(u)-Ty(u))/270,y=By(u),x=L(Lx(u),Rx(u),side<0?.08:.92);
+      items.push({y:y-.01,svg:`<rect x="${f1(x-7*k)}" y="${f1(y-11*k)}" width="${f1(14*k)}" height="${f1(11*k)}" fill="#c9d0d6" stroke="#8b949c" stroke-width="${f1(.8*k)}"/><rect x="${f1(x-1*k)}" y="${f1(y-21*k)}" width="${f1(2*k)}" height="${f1(10*k)}" fill="#6b4a2a"/><circle cx="${f1(x)}" cy="${f1(y-28*k)}" r="${f1(10*k)}" fill="#3f7a3a"/><circle cx="${f1(x-4*k)}" cy="${f1(y-30*k)}" r="${f1(1.8*k)}" fill="#f39c12"/><circle cx="${f1(x+4*k)}" cy="${f1(y-25*k)}" r="${f1(1.8*k)}" fill="#f39c12"/><circle cx="${f1(x+1*k)}" cy="${f1(y-34*k)}" r="${f1(1.8*k)}" fill="#f39c12"/>`});
+      const u2=u+.06,k2=(By(u2)-Ty(u2))/270,y2=By(u2),x2=L(Lx(u2),Rx(u2),side<0?.1:.9);
+      items.push({y:y2-.01,svg:`<rect x="${f1(x2-1.2*k2)}" y="${f1(y2-36*k2)}" width="${f1(2.4*k2)}" height="${f1(36*k2)}" fill="#c9d0d6"/><rect x="${f1(x2-6*k2)}" y="${f1(y2-38*k2)}" width="${f1(12*k2)}" height="${f1(3*k2)}" fill="#c9d0d6"/><circle cx="${f1(x2)}" cy="${f1(y2-44*k2)}" r="${f1(9*k2)}" fill="#ffe9a0" opacity=".45"/><ellipse cx="${f1(x2)}" cy="${f1(y2-42*k2)}" rx="${f1(1.6*k2)}" ry="${f1(2.6*k2)}" fill="#ffb92e"/>`});}
+    for(let i=0;i<9;i++){const u=L(.04,.6,r()),x=L(Lx(u),Rx(u),L(.3,.7,r())),y=By(u),s0=sAt(u);
+      items.push({y,svg:r()<.35?dame(x,y,s0,pick(r,KLEIDER)):hoefling(x,y,s0,pick(r,ROECKE),HAUT[0],pick(r,PERUECKE))});}
+  }else{
+    for(const f of [.1,.9])s+=`<line x1="${f1(L(0,480,f))}" y1="262" x2="${f1(L(fx0,fx1,f))}" y2="${fy1}" stroke="#a3263a" stroke-width="2"/>`;
+    for(let i=0;i<22;i++){const u=L(.03,.7,r()),x=L(Lx(u),Rx(u),L(.18,.82,r())),y=By(u),s0=sAt(u);
+      items.push({y,svg:tourist(x,y,s0,pick(r,BUNT),pick(r,HAUT),r()<.55,pick(r,HAAR),r()<.5?'#2f3f5f':'#55555f')});}
+  }
+  s+=sortiert(items);
+  return svgWrap(s,m==='d'?'Spiegelsaal mit Kerzenlicht, Silbermöbeln und Orangenbäumchen':'Spiegelsaal heute voller Touristen');}
+
+/* ---------- Station 5: Schlafzimmer ---------- */
+function szBett(m){
+  const r=rng(41);
+  let s=`<rect width="480" height="270" fill="#efe2bf"/>`;
+  for(const x of [22,350])s+=`<rect x="${x}" y="40" width="108" height="150" fill="#f3e9d0" stroke="${G}" stroke-width="2.5"/><rect x="${x+10}" y="50" width="88" height="130" fill="none" stroke="${G}" stroke-width=".8"/><circle cx="${x+54}" cy="115" r="14" fill="none" stroke="${G}" stroke-width="1.5"/>`;
+  s+=`<path d="M190 58 A50 34 0 0 1 290 58Z" fill="${G}" stroke="${GD}"/><circle cx="240" cy="44" r="7" fill="#f2d675"/><path d="M215 56 Q228 40 240 52 Q252 40 265 56" stroke="${GD}" stroke-width="1.5" fill="none"/>`;
+  s+=`<rect x="148" y="40" width="14" height="168" fill="#f3e9d0" stroke="${G}"/><rect x="318" y="40" width="14" height="168" fill="#f3e9d0" stroke="${G}"/><rect x="145" y="40" width="20" height="6" fill="${G}"/><rect x="315" y="40" width="20" height="6" fill="${G}"/>`;
+  s+=`<rect x="162" y="60" width="156" height="148" fill="#c7b285"/>`;
+  s+=`<rect x="188" y="92" width="104" height="60" fill="#b5303f" stroke="${G}" stroke-width="3"/><ellipse cx="240" cy="120" rx="16" ry="20" fill="none" stroke="${G}" stroke-width="2"/><path d="M240 106 L244 118 L240 134 L236 118Z" fill="${G}"/>`;
+  s+=`<ellipse cx="214" cy="150" rx="22" ry="7" fill="#fbf8f0"/><ellipse cx="266" cy="150" rx="22" ry="7" fill="#fbf8f0"/>`;
+  s+=`<rect x="180" y="152" width="120" height="48" fill="#9b1f30" stroke="${G}" stroke-width="2"/><rect x="180" y="186" width="120" height="14" fill="${G}"/><path d="M180 186 Q240 176 300 186" fill="#a92a3b"/>`;
+  s+=`<path d="M162 80 L190 80 Q182 140 188 206 L162 206Z" fill="#a3263a" stroke="${G}"/><path d="M318 80 L290 80 Q298 140 292 206 L318 206Z" fill="#a3263a" stroke="${G}"/>`;
+  let pat='';for(let y=95;y<200;y+=14)pat+=`M170 ${y}h.1M178 ${y+7}h.1M310 ${y}h.1M302 ${y+7}h.1`;s+=`<path d="${pat}" stroke="${G}" stroke-width="3" stroke-linecap="round"/>`;
+  s+=`<rect x="162" y="60" width="156" height="20" fill="#a3263a"/><path d="${Array.from({length:13},(_,i)=>`M${162+i*12} 60v20`).join('')}" stroke="${G}" stroke-width="1.6"/>`;
+  let sc='M162 80';for(let x=162;x<318;x+=13)sc+=` Q${x+6.5} 92 ${x+13} 80`;s+=`<path d="${sc}Z" fill="${G}"/>`;
+  s+=parkett(206,'#a0703f');
+  if(m==='d'){
+    s+=`<rect x="196" y="178" width="22" height="26" fill="#a3263a" stroke="${G}"/>`;
+    s+=hoefling(207,203,1.25,'#5a6fb0','#f1d4b4','#3a2615');
+    s+=hoefling(254,206,1.2,'#6b5a45')+`<rect x="236" y="174" width="12" height="15" fill="#fff" stroke="#ddd" transform="rotate(-10 242 181)"/>`;
+    s+=hoefling(282,206,1.15,'#24346a');
+  }
+  s+=`<rect x="78" y="204" width="324" height="5" fill="${G}"/><rect x="78" y="230" width="324" height="5" fill="${G}"/>`;
+  let bal='';for(let x=84;x<400;x+=11)bal+=`<path d="M${x-2} 209 Q${x-4} 214 ${x} 219 Q${x+4} 224 ${x+2.5} 230 L${x-2.5} 230 Q${x-4} 224 ${x} 219 Q${x+4} 214 ${x+2} 209Z" fill="${G}" stroke="${GD}" stroke-width=".5"/>`;
+  s+=bal;
+  if(m==='d'){
+    const a=hofstaat(r,7,60,430,252,268,1.55,1.75);s+=sortiert(a);
+  }else{
+    s+=seil(70,240,258)+seil(240,410,258);
+    s+=sortiert(touristen(r,7,40,440,252,268,1.45,1.7,.45));
+  }
+  return svgWrap(s,m==='d'?'Schlafzimmer des Königs beim Lever, Höflinge hinter der goldenen Balustrade':'Schlafzimmer des Königs heute mit Besuchern');}
+
+/* ---------- Station 6: Kapelle ---------- */
+function szKapelle(m){
+  const r=rng(51);
+  let s=`<rect width="480" height="270" fill="#f3eee3"/>`;
+  s+=`<rect width="480" height="56" fill="#8fb4d8"/><ellipse cx="120" cy="22" rx="50" ry="10" fill="#fff" opacity=".85"/><ellipse cx="360" cy="30" rx="60" ry="11" fill="#fff" opacity=".85"/><ellipse cx="240" cy="18" rx="30" ry="12" fill="#ffe7a3" opacity=".9"/>`;
+  s+=`<path d="M0 56 Q120 20 240 40 Q360 20 480 56" stroke="${G}" stroke-width="3" fill="none"/><rect y="54" width="480" height="8" fill="#e9e1cf"/><rect y="60" width="480" height="2" fill="${G}"/>`;
+  for(let x=0;x<480;x+=50){if(x>190&&x<290)continue;s+=`<rect x="${x+16}" y="72" width="22" height="66" fill="#dbe9f3"/>`;}
+  for(let x=10;x<480;x+=50){if(x>185&&x<295)continue;s+=`<rect x="${x-6}" y="64" width="12" height="86" fill="#fbf9f4" stroke="#e1dacb"/><rect x="${x-8}" y="62" width="16" height="6" fill="${G}"/>`;}
+  s+=`<rect x="196" y="66" width="88" height="84" fill="#e9d8a6" stroke="${G}" stroke-width="3"/><path d="M196 66 Q240 86 284 66" fill="#9b2234"/>`;
+  if(m==='d'){s+=hoefling(240,146,1.0,'#24346a','#f1d4b4','#3a2615')+hoefling(218,146,.9,'#7a1f2b')+dame(262,146,.9,'#3d5a9e');}
+  s+=`<rect x="198" y="136" width="84" height="9" fill="#9b2234"/><path d="${Array.from({length:14},(_,i)=>`M${200+i*6} 145l3 4l3 -4`).join('')}" fill="${G}"/>`;
+  s+=`<rect y="148" width="480" height="12" fill="#efe8d8"/><path d="${Array.from({length:60},(_,i)=>`M${i*8+4} 149v10`).join('')}" stroke="${G}" stroke-width="1.6"/><rect y="146" width="480" height="3" fill="${G}"/>`;
+  s+=`<rect y="160" width="480" height="80" fill="#ece5d6"/>`;
+  for(let x=-20;x<480;x+=80)s+=`<path d="M${x+14} 240 V196 Q${x+54} 160 ${x+94} 196 V240Z" fill="#cfc4b0"/><rect x="${x}" y="160" width="14" height="80" fill="#f7f3ea" stroke="#e1dacb"/>`;
+  s+=`<rect y="236" width="480" height="34" fill="#e9e2d4"/>`;
+  for(let x=20;x<480;x+=60)s+=`<circle cx="${x}" cy="253" r="9" fill="none" stroke="#8f1d2c" stroke-width="2"/><rect x="${x+20}" y="248" width="20" height="10" fill="#4a4a4a" opacity=".7"/>`;
+  if(m==='d'){
+    s+=sortiert(hofstaat(r,12,30,450,244,266,1.35,1.6));
+    s+=`<path d="M120 232 Q150 150 212 132" stroke="${G}" stroke-width="2.5" stroke-dasharray="6 4" fill="none"/><path d="M212 132 l-9 -1 l4 8z" fill="${G}"/>`;
+    s+=`<path d="M300 132 Q380 170 410 226" stroke="#1d2b53" stroke-width="2.5" stroke-dasharray="6 4" fill="none"/><path d="M410 226 l-1 -10 l-7 5z" fill="#1d2b53"/>`;
+    s+=`<rect x="20" y="168" width="128" height="22" rx="5" fill="#fff" opacity=".92"/><text x="84" y="183" font-family="Arial" font-size="11" text-anchor="middle" fill="#7a5a0e">Blick der Höflinge</text>`;
+    s+=`<rect x="330" y="166" width="140" height="34" rx="5" fill="#fff" opacity=".92"/><text x="400" y="180" font-family="Arial" font-size="11" text-anchor="middle" fill="#1d2b53">Blick des Königs: zum</text><text x="400" y="194" font-family="Arial" font-size="11" text-anchor="middle" fill="#1d2b53">Altar (hinter dir)</text>`;
+  }else{
+    let st='';for(let row=0;row<3;row++)for(let x=30;x<460;x+=26)st+=`<rect x="${x}" y="${246+row*8}" width="18" height="5" fill="#7a5233"/>`;
+    s+=st+sortiert(touristen(r,5,40,440,250,266,1.4,1.6,.5));
+  }
+  return svgWrap(s,m==='d'?'Schlosskapelle: Höflinge schauen zum König auf der Empore':'Schlosskapelle heute mit Stuhlreihen für Konzerte');}
+
+/* ---------- Station 7: Garten ---------- */
+function szGarten(m){
+  const r=rng(61);
+  let s=himmel('gH','#a9cbea','#eef3e8',64);
+  s+=`<rect y="54" width="480" height="12" fill="#6f8f6a"/><rect y="64" width="480" height="206" fill="#e6dcc2"/>`;
+  s+=`<polygon points="233,64 247,64 257,94 223,94" fill="#a9cbe4"/><rect x="205" y="70" width="70" height="3" fill="#a9cbe4"/>`;
+  for(const side of [-1,1]){const P=x=>240+side*x;
+    s+=`<polygon points="${pts([[P(240),62],[P(12),62],[P(48),140],[P(240),176]])}" fill="#3e6b3a"/>`;
+    let c='';for(let i=0;i<14;i++){const t=i/13;c+=`<circle cx="${f1(L(P(16),P(52),t))}" cy="${f1(L(62,138,t))}" r="${f1(L(3,8,t))}" fill="#4f8048"/>`;}
+    for(let i=0;i<14;i++){const x=P(L(20,236,i/13));c+=`<circle cx="${f1(x)}" cy="63" r="4" fill="#4f8048"/>`;}
+    s+=c;}
+  s+=`<ellipse cx="240" cy="96" rx="22" ry="3.6" fill="#9cc2df"/><rect x="238" y="91" width="4" height="4" fill="${G}"/>`;
+  s+=`<polygon points="218,99 262,99 300,142 180,142" fill="#e3d6b4"/><polygon points="226,99 254,99 283,142 197,142" fill="#86b45f"/>`;
+  let st='';for(let i=0;i<7;i++){const t=i/6,y=L(101,140,t),k=L(.5,1.2,t);st+=`<rect x="${f1(L(222,190,t)-1.5*k)}" y="${f1(y-7*k)}" width="${f1(3*k)}" height="${f1(7*k)}" fill="#fbfaf6"/><rect x="${f1(L(258,290,t)-1.5*k)}" y="${f1(y-7*k)}" width="${f1(3*k)}" height="${f1(7*k)}" fill="#fbfaf6"/>`;}
+  s+=st;
+  s+=`<ellipse cx="240" cy="154" rx="74" ry="13" fill="#9cc2df" stroke="#efe7d6" stroke-width="3"/><ellipse cx="240" cy="150" rx="46" ry="8" fill="#e8e0cf"/><ellipse cx="240" cy="147" rx="28" ry="5" fill="#9cc2df"/><ellipse cx="240" cy="143" rx="12" ry="3" fill="#e8e0cf"/><rect x="236" y="132" width="8" height="10" fill="${G}"/>`;
+  for(const side of [-1,1]){const P=x=>240+side*x;
+    s+=`<polygon points="${pts([[P(14),198],[P(200),198],[P(150),172],[P(16),172]])}" fill="#8ab8db" stroke="#efe7d6" stroke-width="4"/>`;
+    s+=`<polygon points="${pts([[P(40),190],[P(140),190],[P(110),178],[P(40),178]])}" fill="#b6d4ea" opacity=".6"/>`;
+    for(let i=0;i<4;i++){const x=P(L(30,170,i/3));s+=`<ellipse cx="${f1(x)}" cy="${f1(L(172,174,i/3))}" rx="7" ry="2.6" fill="#6b5a2a"/><circle cx="${f1(x+side*4)}" cy="${f1(L(169,171,i/3))}" r="2" fill="#6b5a2a"/>`;}
+    for(let i=0;i<4;i++){const x=P(L(210,226,i/3)),y=L(160,205,i/3),k=L(.6,1.1,i/3);s+=`<path d="M${f1(x-5*k)} ${f1(y)} L${f1(x)} ${f1(y-20*k)} L${f1(x+5*k)} ${f1(y)}Z" fill="#2f5a2c"/>`;}
+  }
+  s+=`<rect y="206" width="480" height="64" fill="#ece4d3"/><rect y="204" width="480" height="4" fill="#d6cbb4"/>`;
+  if(m==='d'){
+    s+=`<path d="M240 140 v-26 M232 142 Q226 128 222 120 M248 142 Q254 128 258 120" stroke="#fff" stroke-width="1.8" opacity=".9" fill="none"/>`;
+    s+=`<g><rect x="186" y="234" width="24" height="18" rx="3" fill="#8a1c2b" stroke="${G}" stroke-width="1.5"/><circle cx="190" cy="254" r="5" fill="none" stroke="#333" stroke-width="1.6"/><circle cx="208" cy="254" r="5" fill="none" stroke="#333" stroke-width="1.6"/>${hoefling(198,246,1.15,'#24346a','#f1d4b4','#3a2615')}<path d="M210 236 L222 232" stroke="#6b4a2a" stroke-width="2"/></g>`;
+    s+=hoefling(230,258,1.35,'#5a4632');
+    s+=sortiert(hofstaat(r,8,260,460,232,264,1.15,1.45).concat(hofstaat(r,3,20,150,226,250,1,1.2)));
+  }else{
+    s+=sortiert(touristen(r,15,20,460,222,266,1.05,1.45,.35));
+  }
+  return svgWrap(s,m==='d'?'Blick vom Schloss in den Barockgarten, der König im Rollstuhl':'Blick in den Garten heute mit Touristen');}
+
+/* ---------- Station 8: Apollobrunnen ---------- */
+function pferdVorne(x,y,s,flip){return `<g transform="translate(${x} ${y}) scale(${flip?-s:s} ${s})" fill="${G}" stroke="${GD}" stroke-width=".8">
+<path d="M0 0 Q-5 -12 1 -20 Q4 -26 0 -32 Q-1 -38 5 -38.5 L12.5 -34 Q14.5 -31 11 -30 L7.5 -31 Q8 -24 10 -20 Q16 -16 18 -8 L22.5 -14.5 Q24.5 -16.5 25.5 -13 L20 -4 Q19 0 14 2 Z"/>
+<path d="M1.5 -36 Q-7 -34 -9 -25" fill="none" stroke-width="2.2"/></g>`;}
+function szApollo(m){
+  const r=rng(71);
+  let s=himmel('aH','#9ec5e8','#eef3e8',112);
+  s+=`<rect y="98" width="480" height="12" fill="#6f8f6a"/><rect y="108" width="480" height="162" fill="#d9cfb3"/>`;
+  s+=`<polygon points="232,104 248,104 336,178 144,178" fill="#a3c6e2"/><rect x="196" y="111" width="88" height="3" fill="#bcd6ea"/>`;
+  for(const side of [-1,1]){const P=x=>240+side*x;
+    s+=`<polygon points="${pts([[P(240),92],[P(14),100],[P(102),178],[P(240),196]])}" fill="#3d6a39"/>`;
+    let c='';for(let i=0;i<12;i++){const t=i/11;c+=`<circle cx="${f1(L(P(14),P(102),t))}" cy="${f1(L(100,176,t))}" r="${f1(L(3,10,t))}" fill="#4b7c45"/>`;}
+    for(let i=0;i<12;i++)c+=`<circle cx="${f1(P(L(18,236,i/11)))}" cy="${f1(L(99,93,i/11))}" r="5" fill="#4b7c45"/>`;
+    s+=c;}
+  s+=`<defs>${verlauf('wa','#8fbbe0','#5e93c4')}</defs><ellipse cx="240" cy="214" rx="206" ry="46" fill="url(#wa)" stroke="#e1d7c3" stroke-width="6"/>`;
+  s+=`<ellipse cx="240" cy="216" rx="120" ry="22" fill="none" stroke="#fff" stroke-width="1" opacity=".35"/>`;
+  s+=pferdVorne(196,218,1.25,true)+pferdVorne(214,210,1.15,true)+pferdVorne(284,210,1.15,false)+pferdVorne(302,218,1.25,false);
+  s+=`<path d="M218 210 Q220 190 244 190 L268 192 Q272 204 262 212Z" fill="${G}" stroke="${GD}"/><circle cx="258" cy="207" r="10" fill="${G}" stroke="${GD}" stroke-width="1.5"/><path d="M258 197v20M248 207h20M251 200l14 14M265 200l-14 14" stroke="${GD}" stroke-width="1"/>`;
+  s+=`<g fill="${G}" stroke="${GD}" stroke-width=".8"><path d="M244 192 L246 172 Q248 166 254 166 Q260 166 261 172 L264 192 Z"/><circle cx="254" cy="160" r="5.5"/><path d="M262 170 Q282 160 288 148 Q282 172 266 180Z"/></g><path d="M248 172 L226 168" stroke="${G}" stroke-width="3"/>`;
+  for(const [x,f] of [[140,1],[340,-1]])s+=`<g transform="translate(${x} 226) scale(${f} 1)" fill="${G}" stroke="${GD}" stroke-width=".8"><path d="M-6 6 Q-8 -10 0 -12 Q8 -10 6 6Z"/><circle cx="0" cy="-16" r="4.5"/><path d="M3 -18 L16 -26 L18 -22 L5 -15Z"/></g>`;
+  if(m==='d'){
+    let j='';for(const [x,h] of [[240,95],[214,60],[266,60],[188,45],[292,45]])j+=`<path d="M${x} 198 Q${x-2} ${198-h/2} ${x} ${198-h}" stroke="#fff" stroke-width="2.4" fill="none" opacity=".9"/><ellipse cx="${x}" cy="${198-h}" rx="5" ry="3" fill="#fff" opacity=".7"/>`;
+    j+=`<path d="M156 210 Q160 180 200 176M324 210 Q320 180 280 176" stroke="#fff" stroke-width="1.8" fill="none" opacity=".85"/>`;
+    s+=j;
+    s+=`<path d="M226 138 Q240 144 254 138 L251 141 Q240 146 229 141Z" fill="#111"/><path d="M254 138 l3 -5" stroke="${G}" stroke-width="1.5"/><path d="M238 138 v-6" stroke="#333" stroke-width="1"/>`;
+    s+=arbeiter(54,256,1.4,'#e6bf98','#3d5a3a')+`<rect x="64" y="200" width="56" height="20" rx="8" fill="#fff" stroke="#999"/><text x="92" y="214" font-family="Arial" font-size="11" text-anchor="middle" fill="#333">♪ Pfiff!</text><path d="M70 220 l-6 8 l12 -8z" fill="#fff" stroke="#999"/>`;
+    s+=sortiert(hofstaat(r,6,370,465,246,266,1.3,1.5));
+  }else{
+    s+=`<ellipse cx="226" cy="136" rx="9" ry="3" fill="#e74c3c"/><ellipse cx="254" cy="150" rx="11" ry="3.6" fill="#f1c40f"/><ellipse cx="240" cy="124" rx="6" ry="2" fill="#2ecc71"/>`;
+    s+=sortiert(touristen(r,9,20,460,248,268,1.3,1.5,.5));
+  }
+  return svgWrap(s,m==='d'?'Apollobrunnen mit Wasserfontänen und Gondel auf dem Großen Kanal':'Apollobrunnen heute ohne Fontänen, Ruderboote auf dem Kanal');}
+
+/* ---------- Station 9: Labyrinth ---------- */
+function szLabyrinth(m){
+  const r=rng(81);
+  let s=`<rect width="480" height="270" fill="#e8dcbf"/>`;
+  if(m==='d'){
+    s+=`<rect x="30" y="18" width="420" height="234" rx="8" fill="#2f6b3a"/>`;
+    const wege=[[[240,252],[240,215],[170,215],[170,180],[110,180],[110,120],[60,120],[60,60],[150,60]],
+      [[240,215],[320,215],[320,170],[400,170],[400,90],[330,90],[330,45],[240,45],[240,95]],
+      [[170,180],[210,150],[270,150],[320,170]],[[110,120],[170,120],[170,85],[240,95],[290,120],[290,150]],
+      [[400,170],[420,222],[360,236]],[[150,60],[200,32],[240,45]],[[400,90],[428,52]],[[110,180],[78,228],[140,238]],[[60,60],[52,36],[110,32]]];
+    s+=`<g stroke="#ead9b0" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none">${wege.map(w=>`<polyline points="${pts(w)}"/>`).join('')}</g>`;
+    const br=[[170,215],[110,180],[60,120],[150,60],[320,215],[400,170],[330,90],[240,45],[240,95],[210,150],[290,120],[428,52],[78,228],[360,236],[200,32],[110,32],[170,120],[270,150]];
+    for(const [x,y] of br)s+=`<circle cx="${x}" cy="${y}" r="7.5" fill="#8fc0e3" stroke="#f4ecd6" stroke-width="2"/><ellipse cx="${x}" cy="${y-1}" rx="2.6" ry="2" fill="${pick(r,['#c0392b','#8e5b38','#e6c65c','#555','#16a085'])}"/>`;
+    s+=`<rect x="226" y="246" width="6" height="10" fill="#fbfaf6"/><rect x="248" y="246" width="6" height="10" fill="#fbfaf6"/><rect x="198" y="255" width="84" height="14" rx="4" fill="#fff" opacity=".9"/><text x="240" y="266" font-family="Arial" font-size="10" text-anchor="middle" fill="#1d2b53">Eingang</text>`;
+  }else{
+    s+=`<rect x="30" y="18" width="420" height="234" rx="8" fill="#7fae5c"/>`;
+    s+=`<g stroke="#ead9b0" stroke-width="10" fill="none"><path d="M240 252 V18 M30 135 H450 M60 40 L420 230 M420 40 L60 230"/></g>`;
+    let t='';for(let x=50;x<445;x+=26)for(let y=34;y<245;y+=24){if(Math.abs(x-240)<14||Math.abs(y-135)<14)continue;t+=`<circle cx="${x}" cy="${y}" r="7.5" fill="#3f7a3a"/>`;}
+    s+=t+`<circle cx="240" cy="135" r="16" fill="#e8dcbf" stroke="#d1c19c" stroke-width="2"/>`;
+  }
+  return svgWrap(s,m==='d'?'Labyrinth aus Hecken mit Brunnen von oben':'Wäldchen der Königin heute von oben');}
+
+/* ---------- Station 10: Baustelle ---------- */
+function szBaustelle(){
+  const r=rng(91);
+  let s=himmel('bH','#c9d2da','#efe7d6',190);
+  s+=`<rect y="172" width="480" height="98" fill="#8a6b45"/>`;
+  for(const [x,y,w] of [[90,230,40],[300,256,52],[420,214,30]])s+=`<ellipse cx="${x}" cy="${y}" rx="${w}" ry="${w/5}" fill="#a9b9c2" opacity=".75"/>`;
+  for(const x of [20,52])s+=`<path d="M${x} 176 L${x+18} 146 L${x+36} 176Z" fill="#d8cdb6" stroke="#b9ab8e"/>`;
+  s+=`<rect x="150" y="96" width="270" height="80" fill="#e9dfc9"/>`;
+  s+=`<path d="M300 96 L320 84 L340 96 L360 78 L380 96 L420 90 L420 96Z" fill="#e9dfc9"/>`;
+  s+=`<polygon points="146,98 300,98 290,76 156,76" fill="#4b5569"/>`;
+  for(let i=0;i<12;i++)for(const y of [108,140]){const x=158+i*22;s+=`<rect x="${x}" y="${y}" width="11" height="${y===108?20:24}" fill="${x>300?'#6b5a45':'#5d7088'}"/>`;}
+  let g='';for(let x=300;x<=430;x+=18)g+=`M${x} 70V178`;for(let y=80;y<178;y+=20)g+=`M296 ${y}H434`;for(let x=300;x<420;x+=36)g+=`M${x} 178L${x+36} 80`;
+  s+=`<path d="${g}" stroke="#6b4a2a" stroke-width="2"/>`;
+  s+=`<g stroke="#6b4a2a" stroke-width="4" fill="none"><circle cx="100" cy="150" r="28"/><path d="M100 122v56M72 150h56M80 130l40 40M120 130l-40 40" stroke-width="1.6"/><path d="M84 178 L100 112 L116 178"/><path d="M100 118 L186 38" stroke-width="5"/></g><path d="M186 38 V112" stroke="#333" stroke-width="1.2"/><rect x="176" y="112" width="20" height="13" fill="#d9ccb0" stroke="#a89878"/>`;
+  for(const [x,y] of [[40,226],[56,220],[48,212],[232,206],[250,210],[240,200]])s+=`<rect x="${x}" y="${y}" width="20" height="12" fill="#d9ccb0" stroke="#a89878"/>`;
+  s+=pferd(330,248,1.2,'#5b3a22',true)+`<rect x="344" y="222" width="40" height="18" fill="#7a5a3a"/><circle cx="352" cy="244" r="7" fill="none" stroke="#3b2414" stroke-width="2"/><circle cx="376" cy="244" r="7" fill="none" stroke="#3b2414" stroke-width="2"/><rect x="350" y="214" width="14" height="9" fill="#d9ccb0"/>`;
+  const a=[];for(let i=0;i<16;i++){const t=r(),y=L(186,266,t);a.push({y,svg:arbeiter(L(20,460,r()),y,L(.9,1.35,t),pick(r,HAUT.slice(0,3)),pick(r,['#7a5a3a','#5a4632','#6b6250','#8c6d4a']),r()<.4)});}
+  for(const [x,y] of [[310,175],[350,155],[390,135],[330,115]])a.push({y:0,svg:arbeiter(x,y,.7,pick(r,HAUT.slice(0,3)),'#6b6250')});
+  s+=sortiert(a);
+  return svgWrap(s,'Baustelle Versailles mit Tretradkran, Gerüsten und Arbeitern');}
+
+/* =========================================================
+   Glossar
+   ========================================================= */
+const GLOSSAR={
+  'Höfling':'Adliger, der am Hof des Königs lebt und dort auf Gunst, Ämter und Geld hofft.',
+  'Hof':'Alle Menschen, die um den König herum leben: Familie, Adlige, Diener, Beamte.',
+  'Gesandter':'Botschafter eines anderen Landes oder Fürsten.',
+  'Baldachin':'Ein Dach aus Stoff über einem Thron oder Bett – Zeichen von Würde und Rang.',
+  'Balustrade':'Ein Geländer aus kleinen Säulen (Balustern).',
+  'Empore':'Ein erhöhtes Stockwerk in einer Kirche, wie ein Balkon im Innenraum.',
+  'Zeremonie':'Eine feierliche Handlung, die immer nach festen Regeln abläuft.',
+  'Gottesgnadentum':'Die Vorstellung, dass der König seine Macht direkt von Gott bekommen hat – und nur Gott Rechenschaft schuldet.',
+  'Absolutismus':'Herrschaftsform, in der ein Fürst allein und uneingeschränkt („absolut“) regiert.',
+  'Barock':'Kunststil im 17. und 18. Jahrhundert: prächtig, prunkvoll, viel Gold, große Wirkung.',
+  'Fabel':'Kurze Geschichte, in der Tiere wie Menschen handeln und am Ende eine Lehre steht.',
+  'Steuern':'Abgaben, die die Menschen an den Staat zahlen müssen.',
+  'Büste':'Skulptur, die nur Kopf und Schultern eines Menschen zeigt.'
+};
+function fmt(t){return t.replace(/\[\[([^\]|]+)(?:\|([^\]]+))?\]\]/g,(_,a,b)=>{const k=b||a;return GLOSSAR[k]?`<span class="g" tabindex="0" data-k="${k}">${a}</span>`:a;});}
+
+/* =========================================================
+   Stationen
+   ========================================================= */
+const STATIONEN=[
+{ titel:'Ankunft im Ehrenhof', ort:'Cour d’honneur & Cour de marbre', jahr:'um 1685', karte:[24,150], liste:'Ehrenhof', szene:szHof,
+  intro:['Deine Kutsche rollt auf das Schloss zu. Die Gebäude bilden eine Art Trichter: Die Höfe werden immer enger, bis dein Blick ganz hinten auf dem kleinen <b>Marmorhof</b> landet. Dort steht der älteste Teil des Schlosses – das Jagdschloss von Ludwigs Vater, Ludwig XIII., aus roten Ziegeln und hellem Stein.',
+         'Ludwig XIV. ließ es nicht abreißen, sondern baute es ab 1661 immer weiter aus. 1682 zog er mit seinem ganzen [[Hof]] und der Regierung nach Versailles.'],
+  damals:'Ein vergoldetes Gitter mit Königskrone trennte die Höfe. Nicht jeder durfte mit der Kutsche bis in den inneren Hof fahren – das war ein Vorrecht für Menschen mit hohem Rang. Auf den Dächern glänzten vergoldete Verzierungen, Wachen standen am Tor.',
+  heute:'Das goldene Königsgitter wurde in der Französischen Revolution zerstört. Seit 2008 steht dort wieder eine Nachbildung. Statt Kutschen kommen heute jedes Jahr Millionen Besucherinnen und Besucher.',
+  beobachte:'Vergleiche den Marmorhof (hinten) mit dem Boden vorne. Welche Farben und Materialien erkennst du? Warum wirkt alles so, als würde es auf einen Punkt zulaufen?',
+  wusstest:'Genau in der Mitte, im ersten Stock über dem Marmorhof, lag ab 1701 das Schlafzimmer des Königs. Alle Wege führen also zum König – wie Strahlen zur Sonne.',
+  frage:{q:'Was lag ab 1701 genau in der Mitte des Schlosses?',o:['Die Schlossküche','Das Schlafzimmer des Königs','Der Pferdestall'],k:1,
+    e:'Richtig! Das Schlafzimmer des Königs lag im Zentrum – der König war buchstäblich der Mittelpunkt von Versailles.'}},
+{ titel:'Die Gesandtentreppe', ort:'Escalier des Ambassadeurs', jahr:'1672–1679', karte:[52,106], liste:'Gesandtentreppe', szene:szTreppe,
+  intro:['Wer als [[Gesandter]] eines anderen Landes zum König kam, stieg diese Treppe hinauf. Sie bestand aus buntem Marmor, durch ein Glasdach fiel Tageslicht herein.',
+         'An den Wänden waren Menschen aus aller Welt gemalt, die über Geländer zu schauen schienen. In einer Nische stand eine [[Büste]] des Königs.'],
+  damals:'Die Treppe sollte Gäste schon beim Hinaufgehen beeindrucken. Die Botschaft war klar: Der französische König ist so reich und mächtig, dass die ganze Welt zu ihm aufschaut. Von hier aus ging es weiter in die Prunksäle des Königs.',
+  heute:'Die Treppe gibt es nicht mehr. Ludwig XV., der Urenkel des Sonnenkönigs, ließ sie 1752 abreißen, weil er Platz für Wohnungen seiner Töchter brauchte. Ein Modell im Schloss und alte Kupferstiche zeigen heute, wie sie aussah.',
+  beobachte:'Schalte zwischen „Damals“ und „Heute“ um. Was ist verloren gegangen?',
+  wusstest:'Die Wandbilder zeigten Menschen aus Europa, Asien, Afrika und Amerika. Sie sollten zeigen: Alle Völker der Erde bewundern den König von Frankreich.',
+  frage:{q:'Warum kannst du die Gesandtentreppe heute nicht mehr hinaufgehen?',o:['Sie ist nur für Staatsgäste geöffnet.','Sie wurde im Zweiten Weltkrieg zerstört.','Sie wurde 1752 abgerissen.'],k:2,
+    e:'Genau! Ludwig XV. ließ die berühmte Treppe 1752 abreißen. Wie sie aussah, wissen wir nur aus Bildern und Beschreibungen.'}},
+{ titel:'Die Planetensäle und der Thronsaal', ort:'Grand Appartement du Roi – Salon d’Apollon', jahr:'um 1680', karte:[92,104], liste:'Thronsaal', szene:szThron,
+  intro:['Hinter der Treppe beginnt eine Reihe prachtvoller Säle, einer hinter dem anderen. Jeder Saal ist nach einem Planeten und einem Gott der Antike benannt: Venus, Diana, Mars, Merkur – und am Ende <b>Apollo</b>, der Gott der Sonne.',
+         'Die Wände sind mit Marmor und rotem Samt verkleidet, die Decken bemalt, überall glänzt Gold. So sieht [[Barock]] aus.'],
+  damals:'Im Apollosaal stand der Thron des Königs – aus massivem Silber, unter einem [[Baldachin]]. Hier empfing Ludwig XIV. wichtige Gäste. An manchen Abenden waren die Säle für den Hof geöffnet: Es gab Musik, Kartenspiele, Erfrischungen – und im Dianasaal einen Billardtisch, denn der König spielte gern Billard.',
+  heute:'Der Silberthron ist verschwunden. 1689 ließ der König viele Silbermöbel einschmelzen, um einen Krieg zu bezahlen. Heute steht dort kein Thron mehr; an der Wand hängt ein Bildnis des Königs.',
+  beobachte:'Suche im Bild die Sonne an der Decke. Wo taucht die Sonne noch auf?',
+  wusstest:'Ludwig XIV. wählte die Sonne als sein Zeichen. Die Botschaft: Wie die Sonne den Planeten Licht und Leben gibt, so ist der König der Mittelpunkt, um den sich ganz Frankreich dreht.',
+  frage:{q:'Warum ist ausgerechnet der Thronsaal nach Apollo benannt?',o:['Apollo ist der Gott der Sonne – und Ludwig XIV. ist der Sonnenkönig.','Der Baumeister des Saals hieß Apollo.','Es ist der hellste Raum des Schlosses.'],k:0,
+    e:'Richtig! Der Sonnengott Apollo steht für den König selbst. Der wichtigste Saal gehört deshalb Apollo.'}},
+{ titel:'Der Spiegelsaal', ort:'Galerie des Glaces', jahr:'1678–1684', karte:[122,150], liste:'Spiegelsaal', szene:szSpiegel,
+  intro:['Der berühmteste Raum von Versailles: 73 Meter lang, mit 17 großen Fenstern zum Garten. Gegenüber jedem Fenster ist ein Bogen aus Spiegeln – insgesamt <b>357 Spiegel</b>. Sie werfen das Licht des Gartens und tausender Kerzen zurück.',
+         'An der Decke zeigen rund 30 Gemälde des Hofmalers Charles Le Brun Ludwig XIV. als siegreichen Herrscher, der Kriege gewinnt und Frankreich regiert.'],
+  damals:'Zur Zeit des Sonnenkönigs standen hier Möbel aus massivem Silber: Tische, Kerzenständer und Kübel mit Orangenbäumchen. Der Saal war vor allem ein Durchgang: [[Höfling|Höfling]]e warteten hier, um den König zu sehen, wenn er vorbeiging.',
+  heute:'Die Silbermöbel wurden 1689 eingeschmolzen, um einen Krieg zu bezahlen. Heute drängen sich hier täglich Tausende Touristen. Der Saal wurde später noch zweimal weltberühmt: 1871 wurde hier das Deutsche Kaiserreich ausgerufen, 1919 der Versailler Vertrag unterzeichnet.',
+  beobachte:'Schau an die rechte Wand: Was spiegelt sich in den Spiegeln? Warum ist es im Saal so hell?',
+  wusstest:'Spiegel waren damals unglaublich teuer. Große Spiegel konnte man lange nur in Venedig herstellen. Für Versailles wurden die Spiegel in Frankreich gemacht – auch das sollte zeigen: Frankreich kann alles.',
+  frage:{q:'Warum beeindruckten 357 Spiegel die Besucher so sehr?',o:['Man brauchte sie, weil der Saal keine Fenster hatte.','Spiegel waren sehr teuer – so viele davon zeigten unvorstellbaren Reichtum.','Sie waren ein Geschenk des Papstes.'],k:1,
+    e:'Richtig! Ein einziger großer Spiegel kostete ein Vermögen. 357 Spiegel in einem Raum – das konnte sich nur der reichste König Europas leisten.'}},
+{ titel:'Das Schlafzimmer des Königs', ort:'Chambre du Roi', jahr:'ab 1701', karte:[80,150], liste:'Schlafzimmer', szene:szBett,
+  intro:['Mitten im Schloss, mit Blick nach Osten auf den Marmorhof – dorthin, wo die Sonne aufgeht – liegt das Schlafzimmer des Königs. Das Bett steht in einer Nische. Davor trennt eine vergoldete [[Balustrade]] den König von den Zuschauern.',
+         'Ja, Zuschauer: Im Leben des Königs war fast nichts privat.'],
+  damals:'Jeden Morgen fand hier das <b>Lever</b> statt: das Aufstehen des Königs als feierliche [[Zeremonie]]. Je nach Rang durften die Höflinge nacheinander eintreten. Wer dem König das Hemd reichen durfte, galt als besonders geehrt. Abends folgte das <b>Coucher</b>, das Zubettgehen – wieder mit Publikum.',
+  heute:'Das Zimmer wurde nach alten Vorlagen wieder eingerichtet; die Stoffe sind Nachbildungen. In diesem Raum starb Ludwig XIV. am 1. September 1715.',
+  beobachte:'Wozu dient das goldene Geländer vor dem Bett? Wer steht davor, wer dahinter?',
+  wusstest:'Durch die Zeremonien band der König den Adel an sich: Die Adligen wetteiferten um kleine Ehren – statt sich gegen den König zu verbünden.',
+  frage:{q:'Was war das „Lever“?',o:['Das Frühstück der Diener in der Küche','Ein Pferderennen im Schlosspark','Das Aufstehen des Königs als Zeremonie mit Zuschauern'],k:2,
+    e:'Richtig! Sogar das Aufstehen war ein öffentliches Ereignis. Dabei zu sein, war für Adlige eine große Ehre.'}},
+{ titel:'Die Schlosskapelle', ort:'Chapelle royale', jahr:'1699–1710', karte:[84,66], liste:'Kapelle', szene:szKapelle,
+  intro:['Jeden Tag besuchte der König die Messe. Die heutige Schlosskapelle wurde 1710 fertig – fünf Jahre vor seinem Tod. Sie ist hoch, hell und weiß-golden.',
+         'Der König saß nicht unten bei den anderen, sondern oben auf einer eigenen [[Empore]], der Königstribüne.'],
+  damals:'Ein Zeitgenosse, der Schriftsteller Jean de La Bruyère, beschrieb eine Messe am Hof so: Die Höflinge drehten dem Altar den Rücken zu und schauten zum König hinauf – der König aber schaute zu Gott. Ludwig XIV. sah sich als König „von Gottes Gnaden“ ([[Gottesgnadentum]]): Gott selbst habe ihm die Macht gegeben.',
+  heute:'Die Kapelle sieht fast noch so aus wie 1710. Heute finden hier auch Konzerte statt.',
+  beobachte:'Folge den Pfeilen im Damals-Bild. Wer steht im Mittelpunkt der Blicke?',
+  wusstest:'Vor 1710 gab es im Schloss schon mehrere kleinere Kapellen. Die heutige ist bereits die fünfte.',
+  frage:{q:'Wohin schauten die Höflinge laut La Bruyère während der Messe?',o:['Zum König auf der Empore','Zum Altar','Aus dem Fenster in den Garten'],k:0,
+    e:'Richtig! Für die Höflinge war der König wichtiger als alles andere. Der König selbst schaute zum Altar – über ihm stand nur Gott.'}},
+{ titel:'Der Garten', ort:'Parterre d’eau & Latona-Brunnen', jahr:'ab 1661', karte:[160,150], liste:'Garten', szene:szGarten,
+  intro:['Vor der Gartenseite des Schlosses breitet sich ein riesiger Park aus. Gestaltet hat ihn <b>André Le Nôtre</b>, der Gärtner des Königs. Alles ist streng geordnet: gerade Wege, geometrische Beete, beschnittene Bäume und Hecken.',
+         'Eine lange Hauptachse führt vom Schloss bis zum Horizont. Vom Schloss aus überblickt der König alles.'],
+  damals:'Direkt am Schloss liegen zwei große Wasserbecken, in denen sich die Fassade spiegelt. Dahinter folgen der Latona-Brunnen und der „Grüne Teppich“, eine lange Rasenfläche. Der König liebte seinen Garten so sehr, dass er selbst eine Anleitung schrieb, wie man ihn Gästen zeigen soll. Im Alter ließ er sich in einem Rollstuhl durch den Park fahren.',
+  heute:'Der Garten hat seine Form behalten, viele Bäume wurden aber neu gepflanzt – zuletzt nach einem schweren Sturm 1999. Er gilt als Musterbeispiel eines Barockgartens.',
+  beobachte:'Wie würdest du die Natur in diesem Garten beschreiben: wild oder gezähmt? Woran erkennst du das?',
+  wusstest:'Diesen Gartentyp nennt man „Französischer Garten“. Viele Fürsten in Europa ahmten ihn nach – auch in Sachsen, zum Beispiel im Großen Garten in Dresden.',
+  frage:{q:'Was sollte der streng geordnete Garten zeigen?',o:['Die Gärtner hatten keine Zeit für schöne Formen.','Der König beherrscht sogar die Natur.','Wilde Natur war damals verboten.'],k:1,
+    e:'Richtig! Wer sogar Bäume, Wasser und Wege in Form zwingen kann, zeigt: Ich habe die Macht über alles.'}},
+{ titel:'Apollobrunnen und Großer Kanal', ort:'Bassin d’Apollon & Grand Canal', jahr:'1668–1679', karte:[255,150], liste:'Apollobrunnen', szene:szApollo,
+  intro:['Am Ende des „Grünen Teppichs“ steigt Apollo, der Sonnengott, mit seinem Wagen und vier Pferden aus dem Wasser – so wie die Sonne am Morgen aufgeht. Die Figuren sind aus vergoldetem Blei.',
+         'Dahinter liegt der <b>Große Kanal</b>: über 1,6 Kilometer lang und in Form eines Kreuzes angelegt.'],
+  damals:'Auf dem Kanal fuhren Gondeln, die die Stadt Venedig dem König geschenkt hatte – samt Gondolieri. Für Feste gab es sogar kleine Segelschiffe. Weil Wasser knapp war, sprangen die Brunnen nur, wenn der König vorbeikam: Brunnenmeister gaben sich mit Pfiffen Zeichen, um den nächsten Brunnen rechtzeitig anzustellen.',
+  heute:'Die Fontänen sprudeln heute nur an bestimmten Tagen bei den großen Wasserspielen. Auf dem Kanal kann man Ruderboote mieten.',
+  beobachte:'Vergleiche „Damals“ und „Heute“: Was fällt dir am Wasser auf?',
+  wusstest:'Um Wasser nach Versailles zu bringen, ließ der König 1684 die „Maschine von Marly“ bauen: Riesige Wasserräder pumpten Wasser aus der Seine einen Berg hinauf. Trotzdem reichte es nie für alle Brunnen gleichzeitig.',
+  frage:{q:'Warum sprangen die Brunnen nicht den ganzen Tag?',o:['Das Plätschern störte den König beim Schlafen.','Im Sommer war es verboten, Wasser zu verbrauchen.','Es gab nicht genug Wasser – sie wurden angestellt, wenn der König kam.'],k:2,
+    e:'Richtig! Wasser war in Versailles knapp. Für den König sollte es aber so aussehen, als gäbe es davon unendlich viel.'}},
+{ titel:'Verschwundene Orte: das Labyrinth', ort:'Le Labyrinthe', jahr:'1665–1778', karte:[182,212], liste:'Labyrinth', szene:szLabyrinth,
+  intro:['Versailles sah zur Zeit des Sonnenkönigs nicht genau so aus wie heute. Manche Orte sind ganz verschwunden. Einer der beliebtesten war das <b>Labyrinth</b>: ein Irrgarten aus Hecken.',
+         'Darin standen 39 Brunnen mit bemalten Tierfiguren. Jeder Brunnen erzählte eine [[Fabel]] des griechischen Dichters Äsop.'],
+  damals:'Das Labyrinth sollte auch der Erziehung des Kronprinzen dienen: An jedem Brunnen stand ein kurzes Gedicht mit der Lehre der Fabel. Am Eingang begrüßten Statuen von Äsop und Amor die Besucher.',
+  heute:'1778, unter Ludwig XVI., wurde das Labyrinth abgerissen. An seiner Stelle liegt heute das „Wäldchen der Königin“ mit geraden Wegen und Bäumen.',
+  beobachte:'Finde im Damals-Bild den Eingang. Wie viele Brunnen kannst du zählen?',
+  wusstest:'Auch andere Bauten verschwanden: Das „Porzellan-Trianon“ (1670) war mit blau-weißen Fliesen verkleidet. Schon 1687 ließ Ludwig XIV. es abreißen und an seiner Stelle das Grand Trianon aus rosa Marmor bauen.',
+  frage:{q:'Was konnte man im Labyrinth entdecken?',o:['Brunnen mit Tierfiguren zu den Fabeln von Äsop','Ein Gehege mit Löwen und Elefanten','Ein Theater für Opern'],k:0,
+    e:'Richtig! 39 Brunnen erzählten Tierfabeln – ein Garten zum Staunen und Lernen.'}},
+{ titel:'Hinter der Pracht: Wer bezahlte?', ort:'Die Baustelle Versailles', jahr:'1661–1715', karte:[32,268], liste:'Wer bezahlte?', szene:szBaustelle, keinHeute:true,
+  intro:['So viel Pracht hatte einen Preis. Versailles war jahrzehntelang eine riesige Baustelle auf sumpfigem Gelände. Um 1685 sollen mehr als 30.000 Menschen gleichzeitig dort gearbeitet haben. Viele verunglückten oder wurden krank.',
+         'Bezahlt wurde das alles mit [[Steuern]]. Die meisten Steuern trugen die Bauern und die einfachen Leute – Adel und Kirche mussten kaum Steuern zahlen.'],
+  damals:'Für ein riesiges Wasserleitungsprojekt an der Eure (ab 1685) wurden sogar Soldaten als Bauarbeiter eingesetzt. Viele erkrankten an Fieber; das Projekt wurde schließlich abgebrochen. Versailles zeigt also nicht nur die Macht des Königs – sondern auch, wer dafür bezahlen musste.',
+  stimmen:[['Ein Höfling','Wer nicht in Versailles ist, ist niemand. Ich muss in der Nähe des Königs sein, sonst bekomme ich keine Ämter und kein Geld.'],
+           ['Ein Bauarbeiter','Wir schleppen Steine durch den Schlamm. Wenn einer stürzt, steht am nächsten Tag ein anderer an seinem Platz.'],
+           ['Eine Bäuerin','Schon wieder höhere Steuern. Von unserer Ernte bleibt kaum etwas für den Winter.'],
+           ['Ein ausländischer Gesandter','Ich werde meinem Fürsten berichten: So ein Schloss gibt es nirgends auf der Welt.']],
+  beobachte:'Lies die vier Stimmen. Wie würde jede dieser Personen Versailles beschreiben?',
+  wusstest:'Versailles wurde zum Vorbild für viele Schlösser in Europa. Auch August der Starke in Sachsen wollte zeigen, wie mächtig er war – zum Beispiel mit dem Dresdner Zwinger.',
+  frage:{q:'Wer musste die meisten Steuern für die Pracht bezahlen?',o:['Vor allem der Adel','Vor allem die Bauern und einfachen Leute','Die Gesandten aus anderen Ländern'],k:1,
+    e:'Richtig! Die Pracht des Hofes bezahlten vor allem die Bauern. Der Adel war von vielen Steuern befreit.'}}
+];
+
+/* =========================================================
+   Zustand
+   ========================================================= */
+const KEY='versailles-rundgang-v1';
+let S={name:'',besucht:[],richtig:{},versuche:{},notizen:{},aktuell:0,modus:'damals',abschluss:''};
+function laden(){try{const d=JSON.parse(localStorage.getItem(KEY)||'null');if(d)S=Object.assign(S,d);}catch(e){}}
+function speichern(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
+const $=q=>document.querySelector(q);
+
+/* =========================================================
+   Lageplan
+   ========================================================= */
+function plan(){
+  let s=`<svg viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Lageplan von Schloss und Garten Versailles">
+<rect width="400" height="300" fill="#efe8d4"/>
+<polygon points="0,112 40,122 40,178 0,188" fill="#e2d6b8"/>
+<rect x="8" y="98" width="34" height="13" fill="#d2bf97" stroke="#9a7b16" stroke-width=".8"/><rect x="8" y="189" width="34" height="13" fill="#d2bf97" stroke="#9a7b16" stroke-width=".8"/>
+<path d="M42 88 H125 V212 H42 Z M42 125 H72 V175 H42 Z" fill-rule="evenodd" fill="#d8c39a" stroke="#9a7b16"/>
+<rect x="95" y="28" width="30" height="60" fill="#d8c39a" stroke="#9a7b16"/><rect x="95" y="212" width="30" height="60" fill="#d8c39a" stroke="#9a7b16"/>
+<rect x="72" y="54" width="22" height="26" fill="#ede2c6" stroke="#9a7b16"/>
+<g fill="#b9d39b" stroke="#8bb06b">`;
+  for(let x=150;x<250;x+=25)for(const y of [60,85,110,165,190,215,240]){if(x<205&&y>=190&&y<=215)continue;s+=`<rect x="${x}" y="${y}" width="21" height="21" rx="2"/>`;}
+  s+=`</g>
+<rect x="132" y="124" width="30" height="20" fill="#a9cbe4"/><rect x="132" y="156" width="30" height="20" fill="#a9cbe4"/>
+<ellipse cx="186" cy="150" rx="10" ry="13" fill="#a9cbe4" stroke="#fff"/>
+<rect x="197" y="144" width="48" height="12" fill="#9cc47a"/>
+<ellipse cx="256" cy="150" rx="9" ry="7" fill="#a9cbe4" stroke="#fff"/>
+<rect x="268" y="144" width="130" height="12" fill="#a9cbe4"/><rect x="322" y="38" width="12" height="226" fill="#a9cbe4"/>
+<rect x="345" y="16" width="34" height="13" fill="#e9b7bd" stroke="#b5737b"/>
+<path d="M132 238 H178 V266 H170 V246 H140 V266 H132Z" fill="#d8c39a" stroke="#9a7b16"/>
+<rect x="164" y="194" width="36" height="34" fill="#4f8048"/><path d="M168 224 L176 210 L186 222 L194 200 M168 200 L180 204" stroke="#ead9b0" stroke-width="2" fill="none"/>
+<g font-family="Arial" font-size="8.5" fill="#6b6255">
+<text x="3" y="95">Stadt</text><text x="60" y="230">Schloss</text><text x="180" y="54">Garten</text><text x="280" y="140">Großer Kanal</text>
+<text x="347" y="40">Trianon</text><text x="132" y="278">Orangerie</text>
+</g>
+<g transform="translate(378 270)"><path d="M0 -14 L5 0 L0 -4 L-5 0Z" fill="#1d2b53"/><text x="0" y="10" font-family="Arial" font-size="9" text-anchor="middle" fill="#1d2b53">N</text></g>
+<path d="M14 282 v-22 h36" stroke="#9a7b16" stroke-width="1" stroke-dasharray="3 2" fill="none"/>`;
+  STATIONEN.forEach((st,i)=>{const [x,y]=st.karte;
+    s+=`<g class="marker" data-i="${i}" tabindex="0" role="button" aria-label="Station ${i+1}: ${st.titel}"><circle class="ring" cx="${x}" cy="${y}" r="9"/><circle class="punkt" cx="${x}" cy="${y}" r="9"/><text x="${x}" y="${y+3.5}" text-anchor="middle">${i+1}</text></g>`;});
+  s+='</svg>';
+  $('#plan').innerHTML=s;
+  $('#plan').querySelectorAll('.marker').forEach(g=>{
+    g.addEventListener('click',()=>zeige(+g.dataset.i,true));
+    g.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();zeige(+g.dataset.i,true);}});});
+  $('#liste').innerHTML=STATIONEN.map((st,i)=>`<li data-i="${i}">${i+1}. ${st.liste} <span class="ok"></span></li>`).join('');
+  $('#liste').querySelectorAll('li').forEach(li=>li.addEventListener('click',()=>zeige(+li.dataset.i,true)));
+}
+function planAktualisieren(){
+  document.querySelectorAll('#plan .marker').forEach(g=>{const i=+g.dataset.i;
+    g.classList.toggle('besucht',S.besucht.includes(i));g.classList.toggle('aktiv',i===S.aktuell);});
+  document.querySelectorAll('#liste li').forEach(li=>{const i=+li.dataset.i;li.classList.toggle('aktiv',i===S.aktuell);li.querySelector('.ok').textContent=S.richtig[i]?'☀':'';});
+  const n=Object.keys(S.richtig).length;
+  $('#sonnen').innerHTML=STATIONEN.map((_,i)=>`<span class="${S.richtig[i]?'an':''}"></span>`).join('');
+  $('#fortschrittText').textContent=`${n} / ${STATIONEN.length} ☀`;
+}
+
+/* =========================================================
+   Station anzeigen
+   ========================================================= */
+function bildZeichnen(){
+  const st=STATIONEN[S.aktuell];const modus=st.keinHeute?'damals':S.modus;
+  $('#bild').innerHTML=st.szene(modus==='damals'?'d':'h');
+  $('#zeitschalter').classList.toggle('hidden',!!st.keinHeute);
+  document.querySelectorAll('#zeitschalter button').forEach(b=>{const a=b.dataset.modus===modus;b.classList.toggle('aktiv',a);b.setAttribute('aria-pressed',a);});
+  $('#bildlabel').textContent=st.keinHeute?'Baustelle um 1685':(modus==='damals'?'Damals: '+st.jahr:'Heute');
+  $('#kastenDamals').classList.toggle('hidden',modus!=='damals');
+  $('#kastenHeute').classList.toggle('hidden',modus!=='heute');
+  $('#umschaltHinweis').textContent=st.keinHeute?'':(modus==='damals'?'Tipp: Schalte oben im Bild auf „Heute“ um und vergleiche.':'Tipp: Schalte zurück auf „Damals“ und vergleiche.');
+}
+function zeige(i,scroll){
+  S.aktuell=i;if(!S.besucht.includes(i))S.besucht.push(i);speichern();
+  const st=STATIONEN[i];
+  $('#nr').textContent=i+1;$('#titel').textContent=st.titel;$('#ort').textContent=st.ort;$('#jahr').textContent=st.jahr;
+  $('#intro').innerHTML=st.intro.map(p=>`<p>${fmt(p)}</p>`).join('');
+  $('#txtDamals').innerHTML=`<p>${fmt(st.damals)}</p>`;
+  $('#txtHeute').innerHTML=st.heute?`<p>${fmt(st.heute)}</p>`:'';
+  $('#kastenDamals h4').textContent=st.keinHeute?'Die Kehrseite':'So sah es damals aus';
+  $('#extra').innerHTML=st.stimmen?`<h3 style="margin:18px 0 4px;color:var(--blau)">Perspektivwechsel: Vier Stimmen</h3><p class="fiktiv">Ausgedachte Stimmen – so hätten Menschen damals denken können.</p><div class="stimmen">${st.stimmen.map(([w,t])=>`<div class="stimme"><b>${w}</b><q>${t}</q></div>`).join('')}</div>`:'';
+  $('#beobachte').innerHTML=fmt(st.beobachte);
+  $('#wusstest').innerHTML=fmt(st.wusstest);
+  bildZeichnen();
+  frageZeigen();
+  $('#notiz').value=S.notizen[i]||'';
+  $('#zurueck').style.visibility=i===0?'hidden':'visible';
+  $('#vor').textContent=i===STATIONEN.length-1?'Zum Besucherpass →':'Nächste Station →';
+  planAktualisieren();
+  if(scroll){const top=$('#station').getBoundingClientRect().top+window.scrollY-74;window.scrollTo({top,behavior:'smooth'});}
+}
+function frageZeigen(){
+  const i=S.aktuell,f=STATIONEN[i].frage;
+  $('#frage').textContent=f.q;
+  const box=$('#optionen');box.innerHTML='';
+  const fb=$('#rueckmeldung');fb.textContent='';fb.className='rueckmeldung';
+  const falsche=S.versuche[i]||[];
+  f.o.forEach((t,j)=>{const b=document.createElement('button');b.textContent=t;
+    if(S.richtig[i]){b.disabled=true;if(j===f.k)b.classList.add('richtig');}
+    else if(falsche.includes(j)){b.disabled=true;b.classList.add('falsch');}
+    b.addEventListener('click',()=>antwort(j));box.appendChild(b);});
+  if(S.richtig[i]){fb.textContent='☀ '+f.e;fb.classList.add('gut');}
+}
+function antwort(j){
+  const i=S.aktuell,f=STATIONEN[i].frage;
+  if(j===f.k){S.richtig[i]=true;}
+  else{S.versuche[i]=(S.versuche[i]||[]).concat(j);}
+  speichern();frageZeigen();
+  if(j!==f.k){const fb=$('#rueckmeldung');fb.textContent='Leider nicht. Lies noch einmal genau nach und versuche es erneut.';fb.className='rueckmeldung schlecht';}
+  planAktualisieren();
+}
+
+/* =========================================================
+   Besucherpass
+   ========================================================= */
+function esc(t){return String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+const SONNE_AN=`<svg class="stempel" viewBox="0 0 40 40"><g stroke="#c9a227" stroke-width="2.4" stroke-linecap="round"><path d="M20 3v5M20 32v5M3 20h5M32 20h5M8 8l3.5 3.5M28.5 28.5L32 32M8 32l3.5-3.5M28.5 11.5L32 8"/></g><circle cx="20" cy="20" r="8" fill="#e6c65c" stroke="#c9a227"/></svg>`;
+const SONNE_AUS=`<svg class="stempel" viewBox="0 0 40 40"><circle cx="20" cy="20" r="8" fill="none" stroke="#cfc4ad" stroke-width="2" stroke-dasharray="3 2"/></svg>`;
+function pass(){
+  const n=Object.keys(S.richtig).length,dat=new Date().toLocaleDateString('de-DE');
+  let h=`<h2>Besucherpass</h2><p class="unter">Schloss Versailles · zu Gast beim Sonnenkönig Ludwig XIV.</p>
+<div class="pass-name">${esc(S.name||'_______________')}</div>
+<p class="unter">hat ${S.besucht.length} von ${STATIONEN.length} Stationen besucht und ${n} ${n===1?'Sonne':'Sonnen'} gesammelt · ${dat}</p>`;
+  h+=STATIONEN.map((st,i)=>`<div class="pass-zeile">${S.richtig[i]?SONNE_AN:SONNE_AUS}<div><b>${i+1}. ${st.titel}</b>${S.besucht.includes(i)?'':' <span class="fiktiv">(noch nicht besucht)</span>'}<div class="n">${S.notizen[i]?'Machtzeichen: '+esc(S.notizen[i]):'<span class="fiktiv">– keine Notiz –</span>'}</div></div></div>`).join('');
+  h+=`<div class="merksaetze"><h3>Merksätze</h3><ol>
+<li>Ab 1682 war Versailles der Sitz von Hof und Regierung Ludwigs XIV.</li>
+<li>Bauwerke, Kunst und Garten sollten zeigen: Der König ist der Mittelpunkt – wie die Sonne. Die Sonne und der Gott Apollo sind seine Zeichen.</li>
+<li>Der Adel lebte am Hof und war vom König abhängig. Zeremonien wie das Lever banden die Adligen an den König.</li>
+<li>Der König sah sich als Herrscher „von Gottes Gnaden“ und regierte allein ([[Absolutismus]]).</li>
+<li>Bezahlt wurde die Pracht vor allem von den Bauern und einfachen Leuten über Steuern.</li>
+<li>Manches sah damals anders aus als heute: Silbermöbel, Gesandtentreppe und Labyrinth sind verschwunden.</li></ol></div>`;
+  h+=`<div class="abschluss"><h3 style="color:var(--blau);margin-bottom:4px">Abschlussaufgabe</h3><p style="margin-top:0">Erkläre, wie Ludwig XIV. mit dem Aussehen von Versailles seine Macht zeigte. Nenne mindestens drei Beispiele aus dem Rundgang. Beziehe auch Station 10 ein: Wer bezahlte dafür?</p>
+<textarea id="abschluss" placeholder="Ludwig XIV. zeigte seine Macht, indem …">${esc(S.abschluss||'')}</textarea><div class="druck-text" id="abschlussDruck"></div></div>`;
+  $('#pass').innerHTML=fmt(h);
+  const ta=$('#abschluss');const dr=$('#abschlussDruck');dr.textContent=S.abschluss||'';
+  ta.addEventListener('input',()=>{S.abschluss=ta.value;dr.textContent=ta.value;speichern();});
+}
+function ansicht(w){
+  $('#start').classList.toggle('hidden',w!=='start');
+  $('#rundgang').classList.toggle('hidden',w!=='rundgang');
+  $('#passSeite').classList.toggle('hidden',w!=='pass');
+  $('#fortschritt').classList.toggle('hidden',w==='start');
+  if(w==='pass')pass();
+  window.scrollTo(0,0);
+}
+
+/* =========================================================
+   Start-Grafik
+   ========================================================= */
+function hero(){
+  let s=`<svg viewBox="0 0 720 230" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Schloss Versailles unter einer goldenen Sonne"><defs>${verlauf('hh','#1d2b53','#3d5394')}<radialGradient id="hs"><stop offset="0" stop-color="#ffe8a0"/><stop offset="1" stop-color="#ffe8a0" stop-opacity="0"/></radialGradient></defs>
+<rect width="720" height="230" fill="url(#hh)"/><circle cx="360" cy="92" r="120" fill="url(#hs)" opacity=".45"/>`;
+  let ray='';for(let i=0;i<24;i++){const a=i*Math.PI/12;ray+=`M${f1(360+44*Math.cos(a))} ${f1(92+44*Math.sin(a))}L${f1(360+(i%2?62:74)*Math.cos(a))} ${f1(92+(i%2?62:74)*Math.sin(a))}`;}
+  s+=`<path d="${ray}" stroke="#e6c65c" stroke-width="4" stroke-linecap="round"/><circle cx="360" cy="92" r="36" fill="#e6c65c"/><circle cx="348" cy="86" r="3.2" fill="#1d2b53"/><circle cx="372" cy="86" r="3.2" fill="#1d2b53"/><path d="M346 102 Q360 112 374 102" stroke="#1d2b53" stroke-width="3" fill="none"/>`;
+  s+=`<rect y="196" width="720" height="34" fill="#c8b590"/>`;
+  s+=`<rect x="80" y="150" width="560" height="50" fill="#efe5d0"/><rect x="80" y="146" width="560" height="6" fill="#e6c65c"/>`;
+  s+=`<rect x="300" y="128" width="120" height="72" fill="#f3ead8"/><path d="M300 128 L360 108 L420 128Z" fill="#4b5569"/><rect x="300" y="124" width="120" height="5" fill="#e6c65c"/>`;
+  for(let x=92;x<630;x+=22){if(x>292&&x<422)continue;s+=`<rect x="${x}" y="160" width="10" height="28" rx="5" fill="#2c3e74"/>`;}
+  for(let x=310;x<415;x+=22)s+=`<rect x="${x}" y="140" width="10" height="16" rx="5" fill="#2c3e74"/><rect x="${x}" y="164" width="10" height="26" rx="5" fill="#2c3e74"/>`;
+  let st='';for(let x=86;x<640;x+=14)st+=`M${x} 146 l4 -6 l4 6`;s+=`<path d="${st}" fill="#e6c65c"/>`;
+  s+='</svg>';
+  $('#hero').innerHTML=s;
+}
+
+/* =========================================================
+   Ereignisse
+   ========================================================= */
+function init(){
+  laden();hero();plan();
+  $('#name').value=S.name||'';
+  if(S.besucht.length)$('#weiter').classList.remove('hidden');
+  $('#name').addEventListener('input',e=>{S.name=e.target.value.trim();speichern();});
+  $('#los').addEventListener('click',()=>{ansicht('rundgang');zeige(S.besucht.length?S.aktuell:0);});
+  $('#weiter').addEventListener('click',()=>{ansicht('rundgang');zeige(S.aktuell);});
+  $('#vor').addEventListener('click',()=>{if(S.aktuell<STATIONEN.length-1)zeige(S.aktuell+1,true);else ansicht('pass');});
+  $('#zurueck').addEventListener('click',()=>{if(S.aktuell>0)zeige(S.aktuell-1,true);});
+  document.querySelectorAll('#zeitschalter button').forEach(b=>b.addEventListener('click',()=>{S.modus=b.dataset.modus;speichern();bildZeichnen();}));
+  $('#notiz').addEventListener('input',e=>{S.notizen[S.aktuell]=e.target.value;speichern();});
+  $('#zumPass').addEventListener('click',()=>ansicht('pass'));
+  $('#zurRundgang').addEventListener('click',()=>{ansicht('rundgang');zeige(S.aktuell);});
+  let eingebettet=false;try{eingebettet=window.self!==window.top;}catch(e){eingebettet=true;}
+  if(eingebettet){$('#drucken').textContent='Drucken: Seite direkt im Browser öffnen';$('#drucken').disabled=true;$('#drucken').style.opacity='.6';}
+  $('#drucken').addEventListener('click',()=>{try{window.print();}catch(e){}});
+  $('#neustart').addEventListener('click',()=>{
+    const b=$('#neustart');
+    if(b.dataset.sicher){try{localStorage.removeItem(KEY);}catch(e){}location.reload();}
+    else{b.dataset.sicher='1';b.textContent='Wirklich alles löschen? Nochmal klicken';setTimeout(()=>{delete b.dataset.sicher;b.textContent='Alles zurücksetzen';},4000);}
+  });
+  // Glossar-Tooltip
+  const tip=$('#tip');
+  document.addEventListener('click',e=>{
+    const g=e.target.closest('.g');
+    if(!g){tip.classList.add('hidden');return;}
+    const k=g.dataset.k;tip.innerHTML=`<b>${k}:</b> ${GLOSSAR[k]}`;tip.classList.remove('hidden');
+    const rc=g.getBoundingClientRect();const w=Math.min(280,window.innerWidth-20);
+    tip.style.left=Math.max(10,Math.min(rc.left,window.innerWidth-w-10))+'px';
+    tip.style.top=(rc.bottom+8+tip.offsetHeight>window.innerHeight?rc.top-tip.offsetHeight-8:rc.bottom+8)+'px';
+  });
+  document.addEventListener('keydown',e=>{
+    if(e.key==='Enter'&&e.target.classList&&e.target.classList.contains('g')){e.target.click();return;}
+    if($('#rundgang').classList.contains('hidden'))return;
+    if(['TEXTAREA','INPUT'].includes(document.activeElement.tagName))return;
+    if(e.key==='ArrowRight'&&S.aktuell<STATIONEN.length-1)zeige(S.aktuell+1);
+    if(e.key==='ArrowLeft'&&S.aktuell>0)zeige(S.aktuell-1);
+  });
+  window.addEventListener('scroll',()=>tip.classList.add('hidden'),{passive:true});
+}
+init();
+</script>
+</body>
+</html>
