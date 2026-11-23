@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Die Insel der Lese-Schätze – Lesespiel Klasse 5</title>
+<style>
+:root{
+  --sea:#0f5d7a; --sea2:#0b4660; --sand:#fbf3dd; --sand2:#f1e3bb; --ink:#2a2216; --mut:#6e6450;
+  --wood:#8a5a2b; --gold:#f2b632; --ok:#2e9e5b; --bad:#d4553f; --blue:#2f7fd1; --mark:#ffe36e;
+  --fs:20px; --r:16px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;font-family:Verdana,"Trebuchet MS",system-ui,sans-serif;color:var(--ink);background:var(--sea)}
+body{min-height:100vh;background:
+  radial-gradient(1200px 500px at 50% -10%,#3fa4c4 0%,transparent 60%),
+  repeating-radial-gradient(circle at 20% 120%,#ffffff08 0 14px,transparent 14px 40px),var(--sea)}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer;border-radius:12px;border:2px solid #d9c693;background:#fffaf0;padding:.6em 1em;font-weight:700;transition:transform .08s,filter .15s}
+button:hover{filter:brightness(.97)}
+button:active{transform:scale(.97)}
+button:disabled{opacity:.45;cursor:default;transform:none}
+.btn-go{background:var(--gold);border-color:#c98f12;color:#3a2600;box-shadow:0 4px 0 #c98f12}
+.btn-go:active{box-shadow:0 1px 0 #c98f12;transform:translateY(3px)}
+.btn-sm{padding:.35em .7em;font-size:.82em;border-radius:9px}
+input,select{border:2px solid #d9c693;border-radius:12px;padding:.55em .8em;background:#fff;outline:none}
+input:focus,select:focus{border-color:var(--blue)}
+.wrap{max-width:1200px;margin:0 auto;padding:14px}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.grow{flex:1}
+.mut{color:var(--mut)}
+.center{text-align:center}
+.small{font-size:.85em}
+.hidden{display:none!important}
+.card{background:var(--sand);border-radius:var(--r);padding:18px 20px;box-shadow:0 6px 0 #00000022,0 10px 30px #0003}
+h1,h2,h3{font-family:"Trebuchet MS",Verdana,sans-serif;margin:.2em 0 .4em;line-height:1.2}
+/* Kopfzeile */
+.top{display:flex;gap:10px;align-items:center;flex-wrap:wrap;color:#fff;padding:10px 14px;max-width:1200px;margin:0 auto}
+.top .brand{font-weight:800;font-size:1.05em;display:flex;align-items:center;gap:6px}
+.pill{background:#ffffff22;border:1px solid #ffffff44;border-radius:999px;padding:.25em .8em;font-weight:700;font-size:.9em;color:#fff}
+.tools button{background:#ffffff22;border:1px solid #ffffff55;color:#fff;padding:.35em .7em;font-size:.88em}
+.tools button.on{background:#fff;color:var(--sea2)}
+.islands{display:flex;gap:6px;align-items:center}
+.isl{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#ffffff22;border:2px solid #ffffff55;font-size:.95em}
+.isl.done{background:var(--gold);border-color:#fff}
+.isl.cur{background:#fff;color:var(--sea2);font-weight:800}
+/* Spielfläche */
+.stage{display:grid;grid-template-columns:1.15fr 1fr;gap:14px;align-items:start}
+@media (max-width:900px){.stage{grid-template-columns:1fr}}
+.textbox{position:relative;font-size:var(--fs);line-height:1.75}
+@media (min-width:901px){.textbox{position:sticky;top:10px;max-height:calc(100vh - 90px);overflow:auto}}
+.kind{display:inline-block;background:var(--sea);color:#fff;font-size:.62em;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:.2em .7em;border-radius:999px}
+.textbox h2{font-size:1.25em;margin:.35em 0 .5em}
+.para{position:relative;padding:4px 8px 4px 34px;border-radius:10px;margin:0 0 .55em;transition:background .3s}
+.para .pn{position:absolute;left:4px;top:6px;width:22px;height:22px;border-radius:50%;background:var(--sand2);color:var(--mut);font-size:.6em;font-weight:800;display:flex;align-items:center;justify-content:center}
+.para.hl{background:var(--mark);box-shadow:0 0 0 3px #f2c94c}
+.w{border-radius:5px;transition:background .15s}
+.findmode .w{cursor:pointer;background:#fff6d6;box-shadow:0 0 0 1px #ead9a3;padding:0 2px}
+.findmode .w:hover{background:#ffe9a0}
+.w.ok{background:#bff0cf!important}
+.w.no{background:#ffc9bd!important;animation:shake .4s}
+table.prog{border-collapse:collapse;width:100%;font-size:.92em;margin:.4em 0}
+table.prog th{background:var(--sea);color:#fff;text-align:left;padding:.4em .6em}
+table.prog td{border-bottom:2px solid var(--sand2);padding:.45em .6em;vertical-align:top}
+table.prog tr.hl td{background:var(--mark)}
+.note{background:#fff;border:2px dashed #d9c693;border-radius:10px;padding:.5em .8em;margin-top:.6em}
+.note.hl{background:var(--mark)}
+.ingred{background:#fff;border-radius:10px;padding:.4em .8em;margin:.3em 0 .6em}
+/* Lese-Lineal */
+.ruler{position:absolute;left:0;right:0;height:2.1em;background:#ffe36e55;border-top:2px solid #f2c94c;border-bottom:2px solid #f2c94c;pointer-events:none;display:none;border-radius:4px}
+.ruleron .ruler{display:block}
+/* Aufgaben */
+.task .qhead{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:6px}
+.qnum{font-weight:800;color:var(--sea)}
+.cat{font-size:.72em;background:var(--sand2);border-radius:999px;padding:.2em .7em;color:var(--mut);font-weight:700}
+.q{font-size:1.15em;font-weight:700;line-height:1.45;margin:.2em 0 .7em}
+.opts{display:flex;flex-direction:column;gap:8px}
+.opt{text-align:left;font-weight:600;font-size:1.02em;padding:.7em .9em;display:flex;gap:10px;align-items:flex-start;line-height:1.4}
+.opt .l{flex:0 0 28px;height:28px;border-radius:50%;background:var(--sand2);display:flex;align-items:center;justify-content:center;font-weight:800}
+.opt.ok{background:#d7f5e1;border-color:var(--ok)}
+.opt.no{background:#ffe1da;border-color:var(--bad);animation:shake .4s}
+.tf{display:grid;grid-template-columns:1fr auto;gap:8px 10px;align-items:center}
+.tf .s{font-weight:600;line-height:1.4;padding:.4em 0}
+.tf .bs{display:flex;gap:6px}
+.tf .bs button{min-width:84px;padding:.45em .6em;font-size:.92em}
+.tf .bs button.sel.r{background:#d7f5e1;border-color:var(--ok)}
+.tf .bs button.sel.f{background:#ffe1da;border-color:var(--bad)}
+.tf .s.wrong{color:var(--bad)}
+@media (max-width:520px){.tf{grid-template-columns:1fr}.tf .bs{margin-bottom:6px}}
+.seq{display:flex;flex-direction:column;gap:6px;margin:6px 0}
+.slot{display:flex;gap:10px;align-items:center;padding:.55em .8em;border-radius:12px;border:2px dashed #d9c693;min-height:48px;font-weight:600}
+.slot .n{flex:0 0 30px;height:30px;border-radius:50%;background:var(--gold);color:#3a2600;display:flex;align-items:center;justify-content:center;font-weight:800}
+.slot.filled{border-style:solid;background:#fff;cursor:pointer}
+.pick{text-align:left;font-weight:600}
+.match{display:grid;grid-template-columns:auto 1fr;gap:8px 10px;align-items:center}
+.match select{width:100%;font-weight:600}
+.match select.wrong{border-color:var(--bad);background:#ffe1da}
+.match select.right{border-color:var(--ok);background:#d7f5e1}
+.feedback{min-height:1.5em;font-weight:700;margin-top:10px;font-size:1.02em}
+.feedback.bad{color:var(--bad)}
+.feedback.good{color:var(--ok)}
+.tipbox{background:#e8f4ff;border:2px solid #9cc7f0;border-radius:12px;padding:.6em .9em;margin-top:10px;line-height:1.45}
+.solution{background:#fff3d6;border:2px solid #f2c94c;border-radius:12px;padding:.6em .9em;margin-top:10px;line-height:1.45}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.stars{color:var(--gold);letter-spacing:2px;font-size:1.3em;text-shadow:0 1px 0 #c98f12}
+.dots{display:flex;gap:5px}
+.dots span{width:12px;height:12px;border-radius:50%;background:var(--sand2);border:1px solid #d9c693}
+.dots span.d{background:var(--gold)}
+.dots span.c{background:var(--blue)}
+@keyframes shake{20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
+@keyframes pop{0%{transform:scale(.3);opacity:0}70%{transform:scale(1.15)}100%{transform:scale(1);opacity:1}}
+.overlay{position:fixed;inset:0;background:#06283acc;z-index:30;display:flex;align-items:center;justify-content:center;padding:16px}
+.overlay .card{max-width:560px;width:100%;max-height:94vh;overflow:auto;animation:pop .45s cubic-bezier(.3,1.4,.6,1)}
+.bigicon{font-size:3.6em;line-height:1;animation:pop .6s}
+.mapgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin:10px 0}
+.mapgrid div{aspect-ratio:1;border-radius:8px;background:var(--sand2);border:2px dashed #d9c693;display:flex;align-items:center;justify-content:center;font-size:1.5em}
+.mapgrid div.got{background:#f7d98a;border:2px solid #c98f12;animation:pop .5s}
+.title-xl{font-family:"Trebuchet MS",Verdana,sans-serif;font-size:clamp(2rem,6vw,3.2rem);font-weight:900;color:#fff;text-shadow:0 3px 0 #0b4660;margin:2vh 0 .2em;line-height:1.05}
+.parrot{width:min(40vw,170px);display:block;margin:2vh auto 0}
+.speech{background:#fff;border-radius:16px;padding:12px 16px;position:relative;margin:10px auto;max-width:560px;line-height:1.5;font-size:1.05em}
+.speech:after{content:"";position:absolute;left:50%;top:-12px;border:12px solid transparent;border-top:0;border-bottom-color:#fff;transform:translateX(-50%)}
+.cert{background:linear-gradient(180deg,#fffaf0,#f6e7bf);border:6px double #b8893a;border-radius:12px;padding:20px;text-align:center}
+.skills{display:flex;flex-direction:column;gap:8px}
+.skill{display:grid;grid-template-columns:1fr 120px 150px;gap:10px;align-items:center}
+.bar{height:12px;background:var(--sand2);border-radius:9px;overflow:hidden}
+.bar div{height:100%;background:linear-gradient(90deg,#f2b632,#2e9e5b)}
+.toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:#000c;color:#fff;padding:.7em 1.2em;border-radius:12px;z-index:50;font-weight:700}
+.lk table{width:100%;border-collapse:collapse;font-size:.88em}
+.lk td{border-bottom:1px solid #e3d4a8;padding:5px 4px;vertical-align:top}
+.lk td:first-child{white-space:nowrap;font-weight:700;padding-right:10px}
+.jump{position:fixed;right:12px;bottom:14px;z-index:20;display:none;background:var(--gold);border-color:#c98f12;box-shadow:0 4px 0 #c98f12,0 6px 16px #0005}
+@media (max-width:900px){.jump{display:block}}
+.foot{color:#ffffffcc;text-align:center;font-size:.82em;margin:18px 0 8px}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+"use strict";
+/* ============================================================
+   Die Insel der Lese-Schätze – Lesespiel für den Förderunterricht Kl. 5
+   5 Inseln = 5 Texte mit je 5 Aufgaben (ca. 35 Minuten)
+   Läuft offline, keine Daten nach außen, Spielstand im Browser.
+   ============================================================ */
+const KEY = "lese-insel-v1", LKKEY = "lese-insel-lk", TEACHER_CODE = "LESEN5";
+const teacherMin = () => { try{ const v = localStorage.getItem(LKKEY); return v == null ? 35 : +v; }catch(e){ return 35; } };
+const $app = document.getElementById("app");
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const normW = s => String(s).toLowerCase().replace(/[^a-zäöüß0-9-]/g, "");
+const store = { get(){ try{ return JSON.parse(localStorage.getItem(KEY)); }catch(e){ return null; } }, set(v){ try{ localStorage.setItem(KEY, JSON.stringify(v)); }catch(e){} }, del(){ try{ localStorage.removeItem(KEY); }catch(e){} } };
+function toast(m, ms=2000){ const t = document.createElement("div"); t.className = "toast"; t.textContent = m; document.body.appendChild(t); setTimeout(() => t.remove(), ms); }
+function shuffle(a){ a = a.slice(); for(let i = a.length-1; i > 0; i--){ const j = Math.floor(Math.random()*(i+1)); [a[i],a[j]] = [a[j],a[i]]; } return a; }
+
+const CATS = {
+  info:   "Informationen finden",
+  wort:   "Wörter verstehen",
+  folge:  "Reihenfolge erkennen",
+  schluss:"Mitdenken & schlussfolgern",
+  aufbau: "Textaufbau & Textsorte"
+};
+const PARROT = `<svg viewBox="0 0 160 160" class="parrot" aria-hidden="true"><ellipse cx="80" cy="150" rx="46" ry="6" fill="#0006"/><path d="M38 132 h84" stroke="#8a5a2b" stroke-width="8" stroke-linecap="round"/><path d="M78 128 q-34 -6 -36 -48 q0 -40 36 -50 q36 6 34 46 q-2 42 -34 52z" fill="#2e9e5b"/><path d="M76 126 q-6 18 -22 26 q14 -2 26 -12z" fill="#d4553f"/><path d="M84 126 q8 18 26 24 q-14 -1 -28 -12z" fill="#2f7fd1"/><path d="M60 92 q18 -10 38 4 q-10 26 -38 -4z" fill="#f2b632"/><circle cx="92" cy="54" r="16" fill="#fff"/><circle cx="95" cy="54" r="8" fill="#2a2216"/><circle cx="98" cy="51" r="2.6" fill="#fff"/><path d="M106 60 q22 2 20 18 q-4 10 -16 6 q6 -6 -4 -10z" fill="#f2b632" stroke="#c98f12" stroke-width="2"/><path d="M62 34 q4 -20 22 -22 q-6 8 -4 16" fill="#d4553f"/><path d="M48 70 q-14 10 -10 34" stroke="#1f7a44" stroke-width="5" fill="none" stroke-linecap="round"/></svg>`;
+
+/* ============================================================
+   TEXTE & AUFGABEN
+   p = Absatz für den Tipp (bei Tabellen: "r3" = Zeile 3, "note" = Hinweis)
+   ============================================================ */
+const ISLANDS = [
+  { icon: "🏫", name: "Schul-Insel", kind: "Erzählung", title: "Wo ist Ellas Turnbeutel?",
+    paras: [
+      "Es ist Montagmorgen. Ella kommt zu spät in die Schule. Sie rennt in die Klasse 5b und setzt sich schnell an ihren Platz. In der dritten Stunde haben sie Sport. Doch plötzlich merkt Ella: Ihr Turnbeutel ist weg!",
+      "Ella sucht unter dem Tisch. Sie sucht in ihrem Schrank. Sie fragt ihre Freundin Mia. Aber niemand hat den Turnbeutel gesehen. Ella ist traurig. Ohne Sportsachen darf sie nicht mitturnen.",
+      "Da fällt ihr etwas ein. Heute Morgen war sie beim Bäcker. Dort hat sie ein Brötchen gekauft. Hat sie den Beutel vielleicht dort vergessen?",
+      "In der ersten Pause läuft Ella mit Mia zum Bäcker. Die Verkäuferin lacht und hält einen blauen Beutel hoch. „Suchst du den hier?“, fragt sie. Ella ist erleichtert. „Danke!“, ruft sie. Jetzt kann sie doch mitturnen. Ab heute will sie besser aufpassen."
+    ],
+    tasks: [
+      { type: "choice", cat: "info", q: "An welchem Tag spielt die Geschichte?", p: 0, options: [["Am Montag", true], ["Am Mittwoch", false], ["Am Freitag", false], ["Am Sonntag", false]],
+        tip: "Lies den ersten Satz noch einmal genau.", expl: "Im ersten Satz steht: „Es ist Montagmorgen.“" },
+      { type: "tf", cat: "info", q: "Richtig oder falsch? Entscheide bei jedem Satz.", p: [0, 1, 3], statements: [
+        ["Ella geht in die Klasse 5b.", true], ["Mia hat den Turnbeutel versteckt.", false], ["Ella hat beim Bäcker ein Brötchen gekauft.", true], ["Der Turnbeutel ist rot.", false] ],
+        tip: "Suche im Text nach „5b“, „Mia“, „Brötchen“ und nach der Farbe des Beutels.", expl: "Ella ist in der 5b und hat ein Brötchen gekauft. Mia hat nichts versteckt, und der Beutel ist blau." },
+      { type: "order", cat: "folge", q: "Was passiert zuerst, was danach? Tippe die Sätze in der richtigen Reihenfolge an.", p: [0, 1, 2, 3], items: [
+        "Ella kommt zu spät in die Schule.", "Ella merkt, dass ihr Turnbeutel fehlt.", "Ella sucht im Schrank und fragt Mia.", "Ella erinnert sich an den Bäcker.", "Die Verkäuferin gibt Ella den Beutel." ],
+        tip: "Jeder Absatz erzählt einen Teil der Geschichte. Geh die Absätze von oben nach unten durch.", expl: "Die Reihenfolge im Text: zu spät – Beutel fehlt – suchen und Mia fragen – an den Bäcker denken – Beutel zurückbekommen." },
+      { type: "find", cat: "wort", q: "Tippe im Text auf das Wort, das zeigt: Ellas Sorge ist vorbei und sie ist froh.", p: 3, answer: ["erleichtert"],
+        tip: "Das Wort steht im letzten Absatz, kurz nachdem die Verkäuferin etwas fragt.", expl: "„erleichtert“ bedeutet: Man ist froh, weil eine Sorge vorbei ist." },
+      { type: "choice", cat: "schluss", q: "Warum ist Ella in Absatz 2 traurig?", p: 1, options: [
+        ["Weil sie ohne Sportsachen nicht mitturnen darf.", true], ["Weil Mia nicht mit ihr spielen will.", false], ["Weil sie kein Brötchen bekommen hat.", false], ["Weil Sport ausfällt.", false] ],
+        tip: "Lies die letzten zwei Sätze von Absatz 2.", expl: "Im Text steht: „Ohne Sportsachen darf sie nicht mitturnen.“ Deshalb ist sie traurig." }
+    ] },
+  { icon: "🦔", name: "Igel-Insel", kind: "Sachtext", title: "Der Igel – ein stacheliger Gartenbewohner",
+    paras: [
+      "Der Igel ist ein kleines Säugetier. Er wird etwa so groß wie ein Meerschweinchen. Auf seinem Rücken trägt er 6.000 bis 8.000 Stacheln. Bei Gefahr rollt er sich zu einer stacheligen Kugel zusammen. So schützt er sich vor Feinden wie dem Fuchs oder dem Uhu.",
+      "Igel sind nachtaktiv. Am Tag schlafen sie in einem Versteck, zum Beispiel unter einer Hecke. In der Nacht gehen sie auf Futtersuche. Sie fressen Käfer, Raupen, Regenwürmer und Schnecken. Milch dürfen Igel nicht trinken. Davon bekommen sie Bauchschmerzen.",
+      "Im Herbst fressen sich Igel ein dickes Fettpolster an. Ab November halten sie Winterschlaf. Dafür bauen sie sich ein Nest aus Laub. Ihr Herz schlägt dann viel langsamer, und ihr Körper wird ganz kühl. Erst im Frühling wachen sie wieder auf.",
+      "Du kannst Igeln helfen: Lass im Garten einen Haufen aus Laub und Ästen liegen. Dort finden sie ein gutes Versteck für den Winter."
+    ],
+    tasks: [
+      { type: "choice", cat: "info", q: "Wie viele Stacheln hat ein Igel?", p: 0, options: [["6.000 bis 8.000", true], ["60 bis 80", false], ["etwa 600", false], ["über 100.000", false]],
+        tip: "Zahlen findest du schnell, wenn du den Text nach Ziffern absuchst. Schau in Absatz 1.", expl: "In Absatz 1 steht: „6.000 bis 8.000 Stacheln“." },
+      { type: "match", cat: "aufbau", q: "Welche Überschrift passt zu welchem Absatz? Wähle aus.", p: [0, 1, 2, 3], rows: [
+        ["Absatz 1", "So sieht der Igel aus"], ["Absatz 2", "Was frisst der Igel?"], ["Absatz 3", "Der Winterschlaf"], ["Absatz 4", "So kannst du helfen"] ],
+        tip: "Lies von jedem Absatz den ersten Satz. Worum geht es darin?", expl: "1: Aussehen und Stacheln – 2: Nahrung – 3: Winterschlaf – 4: Hilfe im Garten." },
+      { type: "find", cat: "wort", q: "Tippe im Text auf das Wort, das bedeutet: „in der Nacht wach und unterwegs“.", p: 1, answer: ["nachtaktiv"],
+        tip: "Das Wort steht ganz am Anfang von Absatz 2 und hat das Wort „Nacht“ in sich.", expl: "„nachtaktiv“ – Igel schlafen am Tag und sind in der Nacht aktiv." },
+      { type: "tf", cat: "info", q: "Richtig oder falsch? Entscheide bei jedem Satz.", p: [0, 1, 2], statements: [
+        ["Igel fressen Schnecken.", true], ["Milch ist gesund für Igel.", false], ["Igel halten Winterschlaf.", true], ["Der Igel ist ein Vogel.", false] ],
+        tip: "Schau in Absatz 2 (Futter) und Absatz 3 (Winter). Was für ein Tier der Igel ist, steht im ersten Satz.", expl: "Igel fressen Schnecken und halten Winterschlaf. Milch macht ihnen Bauchschmerzen, und der Igel ist ein Säugetier." },
+      { type: "choice", cat: "schluss", q: "Warum fressen sich Igel im Herbst ein dickes Fettpolster an?", p: 2, options: [
+        ["Weil sie im Winterschlaf nichts fressen und vom Fett leben.", true], ["Weil sie dann schneller laufen können.", false], ["Weil sie im Winter viel Milch trinken.", false], ["Weil ihre Stacheln sonst abfallen.", false] ],
+        tip: "Das steht nicht wörtlich im Text. Überlege: Was macht der Igel den ganzen Winter lang? Kann er dabei fressen?", expl: "Im Winterschlaf schläft der Igel monatelang und frisst nichts. Er lebt von dem Fett, das er sich angefressen hat." }
+    ] },
+  { icon: "🍓", name: "Küchen-Insel", kind: "Anleitung / Rezept", title: "Bunte Obstspieße",
+    recipe: true,
+    paras: [
+      "Zutaten für 4 Spieße: 1 Banane, 8 Weintrauben, 1 Apfel, 4 Erdbeeren, 1 Zitrone, 4 Holzspieße",
+      "1. Wasche die Weintrauben, den Apfel und die Erdbeeren.",
+      "2. Schäle die Banane und schneide sie in Scheiben.",
+      "3. Schneide den Apfel in Stücke. Das Kerngehäuse kommt weg.",
+      "4. Träufle etwas Zitronensaft auf die Apfel- und Bananenstücke. So werden sie nicht braun.",
+      "5. Stecke das Obst abwechselnd auf die Spieße. Fertig! Guten Appetit!",
+      "Achtung: Lass dir beim Schneiden von einem Erwachsenen helfen."
+    ],
+    tasks: [
+      { type: "choice", cat: "info", q: "Wie viele Weintrauben brauchst du für 4 Spieße?", p: 0, options: [["8", true], ["4", false], ["1", false], ["12", false]],
+        tip: "Die Mengen stehen ganz oben bei den Zutaten.", expl: "Bei den Zutaten steht: „8 Weintrauben“." },
+      { type: "order", cat: "folge", q: "Bringe die Arbeitsschritte in die richtige Reihenfolge.", p: [1, 2, 3, 4, 5], items: [
+        "Obst waschen", "Banane schälen und in Scheiben schneiden", "Apfel in Stücke schneiden", "Zitronensaft auf das Obst träufeln", "Obst auf die Spieße stecken" ],
+        tip: "Die Schritte sind im Text nummeriert. Achte auf die Zahlen 1 bis 5.", expl: "Die Nummern im Rezept zeigen die Reihenfolge: waschen – Banane – Apfel – Zitronensaft – aufstecken." },
+      { type: "choice", cat: "schluss", q: "Warum kommt Zitronensaft auf den Apfel und die Banane?", p: 4, options: [
+        ["Damit sie nicht braun werden.", true], ["Damit sie süßer schmecken.", false], ["Damit sie größer werden.", false], ["Damit die Spieße halten.", false] ],
+        tip: "Lies Schritt 4 bis zum Ende.", expl: "In Schritt 4 steht: „So werden sie nicht braun.“" },
+      { type: "tf", cat: "info", q: "Richtig oder falsch? Entscheide bei jedem Satz.", p: [0, 2, 6], statements: [
+        ["Für das Rezept brauchst du einen Herd.", false], ["Du brauchst 4 Holzspieße.", true], ["Die Banane wird nicht geschält.", false], ["Beim Schneiden soll dir ein Erwachsener helfen.", true] ],
+        tip: "Schau dir die Zutaten an, Schritt 2 und den Satz mit „Achtung“.", expl: "Einen Herd brauchst du nicht – nichts wird gekocht. Die Banane wird geschält. 4 Holzspieße und Hilfe beim Schneiden stimmen." },
+      { type: "choice", cat: "aufbau", q: "Was für ein Text ist das?", p: [0, 1], options: [
+        ["Eine Anleitung (ein Rezept)", true], ["Ein Märchen", false], ["Ein Brief", false], ["Ein Gedicht", false] ],
+        tip: "Der Text sagt dir Schritt für Schritt, was du tun sollst. Wie nennt man so einen Text?", expl: "Eine Anleitung erklärt Schritt für Schritt, wie man etwas macht. Ein Rezept ist eine Anleitung zum Kochen." }
+    ] },
+  { icon: "🎪", name: "Fest-Insel", kind: "Tabelle / Plan", title: "Programm für das Schulfest",
+    table: { head: ["Uhrzeit", "Was?", "Wo?"], rows: [
+      ["14:00 Uhr", "Begrüßung durch die Schulleiterin", "Schulhof"],
+      ["14:30 Uhr", "Theaterstück der Klasse 6a", "Aula"],
+      ["15:00 Uhr", "Sackhüpfen und Eierlauf", "Sportplatz"],
+      ["15:30 Uhr", "Kuchenbuffet", "Mensa"],
+      ["16:00 Uhr", "Konzert der Schulband", "Aula"],
+      ["17:00 Uhr", "Ende des Festes", "–"] ],
+      note: "Der Eintritt ist frei! Bei Regen findet das Sackhüpfen in der Turnhalle statt." },
+    tasks: [
+      { type: "choice", cat: "info", q: "Um wie viel Uhr beginnt das Theaterstück?", p: "r1", options: [["Um 14:30 Uhr", true], ["Um 14:00 Uhr", false], ["Um 16:00 Uhr", false], ["Um 15:30 Uhr", false]],
+        tip: "Suche in der Spalte „Was?“ das Wort „Theaterstück“. Lies dann in derselben Zeile nach links.", expl: "In der Zeile „Theaterstück der Klasse 6a“ steht die Uhrzeit 14:30 Uhr." },
+      { type: "choice", cat: "info", q: "Wo spielt die Schulband?", p: "r4", options: [["In der Aula", true], ["Auf dem Sportplatz", false], ["In der Mensa", false], ["Auf dem Schulhof", false]],
+        tip: "Suche die Zeile mit „Schulband“ und lies in der Spalte „Wo?“.", expl: "Das Konzert der Schulband ist in der Aula." },
+      { type: "choice", cat: "info", q: "Es regnet. Wo findet das Sackhüpfen statt?", p: "note", options: [["In der Turnhalle", true], ["Auf dem Sportplatz", false], ["Es fällt aus", false], ["In der Mensa", false]],
+        tip: "Diese Information steht nicht in der Tabelle, sondern im Kasten darunter.", expl: "Im Hinweis unter der Tabelle steht: „Bei Regen findet das Sackhüpfen in der Turnhalle statt.“" },
+      { type: "choice", cat: "schluss", q: "Tom möchte erst Kuchen essen und danach das Konzert hören. Wann muss er in der Mensa sein?", p: ["r3", "r4"], options: [["Um 15:30 Uhr", true], ["Um 16:00 Uhr", false], ["Um 14:30 Uhr", false], ["Um 17:00 Uhr", false]],
+        tip: "Suche zuerst das Kuchenbuffet. Prüfe dann: Ist es vor dem Konzert?", expl: "Das Kuchenbuffet beginnt um 15:30 Uhr in der Mensa, das Konzert erst um 16:00 Uhr. Das passt also." },
+      { type: "tf", cat: "schluss", q: "Richtig oder falsch? Entscheide bei jedem Satz.", p: ["r0", "r1", "r3", "r5", "note"], statements: [
+        ["Das Fest dauert drei Stunden.", true], ["Man muss Eintritt bezahlen.", false], ["Das Theaterstück spielt die Klasse 5b.", false], ["Das Kuchenbuffet ist in der Mensa.", true] ],
+        tip: "Für die Dauer: Wann beginnt das Fest, wann endet es? Zähle die Stunden von 14 bis 17 Uhr.", expl: "Von 14 bis 17 Uhr sind es drei Stunden. Der Eintritt ist frei, das Theater spielt die 6a, und das Kuchenbuffet ist in der Mensa." }
+    ] },
+  { icon: "🦊", name: "Fabel-Insel", kind: "Fabel", title: "Der Rabe und der Fuchs",
+    paras: [
+      "Ein Rabe hatte ein großes Stück Käse gefunden. Stolz setzte er sich damit auf einen hohen Ast, um es in Ruhe zu fressen.",
+      "Da kam ein Fuchs vorbei. Er roch den Käse und bekam großen Hunger. Doch der Ast war viel zu hoch für ihn. Also dachte er sich eine List aus.",
+      "„Guten Tag, lieber Rabe!“, rief der Fuchs. „Was für schöne, glänzende Federn du hast! Du bist bestimmt der schönste Vogel im ganzen Wald. Wenn deine Stimme genauso schön ist, bist du der König der Vögel!“",
+      "Der Rabe fühlte sich geschmeichelt. Er wollte zeigen, wie schön er singen kann. Er öffnete den Schnabel und krächzte laut. Da fiel der Käse herunter – direkt vor die Füße des Fuchses.",
+      "Der Fuchs schnappte sich den Käse und lachte: „Lieber Rabe, merke dir: Wer jedem Schmeichler glaubt, verliert am Ende mehr als nur seinen Käse!“"
+    ],
+    tasks: [
+      { type: "choice", cat: "info", q: "Was hat der Rabe gefunden?", p: 0, options: [["Ein Stück Käse", true], ["Ein Stück Brot", false], ["Eine Wurst", false], ["Einen Apfel", false]],
+        tip: "Lies den ersten Satz.", expl: "Im ersten Satz steht: „Ein Rabe hatte ein großes Stück Käse gefunden.“" },
+      { type: "find", cat: "wort", q: "Tippe im Text auf das Wort, das bedeutet: „ein schlauer Trick“.", p: 1, answer: ["list"],
+        tip: "Das Wort steht am Ende von Absatz 2. Es ist ein kurzes Wort mit vier Buchstaben.", expl: "Eine „List“ ist ein schlauer Trick. Der Fuchs will den Raben austricksen." },
+      { type: "choice", cat: "schluss", q: "Warum lobt der Fuchs die Federn des Raben?", p: [1, 2], options: [
+        ["Weil er den Käse haben will.", true], ["Weil er den Raben wirklich bewundert.", false], ["Weil er selbst Federn haben möchte.", false], ["Weil er mit dem Raben singen will.", false] ],
+        tip: "Denk an Absatz 2: Was will der Fuchs eigentlich?", expl: "Der Fuchs hat Hunger und will den Käse. Das Lob ist nur eine List." },
+      { type: "choice", cat: "schluss", q: "Was will uns die Fabel sagen?", p: 4, options: [
+        ["Man soll nicht jedem glauben, der einem nur schöne Worte sagt.", true], ["Raben können sehr schön singen.", false], ["Füchse mögen keinen Käse.", false], ["Man soll Essen immer teilen.", false] ],
+        tip: "Am Ende einer Fabel steht oft eine Lehre. Lies den letzten Satz des Fuchses.", expl: "Die Lehre: Wer jedem Schmeichler glaubt, wird leicht ausgetrickst." },
+      { type: "tf", cat: "aufbau", q: "Woran erkennst du eine Fabel? Richtig oder falsch?", p: [2, 4], statements: [
+        ["In der Fabel sprechen Tiere.", true], ["Am Ende steht eine Lehre.", true], ["Die Geschichte spielt in einer großen Stadt.", false], ["Der Fuchs ist in der Fabel dumm.", false] ],
+        tip: "Wer spricht in der Geschichte? Und wer ist am Ende schlauer – der Fuchs oder der Rabe?", expl: "In Fabeln sprechen Tiere, und am Ende steht eine Lehre. Die Fabel spielt im Wald, und der Fuchs ist schlau." }
+    ] }
+];
+const TOTAL = ISLANDS.reduce((a, i) => a + i.tasks.length, 0);
+
+/* ============================================================
+   ZUSTAND
+   ============================================================ */
+let S = store.get();
+function fresh(name, minutes){ return { name, minutes, start: Date.now(), isl: 0, task: 0, res: {}, tries: 0, tip: false, fs: 20, ruler: false, end: null, order: {} }; }
+const save = () => store.set(S);
+const tkey = (i, t) => i + "-" + t;
+function stars(){ return Object.values(S.res).reduce((a, r) => a + r.stars, 0); }
+let timer = null;
+
+/* ---------- Vorlesen (nur Aufgaben) ---------- */
+const canSpeak = "speechSynthesis" in window;
+function speak(text){
+  if(!canSpeak) return;
+  try{
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text); u.lang = "de-DE"; u.rate = .9;
+    const v = speechSynthesis.getVoices().find(v => v.lang && v.lang.startsWith("de")); if(v) u.voice = v;
+    speechSynthesis.speak(u);
+  }catch(e){}
+}
+
+/* ============================================================
+   START
+   ============================================================ */
+function renderStart(){
+  clearInterval(timer);
+  const running = S && S.name && !S.end;
+  $app.innerHTML = `
+  <div class="wrap center">
+    ${PARROT}
+    <div class="title-xl">Die Insel der Lese-Schätze</div>
+    <div class="speech">Ahoi! Ich bin <b>Papagei Pepe</b>. Auf fünf Inseln liegen Flaschenposts mit Texten. Lies sie genau und löse die Aufgaben. Für jede Insel bekommst du ein Stück der Schatzkarte. Mit allen fünf Stücken findest du den Schatz!</div>
+    ${running ? `<div class="card" style="max-width:520px;margin:14px auto;text-align:left"><b>Weiterspielen, ${esc(S.name)}?</b><div class="mut small">Insel ${S.isl+1} von ${ISLANDS.length} · ${stars()} Sterne</div>
+      <div class="row" style="margin-top:10px"><button class="btn-go grow" id="cont">Weiterspielen</button><button class="btn-sm" id="reset">Neu anfangen</button></div></div>` : ""}
+    <div class="card" style="max-width:520px;margin:14px auto;text-align:left">
+      <label style="display:flex;flex-direction:column;gap:6px;font-weight:700">Wie heißt du?<input id="name" maxlength="24" placeholder="Dein Vorname" autocomplete="off"></label>
+      <button class="btn-go" id="go" style="width:100%;margin-top:12px;font-size:1.15em">Leinen los! ⛵</button>
+      <div class="mut small" style="margin-top:8px">Du kannst den Text immer wieder lesen, während du die Aufgaben löst. Bei jeder Aufgabe gibt es einen Tipp.</div>
+    </div>
+    <div class="foot"><button class="btn-sm" id="lk" style="background:#ffffff22;color:#fff;border-color:#ffffff55">🎓 Für Lehrkräfte</button></div>
+  </div>`;
+  const ni = document.getElementById("name");
+  document.getElementById("go").onclick = () => {
+    const n = ni.value.trim().slice(0, 24); if(!n){ toast("Schreib bitte deinen Namen auf."); ni.focus(); return; }
+    const go = () => { const keep = S ? { fs: S.fs, ruler: S.ruler } : {}; S = Object.assign(fresh(n, teacherMin()), keep); save(); intro(); };
+    if(running){ if(confirm("Dein altes Spiel wird gelöscht. Neu anfangen?")) go(); } else go();
+  };
+  ni.onkeydown = e => { if(e.key === "Enter") document.getElementById("go").click(); };
+  if(running){ document.getElementById("cont").onclick = renderGame; document.getElementById("reset").onclick = () => { store.del(); S = null; renderStart(); }; }
+  document.getElementById("lk").onclick = renderTeacher;
+}
+function intro(){
+  const isl = ISLANDS[S.isl];
+  overlay(`<div class="center"><div class="bigicon">${isl.icon}</div><h2>Insel ${S.isl+1}: ${esc(isl.name)}</h2>
+    <p>Du findest eine Flaschenpost. Darin steckt ein Text: <b>${esc(isl.kind)}</b>.</p>
+    <p class="mut">Lies den Text zuerst einmal ganz durch. Dann löse die ${isl.tasks.length} Aufgaben.</p>
+    <button class="btn-go" id="ok" style="font-size:1.1em">Flaschenpost öffnen 📜</button></div>`, close => { document.getElementById("ok").onclick = () => { close(); renderGame(); }; });
+}
+function overlay(html, mount){
+  const o = document.createElement("div"); o.className = "overlay"; o.innerHTML = `<div class="card">${html}</div>`;
+  document.body.appendChild(o); mount && mount(() => o.remove());
+}
+
+/* ============================================================
+   SPIEL
+   ============================================================ */
+function header(){
+  const left = S.minutes ? Math.max(0, S.minutes*60 - Math.floor((Date.now() - S.start)/1000)) : null;
+  return `<div class="top">
+    <div class="brand">🦜 Lese-Schätze</div>
+    <span class="pill">👤 ${esc(S.name)}</span>
+    <span class="pill">⭐ ${stars()}</span>
+    ${left != null ? `<span class="pill" id="clock">⏱ ${Math.floor(left/60)}:${String(left%60).padStart(2,"0")}</span>` : ""}
+    <div class="islands">${ISLANDS.map((x, i) => `<div class="isl ${i < S.isl ? "done" : i === S.isl ? "cur" : ""}" title="${esc(x.name)}">${i < S.isl ? "✓" : x.icon}</div>`).join("")}</div>
+    <div class="grow"></div>
+    <div class="tools row" style="gap:6px">
+      <button id="fsm" title="Schrift kleiner">A−</button><button id="fsp" title="Schrift größer">A+</button>
+      <button id="rul" class="${S.ruler ? "on" : ""}" title="Lese-Lineal">📏 Lineal</button>
+      <button id="menu">☰</button>
+    </div></div>`;
+}
+function tickClock(){
+  const el = document.getElementById("clock"); if(!el || !S || !S.minutes) return;
+  const left = Math.max(0, S.minutes*60 - Math.floor((Date.now() - S.start)/1000));
+  el.textContent = `⏱ ${Math.floor(left/60)}:${String(left%60).padStart(2,"0")}`;
+  if(left === 0 && !S.timeMsg){ S.timeMsg = true; save(); toast("Die Lesezeit ist um! Mach die Aufgabe noch fertig.", 4000); }
+}
+function textHtml(isl){
+  let body = "";
+  if(isl.table){
+    body = `<table class="prog"><tr>${isl.table.head.map(h => `<th>${esc(h)}</th>`).join("")}</tr>${isl.table.rows.map((r, i) => `<tr data-p="r${i}">${r.map(c => `<td>${esc(c)}</td>`).join("")}</tr>`).join("")}</table>
+      <div class="note" data-p="note">ℹ️ ${esc(isl.table.note)}</div>`;
+  } else {
+    body = isl.paras.map((p, i) => {
+      const words = p.split(/(\s+)/).map(t => /^\s+$/.test(t) ? t : `<span class="w" data-w="${esc(normW(t))}">${esc(t)}</span>`).join("");
+      const cls = isl.recipe && i === 0 ? "ingred" : "";
+      return `<div class="para ${cls}" data-p="${i}"><span class="pn">${i+1}</span>${words}</div>`;
+    }).join("");
+  }
+  return `<span class="kind">${esc(isl.kind)}</span><h2>${esc(isl.title)}</h2>${body}<div class="ruler" id="ruler"></div>`;
+}
+function renderGame(){
+  clearInterval(timer);
+  if(S.end){ renderEnd(); return; }
+  document.documentElement.style.setProperty("--fs", S.fs + "px");
+  const isl = ISLANDS[S.isl], T = isl.tasks[S.task];
+  $app.innerHTML = header() + `
+  <div class="wrap"><div class="stage">
+    <div class="card textbox ${S.ruler ? "ruleron" : ""}" id="text">${textHtml(isl)}</div>
+    <div class="card task" id="task"></div>
+  </div></div><button class="jump" id="jump">✏️ Zur Aufgabe</button>`;
+  timer = setInterval(tickClock, 1000);
+  const jump = document.getElementById("jump");
+  const updJump = () => { const t = document.getElementById("task"); if(!t) return; const r = t.getBoundingClientRect(); jump.textContent = r.top < innerHeight * .5 ? "📖 Zum Text" : "✏️ Zur Aufgabe"; };
+  jump.onclick = () => { const toTask = jump.textContent.includes("Aufgabe"); document.getElementById(toTask ? "task" : "text").scrollIntoView({ behavior: "smooth", block: "start" }); };
+  window.onscroll = updJump; updJump();
+  document.getElementById("fsm").onclick = () => { S.fs = Math.max(16, S.fs - 2); save(); document.documentElement.style.setProperty("--fs", S.fs + "px"); };
+  document.getElementById("fsp").onclick = () => { S.fs = Math.min(30, S.fs + 2); save(); document.documentElement.style.setProperty("--fs", S.fs + "px"); };
+  document.getElementById("rul").onclick = e => { S.ruler = !S.ruler; save(); e.currentTarget.classList.toggle("on", S.ruler); document.getElementById("text").classList.toggle("ruleron", S.ruler); };
+  document.getElementById("menu").onclick = renderStart;
+  // Lese-Lineal folgt Maus/Finger
+  const tb = document.getElementById("text"), ru = document.getElementById("ruler");
+  const moveRuler = y => { const r = tb.getBoundingClientRect(); ru.style.top = (y - r.top + tb.scrollTop - ru.offsetHeight/2) + "px"; };
+  tb.addEventListener("pointermove", e => { if(S.ruler) moveRuler(e.clientY); });
+  tb.addEventListener("pointerdown", e => { if(S.ruler) moveRuler(e.clientY); });
+  renderTask(isl, T);
+}
+function highlight(p){
+  document.querySelectorAll("[data-p].hl").forEach(e => e.classList.remove("hl"));
+  [].concat(p).forEach(x => { const el = document.querySelector(`#text [data-p="${x}"]`); if(el) el.classList.add("hl"); });
+  const first = document.querySelector("#text .hl"); if(first) first.scrollIntoView({ behavior: "smooth", block: "center" });
+}
+function orderFor(n){ const k = tkey(S.isl, S.task); if(!S.order[k] || S.order[k].length !== n){ S.order[k] = shuffle([...Array(n).keys()]); save(); } return S.order[k]; }
+
+function renderTask(isl, T){
+  const el = document.getElementById("task");
+  const num = S.task + 1;
+  el.innerHTML = `
+    <div class="qhead"><span class="qnum">Aufgabe ${num} von ${isl.tasks.length}</span><span class="cat">${esc(CATS[T.cat])}</span></div>
+    <div class="dots">${isl.tasks.map((_, i) => `<span class="${i < S.task ? "d" : i === S.task ? "c" : ""}"></span>`).join("")}</div>
+    <div class="q">${esc(T.q)}</div>
+    <div id="body"></div>
+    <div class="feedback" id="fb"></div>
+    <div id="extra">${S.tip ? `<div class="tipbox">💡 ${esc(T.tip)}</div>` : ""}</div>
+    <div class="actions" id="acts">
+      <button class="btn-sm" id="tip" ${S.tip ? "disabled" : ""}>💡 Tipp</button>
+      ${canSpeak ? `<button class="btn-sm" id="say">🔊 Aufgabe vorlesen</button>` : ""}
+    </div>`;
+  if(S.tip) highlight(T.p);
+  document.getElementById("tip").onclick = () => { S.tip = true; save(); highlight(T.p); document.getElementById("extra").innerHTML = `<div class="tipbox">💡 ${esc(T.tip)}</div>`; document.getElementById("tip").disabled = true; };
+  const say = document.getElementById("say");
+  if(say) say.onclick = () => speak(T.q + (T.type === "choice" ? " " + T.options.map(o => o[0]).join(". ") : T.type === "tf" ? " " + T.statements.map(s => s[0]).join(". ") : ""));
+  const body = document.getElementById("body"), fb = document.getElementById("fb");
+  const wrong = (msg) => {
+    S.tries++; save();
+    if(S.tries >= 2){ solved(false); return; }
+    fb.className = "feedback bad"; fb.textContent = msg || "Noch nicht ganz. Lies im Text noch einmal nach!";
+    if(!S.tip){ fb.textContent += " Du kannst auch den Tipp nutzen."; }
+  };
+  const solved = ok => finishTask(isl, T, ok);
+  const textEl = document.getElementById("text");
+  textEl.classList.remove("findmode");
+
+  if(T.type === "choice"){
+    const order = orderFor(T.options.length);
+    body.innerHTML = `<div class="opts">${order.map((i, k) => `<button class="opt" data-i="${i}"><span class="l">${"ABCD"[k]}</span><span>${esc(T.options[i][0])}</span></button>`).join("")}</div>`;
+    body.querySelectorAll(".opt").forEach(b => b.onclick = () => {
+      if(T.options[+b.dataset.i][1]){ b.classList.add("ok"); body.querySelectorAll(".opt").forEach(x => x.disabled = true); setTimeout(() => solved(true), 450); }
+      else { b.classList.add("no"); b.disabled = true; wrong(); }
+    });
+  }
+  else if(T.type === "tf"){
+    const ans = {};
+    body.innerHTML = `<div class="tf">${T.statements.map((s, i) => `<div class="s" id="s${i}">${esc(s[0])}</div><div class="bs"><button data-i="${i}" data-v="1" class="r">✔ richtig</button><button data-i="${i}" data-v="0" class="f">✘ falsch</button></div>`).join("")}</div>
+      <div class="actions"><button class="btn-go" id="chk" disabled>Prüfen</button></div>`;
+    body.querySelectorAll(".bs button").forEach(b => b.onclick = () => {
+      const i = +b.dataset.i; ans[i] = b.dataset.v === "1";
+      b.parentElement.querySelectorAll("button").forEach(x => x.classList.toggle("sel", x === b));
+      document.getElementById("s" + i).classList.remove("wrong");
+      document.getElementById("chk").disabled = Object.keys(ans).length < T.statements.length;
+    });
+    document.getElementById("chk").onclick = () => {
+      const bad = T.statements.map((s, i) => ans[i] !== s[1] ? i : -1).filter(i => i >= 0);
+      if(!bad.length){ solved(true); return; }
+      bad.forEach(i => document.getElementById("s" + i).classList.add("wrong"));
+      wrong(`${bad.length === 1 ? "Ein Satz ist" : bad.length + " Sätze sind"} noch falsch eingeordnet (rot). Prüfe sie im Text!`);
+    };
+  }
+  else if(T.type === "order"){
+    const order = orderFor(T.items.length); let seq = [];
+    const draw = () => {
+      body.innerHTML = `<div class="seq">${T.items.map((_, k) => seq[k] != null ? `<div class="slot filled" data-k="${k}"><span class="n">${k+1}</span>${esc(T.items[seq[k]])}</div>` : `<div class="slot"><span class="n">${k+1}</span><span class="mut">…</span></div>`).join("")}</div>
+        <div class="mut small">Tippe an, was als Nächstes kommt:</div>
+        <div class="seq">${order.filter(i => !seq.includes(i)).map(i => `<button class="pick" data-i="${i}">${esc(T.items[i])}</button>`).join("") || `<span class="mut small">Fertig sortiert! Oben antippen nimmt einen Satz wieder heraus.</span>`}</div>
+        <div class="actions"><button class="btn-go" id="chk" ${seq.length < T.items.length ? "disabled" : ""}>Prüfen</button></div>`;
+      body.querySelectorAll(".pick").forEach(b => b.onclick = () => { seq.push(+b.dataset.i); draw(); });
+      body.querySelectorAll(".slot.filled").forEach(s => s.onclick = () => { seq = seq.slice(0, +s.dataset.k); draw(); });
+      document.getElementById("chk").onclick = () => {
+        let ok = 0; while(ok < seq.length && seq[ok] === ok) ok++;
+        if(ok === T.items.length){ solved(true); return; }
+        seq = seq.slice(0, ok); draw();
+        wrong(ok ? `Die ersten ${ok} stimmen! Ab Nummer ${ok+1} geht es anders weiter.` : "Schon der erste Satz stimmt noch nicht. Was passiert ganz am Anfang?");
+      };
+    };
+    draw();
+  }
+  else if(T.type === "find"){
+    textEl.classList.add("findmode");
+    body.innerHTML = `<div class="tipbox" style="background:#fff6d6;border-color:#ead9a3">👉 Tippe im <b>Text</b> auf das richtige Wort.${window.innerWidth <= 900 ? " (Der Text steht oben.)" : ""}</div>`;
+    textEl.querySelectorAll(".w").forEach(w => w.onclick = () => {
+      if(!textEl.classList.contains("findmode")) return;
+      if(T.answer.includes(w.dataset.w)){ w.classList.add("ok"); textEl.classList.remove("findmode"); setTimeout(() => solved(true), 500); }
+      else { w.classList.remove("no"); void w.offsetWidth; w.classList.add("no"); wrong(`„${w.textContent.replace(/[.,!?:;„“"]/g, "")}“ ist es nicht. Lies den Satz drumherum genau.`); }
+    });
+    if(window.innerWidth <= 900) textEl.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+  else if(T.type === "match"){
+    const opts = shuffle(T.rows.map(r => r[1]));
+    body.innerHTML = `<div class="match">${T.rows.map((r, i) => `<b>${esc(r[0])}</b><select data-i="${i}"><option value="">– wählen –</option>${opts.map(o => `<option>${esc(o)}</option>`).join("")}</select>`).join("")}</div>
+      <div class="actions"><button class="btn-go" id="chk">Prüfen</button></div>`;
+    body.querySelectorAll("select").forEach(s => s.onchange = () => s.classList.remove("wrong", "right"));
+    document.getElementById("chk").onclick = () => {
+      const sels = [...body.querySelectorAll("select")];
+      if(sels.some(s => !s.value)){ fb.className = "feedback bad"; fb.textContent = "Wähle bei jedem Absatz eine Überschrift."; return; }
+      let bad = 0; sels.forEach(s => { const ok = s.value === T.rows[+s.dataset.i][1]; s.classList.toggle("right", ok); s.classList.toggle("wrong", !ok); if(!ok) bad++; });
+      if(!bad){ setTimeout(() => solved(true), 400); return; }
+      wrong(`${bad === 1 ? "Eine Überschrift passt" : bad + " Überschriften passen"} noch nicht (rot).`);
+    };
+  }
+}
+function finishTask(isl, T, ok){
+  const st = ok ? (S.tries === 0 && !S.tip ? 2 : 1) : 0;
+  S.res[tkey(S.isl, S.task)] = { stars: st, cat: T.cat, tries: S.tries + (ok ? 1 : 0), tip: S.tip, ok };
+  save();
+  highlight(T.p);
+  document.getElementById("text").classList.remove("findmode");
+  const el = document.getElementById("task");
+  const praise = ["Super!", "Klasse gelesen!", "Genau richtig!", "Stark!", "Prima!"][Math.floor(Math.random()*5)];
+  el.querySelector("#fb").className = "feedback " + (ok ? "good" : "bad");
+  el.querySelector("#fb").innerHTML = ok ? `${praise} <span class="stars">${"★".repeat(st)}${"☆".repeat(2-st)}</span>` : "Diesmal hat es nicht geklappt – kein Problem!";
+  el.querySelector("#extra").innerHTML = `<div class="solution">📖 <b>So steht es im Text:</b> ${esc(T.expl)}<br><span class="small mut">Die passende Textstelle ist jetzt gelb markiert.</span></div>`;
+  el.querySelectorAll("#body button, #body select").forEach(b => b.disabled = true);
+  const last = S.task + 1 >= isl.tasks.length;
+  el.querySelector("#acts").innerHTML = `<button class="btn-go" id="next" style="font-size:1.1em">${last ? "Insel geschafft! 🗺️" : "Nächste Aufgabe ➜"}</button>`;
+  document.getElementById("next").onclick = () => {
+    S.tries = 0; S.tip = false;
+    if(!last){ S.task++; save(); renderGame(); window.scrollTo({ top: 0 }); return; }
+    S.task = 0; const done = S.isl; S.isl++;
+    if(S.isl >= ISLANDS.length){ S.end = Date.now(); save(); mapPiece(done, true); return; }
+    save(); mapPiece(done, false);
+  };
+  document.getElementById("next").focus();
+}
+function mapPiece(i, final){
+  const got = ISLANDS.slice(0, i + 1).length;
+  const st = ISLANDS[i].tasks.reduce((a, _, t) => a + (S.res[tkey(i, t)] ? S.res[tkey(i, t)].stars : 0), 0);
+  overlay(`<div class="center"><div class="bigicon">🗺️</div><h2>Kartenstück gefunden!</h2>
+    <p>Du hast die <b>${esc(ISLANDS[i].name)}</b> geschafft und dabei <span class="stars">${st}</span> von ${ISLANDS[i].tasks.length * 2} Sternen gesammelt.</p>
+    <div class="mapgrid">${ISLANDS.map((x, k) => `<div class="${k < got ? "got" : ""}">${k < got ? x.icon : "?"}</div>`).join("")}</div>
+    <button class="btn-go" id="ok" style="font-size:1.1em">${final ? "Zum Schatz! 💰" : "Weiter zur nächsten Insel ⛵"}</button></div>`,
+  close => document.getElementById("ok").onclick = () => { close(); if(final) renderEnd(true); else intro(); });
+}
+
+/* ============================================================
+   ENDE
+   ============================================================ */
+function skillStats(){
+  const out = {};
+  Object.keys(CATS).forEach(c => out[c] = { n: 0, first: 0, ok: 0 });
+  Object.values(S.res).forEach(r => { const o = out[r.cat]; o.n++; if(r.stars === 2) o.first++; if(r.ok) o.ok++; });
+  return out;
+}
+function renderEnd(fresh){
+  clearInterval(timer);
+  const st = stars(), max = TOTAL * 2, mins = Math.round((S.end - S.start) / 60000);
+  const sk = skillStats();
+  const good = Object.entries(sk).filter(([, o]) => o.n && o.first / o.n >= .75).map(([c]) => CATS[c]);
+  const train = Object.entries(sk).filter(([, o]) => o.n && o.first / o.n < .5).map(([c]) => CATS[c]);
+  $app.innerHTML = `
+  <div class="wrap" style="max-width:760px">
+    <div class="center"><svg viewBox="0 0 120 100" width="130" style="display:block;margin:2vh auto 0;animation:pop .6s"><path d="M14 46 Q14 14 60 14 Q106 14 106 46 Z" fill="#a8642a" stroke="#5a3412" stroke-width="4"/><path d="M60 14 V46" stroke="#f2b632" stroke-width="6"/><circle cx="34" cy="10" r="7" fill="#ffe36e"/><circle cx="60" cy="4" r="6" fill="#7fe0ff"/><circle cx="84" cy="9" r="7" fill="#ff8fb0"/><rect x="14" y="46" width="92" height="46" rx="4" fill="#8a5a2b" stroke="#5a3412" stroke-width="4"/><path d="M14 58 H106" stroke="#f2b632" stroke-width="6"/><rect x="51" y="52" width="18" height="20" rx="3" fill="#f2b632" stroke="#5a3412" stroke-width="3"/></svg><div class="title-xl">Schatz gefunden!</div></div>
+    <div class="cert">
+      <div class="small" style="letter-spacing:.2em">URKUNDE</div>
+      <h2>${esc(S.name)}</h2>
+      <p>hat alle fünf Lese-Inseln erkundet und den Schatz gefunden!</p>
+      <div class="stars" style="font-size:2em">★ ${st} / ${max}</div>
+      <div class="mut small">Lesezeit: ${mins} ${mins === 1 ? "Minute" : "Minuten"} · ${new Date(S.end).toLocaleDateString("de-DE")}</div>
+    </div>
+    <div class="card" style="margin-top:14px">
+      <h3>📊 Deine Lese-Fähigkeiten</h3>
+      <div class="skills">${Object.entries(sk).filter(([, o]) => o.n).map(([c, o]) => `<div class="skill"><span>${esc(CATS[c])}</span><div class="bar"><div style="width:${Math.round(o.first / o.n * 100)}%"></div></div><span class="small mut">${o.first} von ${o.n} sofort richtig</span></div>`).join("")}</div>
+      ${good.length ? `<p>💪 <b>Das kannst du schon richtig gut:</b> ${good.join(", ")}.</p>` : ""}
+      ${train.length ? `<p>🎯 <b>Das üben wir noch:</b> ${train.join(", ")}.</p>` : `<p>🎉 Toll gelesen – weiter so!</p>`}
+    </div>
+    <div class="card" style="margin-top:14px">
+      <h3>🦜 Pepes Lese-Tipps zum Merken</h3>
+      <p>1. Lies den Text erst einmal <b>ganz</b>.<br>2. Lies die Aufgabe genau: <b>Wonach</b> wird gefragt?<br>3. Suche die <b>passende Stelle</b> im Text und lies dort noch einmal.<br>4. Manche Antworten stehen nicht wörtlich da – dann musst du <b>mitdenken</b>.</p>
+    </div>
+    <div class="row" style="justify-content:center;margin:16px 0"><button class="btn-go" id="again">Noch einmal spielen</button></div>
+  </div>`;
+  document.getElementById("again").onclick = () => { if(confirm("Ergebnis löschen und neu anfangen?")){ store.del(); S = null; renderStart(); } };
+}
+
+/* ============================================================
+   LEHRKRAFT
+   ============================================================ */
+function renderTeacher(){
+  overlay(`<div class="lk"><h2>🎓 Für Lehrkräfte</h2>
+    <p><b>Ablauf:</b> 5 Inseln mit je einem Text und 5 Aufgaben (insgesamt 25), ca. 35 Minuten. Ein Gerät pro Kind oder pro Lesepaar.</p>
+    <p><b>Textsorten:</b> Erzählung, Sachtext, Anleitung/Rezept, Tabelle (nicht-linearer Text), Fabel.</p>
+    <p><b>Kompetenzen:</b> Jede Aufgabe gehört zu einem Bereich (Informationen finden, Wörter verstehen, Reihenfolge, Schlussfolgern, Textaufbau). Am Ende sieht man, wie viele Aufgaben je Bereich <i>sofort</i> richtig gelöst wurden – nützlich für die weitere Förderung.</p>
+    <p><b>Wertung:</b> ★★ beim ersten Versuch ohne Tipp, ★ mit Tipp oder im zweiten Versuch. Nach zwei Fehlversuchen wird die Lösung mit Textstelle gezeigt – niemand bleibt hängen.</p>
+    <p><b>Hilfen:</b> Schriftgröße (A−/A+), Lese-Lineal, der Tipp markiert die passende Textstelle gelb, die <i>Aufgaben</i> (nicht die Texte) können vorgelesen werden.</p>
+    <label style="display:flex;gap:8px;align-items:center;font-weight:700;margin:8px 0">Zeitanzeige für neue Spiele:
+      <select id="tmin"><option value="35">35 Minuten</option><option value="30">30 Minuten</option><option value="45">45 Minuten</option><option value="0">keine Uhr</option></select></label>
+    <div id="sol" class="row"><input id="code" placeholder="Code für Lösungen" class="grow"><button id="show">Lösungen zeigen</button></div>
+    <div class="row" style="justify-content:flex-end;margin-top:10px"><button class="btn-go" id="close">Schließen</button></div></div>`,
+  close => {
+    const sel = document.getElementById("tmin");
+    sel.value = String(teacherMin());
+    sel.onchange = () => { try{ localStorage.setItem(LKKEY, sel.value); }catch(e){} toast("Gespeichert ✓ – gilt für neue Spiele auf diesem Gerät"); };
+    document.getElementById("close").onclick = close;
+    const show = () => {
+      if(document.getElementById("code").value.trim().toUpperCase() !== TEACHER_CODE){ toast("Falscher Code."); return; }
+      document.getElementById("sol").outerHTML = `<table>${ISLANDS.map((isl, i) => `<tr><td>${isl.icon} ${esc(isl.name)}</td><td>${isl.tasks.map((t, k) => `${k+1}) ${esc(solText(t))}`).join("<br>")}</td></tr>`).join("")}</table>`;
+    };
+    document.getElementById("show").onclick = show;
+    document.getElementById("code").onkeydown = e => { if(e.key === "Enter") show(); };
+  });
+}
+function solText(t){
+  if(t.type === "choice") return t.options.find(o => o[1])[0];
+  if(t.type === "tf") return t.statements.map(s => (s[1] ? "R" : "F")).join(" – ");
+  if(t.type === "order") return t.items.join(" → ");
+  if(t.type === "find") return "Wort: " + t.answer.join(", ");
+  if(t.type === "match") return t.rows.map(r => r[0].replace("Absatz ", "") + ": " + r[1]).join(" · ");
+  return "";
+}
+
+/* ---------- Start ---------- */
+if(S && S.name && S.end) renderEnd(false);
+else renderStart();
+</script>
+</body>
+</html>
