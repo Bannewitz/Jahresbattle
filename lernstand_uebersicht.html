@@ -20,7 +20,10 @@ main{padding:16px 20px;max-width:1500px;margin:0 auto}
 .btn.sec{background:#e2e8f0;color:var(--ink)}
 .btn.danger{background:#fee2e2;color:var(--no)}
 .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-video{width:100%;border-radius:10px;background:#0f172a;aspect-ratio:4/3;object-fit:cover}
+video{width:100%;border-radius:10px;background:#0f172a;aspect-ratio:4/3;object-fit:cover;display:block}
+#scanWrap{position:relative}
+#scanWrap .aim{position:absolute;left:50%;top:50%;width:55%;aspect-ratio:1;transform:translate(-50%,-50%);border:3px solid rgba(255,255,255,.85);border-radius:12px;box-shadow:0 0 0 9999px rgba(0,0,0,.25);pointer-events:none}
+#scanWrap.hit .aim{border-color:#22c55e}
 textarea,select{font:inherit;width:100%;border:2px solid var(--line);border-radius:9px;padding:7px}
 .hint{color:var(--muted);font-size:13px}
 .toast{margin-top:8px;padding:8px 10px;border-radius:9px;font-weight:600;display:none}
@@ -87,7 +90,7 @@ button,.btn,label.btn{touch-action:manipulation}
   <div>
     <div class="card">
       <h2>Codes einscannen</h2>
-      <video id="video" playsinline muted></video>
+      <div id="scanWrap"><video id="video" playsinline muted></video><div class="aim"></div></div>
       <div class="hint" id="camStatus" style="min-height:18px;margin-top:4px"></div>
       <div class="row" style="margin-top:6px">
         <button class="btn" id="camBtn">Kamera starten</button>
@@ -95,7 +98,7 @@ button,.btn,label.btn{touch-action:manipulation}
         <select id="camSel" style="width:auto;flex:1;display:none"></select>
       </div>
       <div class="toast" id="toast"></div>
-      <p class="hint">Die Schüler:innen öffnen oben „Lernstand-Code“ und halten das Tablet vor die Kamera. Erneutes Scannen aktualisiert den Stand.<br>Klappt die Live-Kamera nicht (z. B. auf manchen iPads): „Code abfotografieren“ funktioniert auf jedem Tablet.</p>
+      <p class="hint">Die Schüler:innen öffnen oben „Lernstand-Code“ und halten das Tablet vor die Kamera. Erneutes Scannen aktualisiert den Stand.<br><b>Tipp:</b> Code ins weiße Quadrat, ca. 20–30 cm Abstand, Schüler-Bildschirm hell. Klappt es nicht: „Code abfotografieren“.</p>
     </div>
     <div class="card">
       <h2>Code von Hand eingeben</h2>
@@ -261,25 +264,39 @@ async function startCam(deviceId){
   }catch(e){}
 }
 function stopCam(){ scanning=false; if(stream){ stream.getTracks().forEach(t=>t.stop()); stream=null; } $("#camBtn").textContent="Kamera starten"; setStatus(""); try{ wakeLock&&wakeLock.release(); }catch(e){} wakeLock=null; }
-function decodeCanvas(src,w,h,maxSide){
-  const s=Math.min(1,maxSide/Math.max(w,h)); canvas.width=Math.round(w*s); canvas.height=Math.round(h*s);
-  ctx.drawImage(src,0,0,canvas.width,canvas.height);
+function decodeRegion(src,sx,sy,sw,sh,maxSide,inv){
+  const s=Math.min(1,maxSide/Math.max(sw,sh)); canvas.width=Math.max(1,Math.round(sw*s)); canvas.height=Math.max(1,Math.round(sh*s));
+  ctx.drawImage(src,sx,sy,sw,sh,0,0,canvas.width,canvas.height);
   const img=ctx.getImageData(0,0,canvas.width,canvas.height);
-  const r=jsQR(img.data,img.width,img.height,{inversionAttempts:"attemptBoth"}); return r?r.data:null;
+  const r=jsQR(img.data,img.width,img.height,{inversionAttempts:inv||"dontInvert"}); return r?r.data:null;
 }
-let frame=0;
+function decodeCanvas(src,w,h,maxSide){ return decodeRegion(src,0,0,w,h,maxSide,"attemptBoth"); }
+/* Mehrere Strategien im Wechsel: ganzes Bild, Bildmitte vergrößert, ganzes Bild in hoher Auflösung */
+function decodeVideo(){
+  const w=video.videoWidth, h=video.videoHeight, m=frame%4;
+  if(m===0) return decodeRegion(video,0,0,w,h,800);
+  if(m===1){ const s=Math.min(w,h)*0.8; return decodeRegion(video,(w-s)/2,(h-s)/2,s,s,1000); }
+  if(m===2){ const s=Math.min(w,h)*0.55; return decodeRegion(video,(w-s)/2,(h-s)/2,s,s,1000); }
+  return decodeRegion(video,0,0,w,h,1400,"attemptBoth");
+}
+let frame=0, sysOk=0;
 async function loop(){
   if(!scanning) return;
   if(video.readyState>=2 && video.videoWidth){
-    let txt=null;
-    if(detector){
-      try{ const r=await detector.detect(video); if(r.length) txt=r[0].rawValue; }
-      catch(e){ detector=null; } // Erkennung des Geräts streikt -> jsQR übernimmt
+    let txt=null; frame++;
+    /* Systemerkennung nur jedes zweite Bild – sie liefert auf manchen Geräten nie etwas, daher läuft jsQR immer mit */
+    if(detector && frame%2===0){
+      try{ const r=await detector.detect(video); if(r.length){ txt=r[0].rawValue; sysOk++; } }
+      catch(e){ detector=null; }
     }
-    if(!txt && !detector){ frame++; try{ txt=decodeCanvas(video,video.videoWidth,video.videoHeight, frame%2?720:1080); }catch(e){} }
-    if(txt && (txt!==lastCode || Date.now()-lastTime>4000)){ lastCode=txt; lastTime=Date.now(); addCode(txt); }
+    if(!txt){ try{ txt=decodeVideo(); }catch(e){} }
+    if(frame%10===0) setStatus(`Suche QR-Code … · Kamera ${video.videoWidth}×${video.videoHeight} · ${frame} Bilder geprüft`);
+    if(txt){
+      $("#scanWrap").classList.add("hit"); setTimeout(()=>$("#scanWrap").classList.remove("hit"),600);
+      if(txt!==lastCode || Date.now()-lastTime>4000){ lastCode=txt; lastTime=Date.now(); addCode(txt); }
+    }
   }
-  setTimeout(loop,180);
+  setTimeout(loop,120);
 }
 /* Fallback für jedes Tablet: Foto vom Code aufnehmen */
 $("#photoIn").onchange=async e=>{
