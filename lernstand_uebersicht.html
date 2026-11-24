@@ -51,6 +51,12 @@ th{font-size:12.5px;color:var(--muted);font-weight:600;position:sticky;top:0;bac
 .prob .n{font-weight:800;text-align:center;border-radius:6px}
 .top{display:grid;grid-template-columns:minmax(0,1fr) 110px 70px;gap:8px;align-items:center;padding:5px 0;border-bottom:1px solid var(--line);font-size:14px}
 .matrix{overflow:auto;max-height:70vh}
+.tscroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.grid>div{min-width:0}
+html,body{overflow-x:hidden}
+@media(max-width:1000px){ main{padding:12px} .stbar{grid-template-columns:110px minmax(0,1fr) 90px 100px;font-size:14px} .top{grid-template-columns:minmax(0,1fr) 90px 50px} video{max-height:45vh} }
+@media(max-width:700px){ .stbar{grid-template-columns:90px minmax(0,1fr) 60px} .stbar>span:last-child{display:none} header h1{font-size:16px} }
+button,.btn,label.btn{touch-action:manipulation}
 .matrix table{font-size:12.5px}
 .matrix th.rot{writing-mode:vertical-rl;transform:rotate(180deg);height:110px;white-space:nowrap;text-align:left}
 .matrix td.c{width:26px;text-align:center;font-weight:700;padding:3px}
@@ -82,12 +88,14 @@ th{font-size:12.5px;color:var(--muted);font-weight:600;position:sticky;top:0;bac
     <div class="card">
       <h2>Codes einscannen</h2>
       <video id="video" playsinline muted></video>
-      <div class="row" style="margin-top:8px">
+      <div class="hint" id="camStatus" style="min-height:18px;margin-top:4px"></div>
+      <div class="row" style="margin-top:6px">
         <button class="btn" id="camBtn">Kamera starten</button>
+        <label class="btn sec" style="display:inline-block">Code abfotografieren<input type="file" id="photoIn" accept="image/*" capture="environment" style="display:none"></label>
         <select id="camSel" style="width:auto;flex:1;display:none"></select>
       </div>
       <div class="toast" id="toast"></div>
-      <p class="hint">Die Schüler:innen öffnen oben „Lernstand-Code“ und halten das Tablet vor die Kamera. Erneutes Scannen aktualisiert den Stand.</p>
+      <p class="hint">Die Schüler:innen öffnen oben „Lernstand-Code“ und halten das Tablet vor die Kamera. Erneutes Scannen aktualisiert den Stand.<br>Klappt die Live-Kamera nicht (z. B. auf manchen iPads): „Code abfotografieren“ funktioniert auf jedem Tablet.</p>
     </div>
     <div class="card">
       <h2>Code von Hand eingeben</h2>
@@ -219,35 +227,71 @@ function beep(){ try{ const a=new (window.AudioContext||window.webkitAudioContex
 /* ---------- Kamera ---------- */
 let stream=null, scanning=false, lastCode="", lastTime=0, detector=null;
 const video=$("#video"), canvas=document.createElement("canvas"), ctx=canvas.getContext("2d",{willReadFrequently:true});
+let wakeLock=null;
+function camHelp(e){
+  const ios=/iPad|iPhone|Macintosh/.test(navigator.userAgent) && "ontouchend" in document;
+  if(!window.isSecureContext) return "Die Kamera braucht eine sichere Adresse (https). Öffne die Übersicht über GitHub Pages.";
+  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia) return "Dieser Browser erlaubt keinen Kamerazugriff. Nutze „Code abfotografieren“.";
+  if(e&&e.name==="NotAllowedError") return ios ? "Kamera blockiert. iPad: Einstellungen → Safari → Kamera → „Erlauben“, dann die Seite neu laden. Oder „Code abfotografieren“ nutzen." : "Kamera blockiert. Tippe auf das Schloss neben der Adresse → Berechtigungen → Kamera erlauben, dann neu laden. Oder „Code abfotografieren“ nutzen.";
+  if(e&&e.name==="NotReadableError") return "Die Kamera wird gerade von einer anderen App benutzt. Schließe die Kamera-App und versuche es erneut.";
+  if(e&&e.name==="NotFoundError") return "Keine Kamera gefunden. Nutze „Code abfotografieren“ oder die Eingabe von Hand.";
+  return "Kamera nicht verfügbar"+(e&&e.message?": "+e.message:"")+". Nutze „Code abfotografieren“.";
+}
+function setStatus(s){ $("#camStatus").textContent=s; }
 async function startCam(deviceId){
   stopCam();
+  if(!window.isSecureContext||!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){ toast(camHelp(),"no"); return; }
+  const base={width:{ideal:1280},height:{ideal:720}};
   try{
-    stream=await navigator.mediaDevices.getUserMedia({video: deviceId?{deviceId:{exact:deviceId}}:{facingMode:"environment"}, audio:false});
-  }catch(e){ toast("Kamera nicht verfügbar: "+e.message+". Codes können auch von Hand eingegeben werden.","no"); return; }
-  video.srcObject=stream; await video.play();
-  if("BarcodeDetector" in window){ try{ detector=new BarcodeDetector({formats:["qr_code"]}); }catch(e){ detector=null; } }
-  scanning=true; $("#camBtn").textContent="Kamera stoppen"; loop();
-  const devs=(await navigator.mediaDevices.enumerateDevices()).filter(d=>d.kind==="videoinput");
-  const sel=$("#camSel"); if(devs.length>1){ sel.style.display=""; sel.innerHTML=devs.map((d,i)=>`<option value="${d.deviceId}">${esc(d.label||"Kamera "+(i+1))}</option>`).join(""); const cur=stream.getVideoTracks()[0].getSettings().deviceId; if(cur) sel.value=cur; }
+    stream=await navigator.mediaDevices.getUserMedia({audio:false, video: deviceId?{...base,deviceId:{exact:deviceId}}:{...base,facingMode:{ideal:"environment"}}});
+  }catch(e){
+    try{ stream=await navigator.mediaDevices.getUserMedia({video:true,audio:false}); }
+    catch(e2){ toast(camHelp(e2),"no"); return; }
+  }
+  video.setAttribute("playsinline",""); video.setAttribute("webkit-playsinline",""); video.muted=true;
+  video.srcObject=stream;
+  try{ await video.play(); }catch(e){ /* iPad: Wiedergabe startet nach Antippen */ toast("Tippe einmal auf das Kamerabild, um es zu starten.","no"); video.onclick=()=>video.play(); }
+  detector=null;
+  if("BarcodeDetector" in window){ try{ const f=await BarcodeDetector.getSupportedFormats(); if(f.includes("qr_code")) detector=new BarcodeDetector({formats:["qr_code"]}); }catch(e){ detector=null; } }
+  scanning=true; $("#camBtn").textContent="Kamera stoppen"; setStatus("Suche QR-Code …"); loop();
+  try{ if("wakeLock" in navigator) wakeLock=await navigator.wakeLock.request("screen"); }catch(e){}
+  try{
+    const devs=(await navigator.mediaDevices.enumerateDevices()).filter(d=>d.kind==="videoinput");
+    const sel=$("#camSel"); if(devs.length>1){ sel.style.display=""; sel.innerHTML=devs.map((d,i)=>`<option value="${d.deviceId}">${esc(d.label||"Kamera "+(i+1))}</option>`).join(""); const cur=stream.getVideoTracks()[0].getSettings().deviceId; if(cur) sel.value=cur; }
+  }catch(e){}
 }
-function stopCam(){ scanning=false; if(stream){ stream.getTracks().forEach(t=>t.stop()); stream=null; } $("#camBtn").textContent="Kamera starten"; }
+function stopCam(){ scanning=false; if(stream){ stream.getTracks().forEach(t=>t.stop()); stream=null; } $("#camBtn").textContent="Kamera starten"; setStatus(""); try{ wakeLock&&wakeLock.release(); }catch(e){} wakeLock=null; }
+function decodeCanvas(src,w,h,maxSide){
+  const s=Math.min(1,maxSide/Math.max(w,h)); canvas.width=Math.round(w*s); canvas.height=Math.round(h*s);
+  ctx.drawImage(src,0,0,canvas.width,canvas.height);
+  const img=ctx.getImageData(0,0,canvas.width,canvas.height);
+  const r=jsQR(img.data,img.width,img.height,{inversionAttempts:"attemptBoth"}); return r?r.data:null;
+}
+let frame=0;
 async function loop(){
   if(!scanning) return;
-  if(video.readyState>=2){
+  if(video.readyState>=2 && video.videoWidth){
     let txt=null;
-    try{
-      if(detector){ const r=await detector.detect(video); if(r.length) txt=r[0].rawValue; }
-      else {
-        const w=video.videoWidth, h=video.videoHeight, s=Math.min(1,800/Math.max(w,h));
-        canvas.width=w*s; canvas.height=h*s; ctx.drawImage(video,0,0,canvas.width,canvas.height);
-        const img=ctx.getImageData(0,0,canvas.width,canvas.height);
-        const r=jsQR(img.data,img.width,img.height,{inversionAttempts:"dontInvert"}); if(r) txt=r.data;
-      }
-    }catch(e){}
+    if(detector){
+      try{ const r=await detector.detect(video); if(r.length) txt=r[0].rawValue; }
+      catch(e){ detector=null; } // Erkennung des Geräts streikt -> jsQR übernimmt
+    }
+    if(!txt && !detector){ frame++; try{ txt=decodeCanvas(video,video.videoWidth,video.videoHeight, frame%2?720:1080); }catch(e){} }
     if(txt && (txt!==lastCode || Date.now()-lastTime>4000)){ lastCode=txt; lastTime=Date.now(); addCode(txt); }
   }
-  setTimeout(loop,200);
+  setTimeout(loop,180);
 }
+/* Fallback für jedes Tablet: Foto vom Code aufnehmen */
+$("#photoIn").onchange=async e=>{
+  const file=e.target.files[0]; e.target.value=""; if(!file) return;
+  setStatus("Lese Foto …");
+  try{
+    const url=URL.createObjectURL(file); const img=new Image(); img.src=url; await img.decode();
+    let txt=null; for(const side of [1600,1000,2400]){ txt=decodeCanvas(img,img.naturalWidth,img.naturalHeight,side); if(txt) break; }
+    URL.revokeObjectURL(url); setStatus("");
+    if(txt) addCode(txt); else toast("Kein QR-Code erkannt. Fotografiere den Code näher und gerade von vorn.","no");
+  }catch(err){ setStatus(""); toast("Das Foto konnte nicht gelesen werden.","no"); }
+};
 $("#camBtn").onclick=()=>scanning?stopCam():startCam();
 $("#camSel").onchange=e=>startCam(e.target.value);
 $("#manualBtn").onclick=()=>{ const lines=$("#manual").value.split(/\n+/).map(s=>s.trim()).filter(Boolean); let n=0; lines.forEach(l=>{ if(addCode(l, lines.length>1)) n++; }); if(lines.length>1) toast(`${n} von ${lines.length} Codes übernommen.`, n?"ok":"no"); if(n) $("#manual").value=""; };
@@ -299,14 +343,14 @@ function render(){
   $("#vKlasse").innerHTML=h;
 
   /* Schüler:innen */
-  let t=`<div class="card"><h2>Schüler:innen</h2><p class="hint" style="margin-top:0">Zeile anklicken für die Fehlerstellen. Zahlen in den Stationsfeldern = Fehlversuche.</p><table><tr><th>Kürzel</th><th>Stationen 0–6</th><th>Fehler</th><th>Zeit</th><th>Daumen</th><th>Tipps</th><th>Auffälligkeiten</th><th>Stand</th><th></th></tr>`;
+  let t=`<div class="card"><h2>Schüler:innen</h2><p class="hint" style="margin-top:0">Zeile anklicken für die Fehlerstellen. Zahlen in den Stationsfeldern = Fehlversuche.</p><div class="tscroll"><table style="min-width:900px"><tr><th>Kürzel</th><th>Stationen 0–6</th><th>Fehler</th><th>Zeit</th><th>Daumen</th><th>Tipps</th><th>Auffälligkeiten</th><th>Stand</th><th></th></tr>`;
   L.forEach((s,idx)=>{
     const cells=STATIONS.map((st,i)=>{ const e=tries(s,i); const cls=s.done[i]?"done":(i===s.cur?"cur":""); return `<span class="cell ${cls} ${!s.done[i]&&i!==s.cur?heat(e):""}" title="${st.t}: ${s.done[i]?"erledigt":i===s.cur?"bearbeitet gerade":"offen"} · ${e} Fehlversuche · ${s.min[i]||0} Min.">${e||(s.done[i]?"✓":"")}</span>`; }).join("");
     const tot=totalTries(s); const mins=s.min.reduce((a,b)=>a+b,0);
     t+=`<tr class="clickable" data-i="${idx}"><td><b>${esc(s.name)}</b></td><td><div class="cells">${cells}</div></td><td><span class="cell ${heat(Math.round(tot/3))}" style="width:auto;padding:0 8px;display:inline-flex">${tot}</span></td><td>${mins} Min.</td><td class="thumbs">${s.th.map(x=>`<span>${TH[x]||"·"}</span>`).join("")}</td><td>${s.tips}</td><td>${flags(s).map(f=>`<span class="flag ${f[1]?"red":""}">${f[0]}</span>`).join("")}</td><td>${fmtTime(s.ts)}</td><td><button class="btn sec" data-del="${esc(s.name.toLowerCase())}" title="Entfernen">✕</button></td></tr>
       <tr class="det" id="det${idx}" style="display:none"><td colspan="9">${detail(s)}</td></tr>`;
   });
-  t+=`</table></div>`;
+  t+=`</table></div></div>`;
   $("#vSchueler").innerHTML=t;
   $$("#vSchueler tr.clickable").forEach(r=>r.onclick=e=>{ if(e.target.closest("[data-del]")) return; const d=$("#det"+r.dataset.i); d.style.display=d.style.display==="none"?"":"none"; });
   $$("[data-del]").forEach(b=>b.onclick=()=>{ if(confirm("Diesen Eintrag entfernen?")){ delete DB[b.dataset.del]; store(); } });
