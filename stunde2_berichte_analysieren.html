@@ -1,0 +1,1720 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Stunde 2 · Berichte analysieren und vergleichen</title>
+<style>
+:root{
+  --bg:#f5f3ee; --card:#ffffff; --ink:#1f2937; --muted:#64748b; --line:#e5e7eb;
+  --accent:#1e3a5f;
+  --wf:#2563eb; --wf-bg:#dbeafe;
+  --auf:#16a34a; --auf-bg:#dcfce7;
+  --stil:#ea580c; --stil-bg:#ffedd5;
+  --zeit:#7c3aed; --zeit-bg:#ede9fe;
+  --rede:#dc2626; --rede-bg:#fee2e2;
+  --begl:#0891b2; --begl-bg:#cffafe;
+  --ok:#15803d; --ok-bg:#dcfce7; --no:#b91c1c; --no-bg:#fee2e2;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{font-family:"Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink);font-size:17px;line-height:1.45}
+button{font:inherit;cursor:pointer}
+input,textarea,select{font:inherit;color:inherit}
+header.top{position:sticky;top:0;z-index:20;background:var(--accent);color:#fff;padding:10px 16px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+header.top h1{font-size:18px;margin:0;font-weight:700}
+header.top .sub{font-size:13px;opacity:.85}
+.top-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.pill{border:1px solid rgba(255,255,255,.5);background:transparent;color:#fff;border-radius:999px;padding:6px 12px;font-size:14px}
+.pill.on{background:#fff;color:var(--accent)}
+#timer{font-variant-numeric:tabular-nums;min-width:96px}
+#timer.warn{background:#f59e0b;border-color:#f59e0b;color:#111}
+#timer.over{background:#dc2626;border-color:#dc2626}
+nav.stations{display:flex;gap:6px;overflow-x:auto;padding:10px 16px;background:#fff;border-bottom:1px solid var(--line)}
+nav.stations button{flex:0 0 auto;border:2px solid var(--line);background:#fff;border-radius:12px;padding:6px 10px;text-align:left;min-width:120px}
+nav.stations button .n{font-size:12px;color:var(--muted);display:block}
+nav.stations button .t{font-weight:600;font-size:15px}
+nav.stations button.active{border-color:var(--accent);background:#eef2f7}
+nav.stations button.done .n::after{content:" ✓";color:var(--ok);font-weight:700}
+main{max-width:1280px;margin:0 auto;padding:16px}
+.station{display:none}
+.station.active{display:block}
+.st-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:10px 16px;margin-bottom:12px}
+.st-head h2{margin:0;font-size:24px}
+.badge{display:inline-block;font-size:13px;padding:3px 10px;border-radius:999px;background:#e2e8f0;color:#334155;font-weight:600}
+.layout{display:grid;grid-template-columns:minmax(0,1fr);gap:16px}
+@media (min-width:1000px){.layout.two{grid-template-columns:minmax(0,1.05fr) minmax(0,1fr)} .layout.two .mat{position:sticky;top:76px;align-self:start;max-height:calc(100vh - 92px);overflow:auto}}
+@media (max-width:999px){.layout.two .mat{max-height:48vh;overflow:auto}}
+.card{background:var(--card);border-radius:14px;padding:16px 18px;box-shadow:0 1px 3px rgba(0,0,0,.08);margin-bottom:14px}
+.card h3{margin:0 0 8px;font-size:19px}
+.card h4{margin:12px 0 6px;font-size:16px}
+.hint{color:var(--muted);font-size:14px}
+.goal{border-left:5px solid var(--accent)}
+.operator{border:2px dashed var(--accent);background:#f8fafc}
+.operator b{color:var(--accent)}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.btn{border:none;border-radius:10px;padding:9px 14px;background:var(--accent);color:#fff;font-weight:600;font-size:15px}
+.btn.sec{background:#e2e8f0;color:var(--ink)}
+.btn.tip{background:#fef3c7;color:#78350f}
+.btn.small{padding:6px 10px;font-size:14px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+textarea,input[type=text]{width:100%;border:2px solid var(--line);border-radius:10px;padding:8px 10px;background:#fff}
+textarea{min-height:64px;resize:vertical}
+textarea:focus,input[type=text]:focus,select:focus{outline:none;border-color:var(--accent)}
+select{border:2px solid var(--line);border-radius:10px;padding:7px 8px;background:#fff;max-width:100%}
+.fb{margin-top:8px;padding:8px 12px;border-radius:10px;font-size:15px;display:none}
+.fb.show{display:block}
+.fb.ok{background:var(--ok-bg);color:var(--ok)}
+.fb.no{background:var(--no-bg);color:var(--no)}
+.fb.info{background:#eff6ff;color:#1e40af}
+.tipbox{display:none;background:#fffbeb;border:1px solid #fcd34d;border-radius:10px;padding:8px 12px;margin-top:8px;font-size:15px}
+.tipbox.show{display:block}
+.model{display:none;background:#f1f5f9;border-left:4px solid var(--muted);border-radius:8px;padding:8px 12px;margin-top:8px;font-size:15px}
+.model.show{display:block}
+.challenge{border:2px solid #f59e0b}
+.challenge>h3::before{content:"★ ";color:#f59e0b}
+body:not(.basis) .basis-only{display:none !important}
+body.basis .basis-only{display:block}
+body.basis .no-basis{display:none !important}
+/* Subtabs */
+.subtabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.subtabs button{border:2px solid var(--line);background:#fff;border-radius:10px;padding:7px 12px;font-weight:600;font-size:15px}
+.subtabs button.active{color:#fff}
+.subtabs button[data-c=wf].active{background:var(--wf);border-color:var(--wf)}
+.subtabs button[data-c=auf].active{background:var(--auf);border-color:var(--auf)}
+.subtabs button[data-c=stil].active{background:var(--stil);border-color:var(--stil)}
+.subtabs button[data-c=zeit].active{background:var(--zeit);border-color:var(--zeit)}
+.subtabs button[data-c=star].active{background:#f59e0b;border-color:#f59e0b}
+.subtabs button.done::after{content:" ✓"}
+.sub{display:none}.sub.active{display:block}
+/* Material */
+.mat .card{margin-bottom:0}
+.mtabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.mtabs button{border:2px solid var(--line);background:#fff;border-radius:10px;padding:6px 12px;font-weight:600;font-size:14px}
+.mtabs button.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.mpane{display:none}.mpane.active{display:block}
+.modebar{font-size:14px;padding:6px 10px;border-radius:8px;margin-bottom:8px;background:#f1f5f9;color:#334155;display:none}
+.modebar.show{display:block}
+.textA h3{font-size:18px;margin:0 0 10px}
+.tline{display:flex;gap:10px;white-space:nowrap;padding:1px 4px;border-radius:6px;font-size:clamp(14px,1.55vw,17px);line-height:1.75}
+.tline .ln{width:26px;flex:0 0 26px;text-align:right;color:#94a3b8;font-variant-numeric:tabular-nums;user-select:none}
+.tline.gap{margin-bottom:12px}
+.textA.mode-lines .tline{cursor:pointer}
+.textA.mode-lines .tline:hover{background:#f1f5f9}
+.tline.sel{background:var(--wf-bg) !important;outline:2px solid var(--wf)}
+.tline.para1{box-shadow:inset 4px 0 0 var(--auf)}
+.tline.para2{box-shadow:inset 4px 0 0 #22c55e}
+.tline.para3{box-shadow:inset 4px 0 0 #86efac}
+.tok{border-radius:4px;padding:0}
+.textA.mode-words .tok{cursor:pointer}
+.textA.mode-words .tok:hover{background:#e2e8f0}
+.tok.zeit{background:var(--zeit-bg);color:var(--zeit);font-weight:700;text-decoration:underline}
+.tok.stil{background:var(--stil-bg);color:var(--stil);font-weight:700}
+.tok.rede{background:var(--rede-bg);color:var(--rede);font-weight:800;outline:2px solid var(--rede)}
+.tok.begl{background:var(--begl-bg);color:#0e7490;font-weight:700;text-decoration:underline wavy}
+.tok.wrong{animation:shake .35s;background:#fecaca}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-3px)}75%{transform:translateX(3px)}}
+.m2 table{border-collapse:collapse;width:100%;font-size:15px}
+.m2 th,.m2 td{border:1px solid #cbd5e1;padding:6px 8px;text-align:left;vertical-align:top}
+.m2 th{background:#f1f5f9;width:32%}
+.m3 ol{margin:0;padding-left:0;list-style:none;font-size:15px}
+.m3 li{display:flex;gap:10px;padding:4px 0;border-bottom:1px dotted #cbd5e1}
+.m3 li b{flex:0 0 74px;font-variant-numeric:tabular-nums}
+svg{max-width:100%;height:auto;display:block}
+/* Begriffe */
+.flipgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px}
+.flip{border:2px solid var(--line);background:#fff;border-radius:12px;padding:12px;min-height:96px;text-align:left;position:relative}
+.flip .term{font-weight:700;font-size:17px}
+.flip .def{display:none;font-size:14.5px;margin-top:6px;color:#334155}
+.flip.open{border-color:var(--accent);background:#f8fafc}
+.flip.open .def{display:block}
+.flip .kind{font-size:12px;color:var(--muted);display:block;margin-bottom:2px}
+.flip.seen::after{content:"✓";position:absolute;top:6px;right:10px;color:var(--ok);font-weight:700}
+.match-row{display:grid;grid-template-columns:minmax(0,1fr) 210px;gap:10px;align-items:center;padding:7px 0;border-bottom:1px solid var(--line)}
+@media (max-width:600px){.match-row{grid-template-columns:1fr}}
+.match-row.ok select{border-color:var(--ok);background:var(--ok-bg)}
+.match-row.no select{border-color:var(--no);background:var(--no-bg)}
+/* W-Fragen */
+.wq{border:2px solid var(--wf-bg);border-radius:12px;padding:10px 12px;margin-bottom:10px}
+.wq.active{border-color:var(--wf);box-shadow:0 0 0 3px var(--wf-bg)}
+.wq.ok{border-color:var(--ok)}
+.wq-head{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.wq-head b{color:var(--wf);font-size:17px}
+.beleg{font-weight:700;color:var(--wf)}
+.choice{display:flex;gap:8px;flex-wrap:wrap}
+.choice button{border:2px solid var(--line);background:#fff;border-radius:10px;padding:7px 12px}
+.choice button.picked{border-color:var(--accent);background:#eef2f7;font-weight:600}
+.choice button.ok{border-color:var(--ok);background:var(--ok-bg)}
+.choice button.no{border-color:var(--no);background:var(--no-bg)}
+.stmt{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;padding:7px 0;border-bottom:1px solid var(--line)}
+.counter{font-weight:700;font-variant-numeric:tabular-nums}
+/* Sortieren */
+.pool{display:flex;flex-wrap:wrap;gap:8px;min-height:48px;padding:8px;border:2px dashed #cbd5e1;border-radius:12px;margin-bottom:10px}
+.icard{border:2px solid #cbd5e1;background:#fff;border-radius:10px;padding:7px 10px;font-size:15px;text-align:left}
+.icard.picked{border-color:var(--accent);box-shadow:0 0 0 3px #c7d2fe}
+.icard.ok{border-color:var(--ok);background:var(--ok-bg)}
+.icard.no{border-color:var(--no);background:var(--no-bg)}
+.cols{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+@media (max-width:700px){.cols{grid-template-columns:1fr}}
+.col{border:2px solid #cbd5e1;border-radius:12px;padding:8px;min-height:120px;background:#fafafa;display:flex;flex-direction:column;gap:6px}
+.col h4{margin:0 0 4px;font-size:15px;text-align:center}
+.col.target{border-color:var(--accent);background:#eef2f7;cursor:pointer}
+.col[data-k=a] h4{color:var(--wf)}
+.col[data-k=b] h4{color:var(--auf)}
+.col[data-k=m] h4{color:var(--stil)}
+/* Lückentext */
+.cloze{font-size:17px;line-height:2.3}
+.blank{display:inline-block;min-width:120px;border:none;border-bottom:2px solid #94a3b8;background:#f8fafc;border-radius:6px 6px 0 0;padding:0 8px;line-height:1.6;text-align:center;font-weight:600}
+.blank.act{background:#e0e7ff;border-bottom-color:var(--accent)}
+.blank.ok{background:var(--ok-bg);border-bottom-color:var(--ok)}
+.blank.no{background:var(--no-bg);border-bottom-color:var(--no)}
+.bank{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.bank button{border:2px solid #cbd5e1;background:#fff;border-radius:999px;padding:5px 12px;font-size:15px}
+.bank button.used{opacity:.35}
+.preview{background:#f8fafc;border-radius:10px;padding:10px 12px;margin-top:8px;font-size:17px}
+.q-rede{color:var(--rede);font-weight:800}
+.q-begl{color:#0e7490;font-weight:700;text-decoration:underline wavy}
+.thumbs{display:flex;gap:6px}
+.thumbs button{border:2px solid var(--line);background:#fff;border-radius:10px;padding:4px 10px;font-size:22px;line-height:1.2}
+.thumbs button.picked{border-color:var(--accent);background:#e0e7ff}
+.goalrow{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}
+.nextbar{display:flex;justify-content:space-between;gap:10px;margin-top:6px}
+/* Modal */
+.modal{position:fixed;inset:0;background:rgba(15,23,42,.55);display:none;z-index:50;align-items:flex-start;justify-content:center;padding:30px 12px;overflow:auto}
+.modal.show{display:flex}
+.modal .box{background:#fff;border-radius:16px;max-width:900px;width:100%;padding:20px 22px}
+.modal table{border-collapse:collapse;width:100%;font-size:14.5px}
+.modal th,.modal td{border:1px solid #cbd5e1;padding:6px 8px;text-align:left;vertical-align:top}
+.modal th{background:#f1f5f9}
+/* Sperren */
+nav.stations button:disabled{opacity:.5;cursor:not-allowed}
+nav.stations button.locked-st .n::after{content:" 🔒"}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.choice button:disabled{cursor:not-allowed}
+.choice button.ok:disabled{opacity:1}
+.subtabs button:disabled{opacity:.45;cursor:not-allowed}
+.subtabs button:disabled::after{content:" 🔒"}
+.card.locked{opacity:.55;filter:grayscale(.7)}
+.card.locked::before{content:"🔒 " attr(data-needmsg);display:block;font-size:14px;font-weight:700;color:#334155;background:#f1f5f9;border-radius:8px;padding:6px 10px;margin-bottom:8px}
+.req{background:#fff7ed;border:1px solid #fdba74;border-radius:12px;padding:10px 14px;font-size:15px;margin:6px 0 10px}
+.req ul{list-style:none;margin:6px 0 0;padding:0}
+.req li.y{color:var(--ok)} .req li.n{color:#7c2d12}
+.req.ok{background:var(--ok-bg);border-color:#86efac;color:var(--ok)}
+.val{font-size:13.5px;margin-top:4px}
+.val.ok{color:var(--ok)} .val.no{color:#92400e}
+.cd{margin-top:6px;font-weight:700;color:#92400e}
+.textA.wlocked{opacity:.5;pointer-events:none}
+.flip:disabled{opacity:1}
+/* Hefter-Druck */
+#hefter{display:none}
+@media print{
+  header.top,nav.stations,main,.modal{display:none !important}
+  #hefter{display:block !important;font-family:Arial,sans-serif;color:#000;font-size:12pt;padding:0}
+  #hefter h1{font-size:16pt;margin:0 0 4pt}
+  #hefter .hbox{border:1.5pt solid #333;border-radius:6pt;padding:8pt 10pt;margin:8pt 0}
+  #hefter .q-rede{color:#c00}
+  #hefter .q-begl{color:#06c}
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <div>
+    <h1>Unfall im Treppenhaus · Berichte analysieren und vergleichen</h1>
+    <div class="sub">Deutsch Klasse 7 · Beherrschen des Berichtens · Stunde 2 (45 Minuten)</div>
+  </div>
+  <div class="top-actions">
+    <button class="pill" id="timer" title="Phasen-Timer starten oder anhalten">⏱ 5:00</button>
+    <span class="pill on" id="basisBadge" style="display:none">Hilfen an</span>
+    <button class="pill" id="codeBtn" title="Lernstand für die Lehrkraft anzeigen">Lernstand-Code</button>
+    <button class="pill" id="teacherBtn">Für Lehrkräfte</button>
+  </div>
+</header>
+
+<nav class="stations" id="nav"></nav>
+
+<main>
+
+<!-- ============ STATION 0: START ============ -->
+<section class="station" data-st="0">
+  <div class="st-head"><h2>Start: Was zeigt die Skizze?</h2><span class="badge">0–5 Min · Plenum</span></div>
+  <div class="layout two">
+    <div class="mat"><div class="card"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 400" font-family="Arial, Helvetica, sans-serif" role="img" aria-label="M1 Unfallskizze Treppenhaus B">
+  <rect x="0" y="0" width="640" height="400" fill="#ffffff"/>
+  <text x="20" y="28" font-size="17" font-weight="bold" fill="#1f2937">M1 · Unfallskizze Treppenhaus B (Ansicht von oben)</text>
+  <!-- Treppenhaus Umriss -->
+  <rect x="20" y="45" width="400" height="300" fill="#f8fafc" stroke="#334155" stroke-width="3"/>
+  <!-- Obergeschoss-Flur -->
+  <rect x="20" y="45" width="400" height="55" fill="#e2e8f0" stroke="#334155" stroke-width="2"/>
+  <text x="34" y="78" font-size="14" fill="#1f2937">1. Obergeschoss (Flur)</text>
+  <!-- Erdgeschoss -->
+  <rect x="20" y="290" width="400" height="55" fill="#e2e8f0" stroke="#334155" stroke-width="2"/>
+  <text x="34" y="324" font-size="14" fill="#1f2937">Erdgeschoss</text>
+  <!-- Treppe: 10 Stufen von y=100 bis y=290 (19 px je Stufe) -->
+  <rect x="190" y="100" width="130" height="190" fill="#ffffff" stroke="#334155" stroke-width="2"/>
+  <g stroke="#64748b" stroke-width="1.5">
+    <line x1="190" y1="119" x2="320" y2="119"/>
+    <line x1="190" y1="138" x2="320" y2="138"/>
+    <line x1="190" y1="157" x2="320" y2="157"/>
+    <line x1="190" y1="176" x2="320" y2="176"/>
+    <line x1="190" y1="195" x2="320" y2="195"/>
+    <line x1="190" y1="214" x2="320" y2="214"/>
+    <line x1="190" y1="233" x2="320" y2="233"/>
+    <line x1="190" y1="252" x2="320" y2="252"/>
+    <line x1="190" y1="271" x2="320" y2="271"/>
+  </g>
+  <!-- nasse Stufe: 3. von unten (233–252) -->
+  <rect x="191" y="233" width="128" height="19" fill="#60a5fa" fill-opacity="0.75" stroke="#1d4ed8" stroke-width="2"/>
+  <!-- Geländer -->
+  <line x1="322" y1="100" x2="322" y2="290" stroke="#92400e" stroke-width="5"/>
+  <text x="330" y="150" font-size="12" fill="#92400e">Geländer</text>
+  <!-- Laufrichtung -->
+  <line x1="170" y1="110" x2="170" y2="275" stroke="#475569" stroke-width="2" stroke-dasharray="5 4"/>
+  <polygon points="163,272 177,272 170,286" fill="#475569"/>
+  <text x="96" y="170" font-size="12" fill="#475569">Laufrichtung</text>
+  <text x="108" y="185" font-size="12" fill="#475569">nach unten</text>
+  <!-- Fundort Mia -->
+  <g stroke="#dc2626" stroke-width="5" stroke-linecap="round">
+    <line x1="238" y1="298" x2="258" y2="318"/>
+    <line x1="258" y1="298" x2="238" y2="318"/>
+  </g>
+  <!-- Jonas T. auf der Treppe, 4 Stufen oberhalb -->
+  <circle cx="225" cy="166" r="13" fill="#16a34a"/>
+  <text x="225" y="171" font-size="14" font-weight="bold" fill="#ffffff" text-anchor="middle">J</text>
+  <!-- Frau Richter an der Tür -->
+  <circle cx="392" cy="317" r="13" fill="#7c3aed"/>
+  <text x="392" y="322" font-size="14" font-weight="bold" fill="#ffffff" text-anchor="middle">R</text>
+  <!-- Ausgang Pausenhof -->
+  <rect x="413" y="300" width="14" height="36" fill="#ffffff" stroke="#334155" stroke-width="2"/>
+  <text x="434" y="314" font-size="12" fill="#1f2937">Ausgang</text>
+  <text x="434" y="329" font-size="12" fill="#1f2937">Pausenhof</text>
+  <!-- Sekretariat -->
+  <line x1="120" y1="336" x2="30" y2="336" stroke="#475569" stroke-width="2"/>
+  <polygon points="32,330 32,342 20,336" fill="#475569"/>
+  <text x="40" y="361" font-size="12" fill="#475569">zum Sekretariat</text>
+  <!-- Legende -->
+  <rect x="440" y="45" width="190" height="200" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5" rx="6"/>
+  <text x="452" y="68" font-size="13" font-weight="bold" fill="#1f2937">Legende</text>
+  <rect x="452" y="80" width="26" height="14" fill="#60a5fa" stroke="#1d4ed8" stroke-width="1.5"/>
+  <text x="486" y="91" font-size="12" fill="#1f2937">nasse Stufe</text>
+  <text x="486" y="105" font-size="11" fill="#475569">(3. Stufe von unten)</text>
+  <g stroke="#dc2626" stroke-width="4" stroke-linecap="round">
+    <line x1="456" y1="118" x2="470" y2="132"/>
+    <line x1="470" y1="118" x2="456" y2="132"/>
+  </g>
+  <text x="486" y="130" font-size="12" fill="#1f2937">Fundort Mia K.</text>
+  <circle cx="463" cy="155" r="10" fill="#16a34a"/>
+  <text x="463" y="159" font-size="11" font-weight="bold" fill="#fff" text-anchor="middle">J</text>
+  <text x="486" y="153" font-size="12" fill="#1f2937">Jonas T.</text>
+  <text x="486" y="167" font-size="11" fill="#475569">(Zeuge, auf der Treppe)</text>
+  <circle cx="463" cy="190" r="10" fill="#7c3aed"/>
+  <text x="463" y="194" font-size="11" font-weight="bold" fill="#fff" text-anchor="middle">R</text>
+  <text x="486" y="188" font-size="12" fill="#1f2937">Frau Richter</text>
+  <text x="486" y="202" font-size="11" fill="#475569">(Pausenaufsicht, Tür)</text>
+  <text x="452" y="232" font-size="11" fill="#475569">Treppe B: 10 Stufen</text>
+  <text x="20" y="388" font-size="11" fill="#64748b">Skizze nicht maßstabsgetreu</text>
+</svg>
+</div></div>
+    <div>
+      <div class="card goal">
+        <h3>Darum geht es heute</h3>
+        <p style="margin:0">Wir untersuchen <b>Text A</b> genau und vergleichen ihn mit einer <b>Skizze</b> und einer <b>Tabelle</b> zum selben Unfall.</p>
+        <h4>Deine Lernziele</h4>
+        <ol style="margin:0;padding-left:20px" id="goalList"></ol>
+      </div>
+      <div class="card">
+        <h3>Dein Kürzel</h3>
+        <p class="hint" style="margin-top:0">So erkennt deine Lehrkraft deinen Lernstand-Code. Nutze das Kürzel, das deine Lehrkraft vorgibt.</p>
+        <input type="text" data-save="kuerzel" maxlength="20" autocomplete="off" placeholder="z. B. Lena M." style="max-width:260px">
+      </div>
+      <div class="card">
+        <h3>1 · Blitzrunde</h3>
+        <p class="hint" style="margin-top:0">Nenne drei Merkmale eines Berichts aus der letzten Stunde.</p>
+        <div class="row" style="flex-wrap:nowrap;gap:6px">
+          <input type="text" data-save="blitz1" placeholder="Merkmal 1">
+          <input type="text" data-save="blitz2" placeholder="Merkmal 2">
+          <input type="text" data-save="blitz3" placeholder="Merkmal 3">
+        </div>
+        <button class="btn tip small" data-tip="tipBlitz" style="margin-top:8px">Tipp</button>
+        <div class="tipbox" id="tipBlitz">Denk an: Zeitform · W-Fragen · Gefühle und Wertungen · Reihenfolge · Aufbau</div>
+      </div>
+      <div class="card">
+        <h3>2 · Betrachte die Skizze M1</h3>
+        <p style="margin-top:0">Du kennst Text A schon. <b>Was erfährt man aus der Skizze, was im Bericht nicht steht?</b> Notiere eine Vermutung.</p>
+        <textarea data-save="vermutung" placeholder="Ich vermute, dass in der Skizze …"></textarea>
+      </div>
+      <div class="req" data-req="0"></div>
+<div class="nextbar"><span></span><button class="btn" data-go="1">Weiter: Begriffe klären →</button></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STATION 1: BEGRIFFE ============ -->
+<section class="station" data-st="1">
+  <div class="st-head"><h2>Begriffe klären</h2><span class="badge">5–8 Min · Plenum</span></div>
+  <div class="card">
+    <h3>1 · Tippe jede Karte an und lies die Erklärung</h3>
+    <p class="hint" style="margin-top:0">Diese Begriffe brauchst du in allen folgenden Aufgaben. <span class="counter" id="flipCount">0/8</span> gelesen</p>
+    <div class="flipgrid" id="flipgrid"></div>
+  </div>
+  <div class="card">
+    <h3>2 · Ordne zu: Welcher Begriff passt?</h3>
+    <div id="matchBox"></div>
+    <div class="row" style="margin-top:10px"><button class="btn" id="matchCheck">Prüfen</button></div>
+    <div class="fb" id="matchFb"></div>
+  </div>
+  <div class="card">
+    <h3>3 · Analysieren oder vergleichen?</h3>
+    <p class="hint" style="margin-top:0">Lies die Aufgabe. Welcher Operator steckt darin?</p>
+    <div id="opBox"></div>
+  </div>
+  <div class="card operator">
+    <h3>4 · Unser Mustersatz mit Textbeleg</h3>
+    <p style="margin-top:0">So belegst du ein Ergebnis: <b>Ergebnis</b> + <b>denn</b> + <b>Textbeleg</b> (Zitat oder Zeilenangabe).</p>
+    <p style="margin:0 0 8px;font-style:italic">Beispiel: Der Text ist sachlich, denn es steht dort: „Ihr Mitschüler Jonas T. beobachtete den Vorfall“ (Z. 8–9).</p>
+    <p class="hint" style="margin:0 0 6px">Formuliert gemeinsam einen eigenen Mustersatz. Text A steht in der nächsten Station.</p>
+    <input type="text" data-save="mustersatz" placeholder="Der Bericht steht im Präteritum, denn in Z. … heißt es: „…“">
+  </div>
+  <div class="req" data-req="1"></div>
+<div class="nextbar"><button class="btn sec" data-go="0">← Zurück</button><button class="btn" data-go="2">Weiter: Text A analysieren →</button></div>
+</section>
+
+<!-- ============ STATION 2: ANALYSE ============ -->
+<section class="station" data-st="2">
+  <div class="st-head"><h2>Text A analysieren</h2><span class="badge">8–20 Min · Partnerarbeit</span></div>
+  <div class="layout two">
+    <div class="mat"><div class="card" id="matHost2"></div></div>
+    <div>
+      <div class="card operator" style="padding:10px 14px">
+        <b>Operator analysieren:</b> Untersuche Text A nach Kriterien und belege jedes Ergebnis mit einer Zeilenangabe.
+      </div>
+      <div class="subtabs" id="anaTabs">
+        <button data-sub="wf" data-c="wf" class="active">① W-Fragen</button>
+        <button data-sub="auf" data-c="auf">② Aufbau</button>
+        <button data-sub="stil" data-c="stil">③ Sprachstil</button>
+        <button data-sub="zeit" data-c="zeit">④ Zeitform</button>
+        <button data-sub="star" data-c="star" class="no-basis">★ Zusatz</button>
+      </div>
+
+      <div class="sub active" data-sub="wf">
+        <div class="card">
+          <h3 style="color:var(--wf)">① Finde zu jeder W-Frage die Textstelle</h3>
+          <p class="hint" style="margin-top:0">So geht's: Tippe bei einer W-Frage auf <b>Beleg wählen</b>. Tippe dann in Text A auf die passende(n) Zeile(n). Notiere dein Ergebnis in Stichpunkten und prüfe.</p>
+          <div class="basis-only tipbox show" style="margin-bottom:8px">Satzanfang für Belege: „Das erkenne ich daran, dass es in Z. … heißt: …“<br>Mit Hilfen bearbeitest du nur die vier wichtigsten W-Fragen.</div>
+          <div id="wqBox"></div>
+          <div class="fb" id="wqAll"></div>
+        </div>
+      </div>
+
+      <div class="sub" data-sub="auf">
+        <div class="card">
+          <h3 style="color:var(--auf)">② Bestimme Einleitung, Hauptteil und Schluss</h3>
+          <p class="hint" style="margin-top:0">Text A hat drei Abschnitte. Wähle für jeden Abschnitt den Teil und seinen Inhalt.</p>
+          <div id="aufBox"></div>
+          <div class="row" style="margin-top:10px"><button class="btn" id="aufCheck">Prüfen</button><button class="btn tip small" data-tip="tipAuf">Tipp</button></div>
+          <div class="tipbox" id="tipAuf">Die Einleitung beantwortet die wichtigsten W-Fragen in ein bis zwei Sätzen.</div>
+          <div class="fb" id="aufFb"></div>
+        </div>
+      </div>
+
+      <div class="sub" data-sub="stil">
+        <div class="card">
+          <h3 style="color:var(--stil)">③ Prüfe den Sprachstil</h3>
+          <h4>a) Markiere in Text A drei sachliche Verben, mit denen etwas mitgeteilt oder beobachtet wird.</h4>
+          <p class="hint" style="margin:0">Tippe die Wörter direkt im Text an. Gefunden: <span class="counter" id="stilCount">0/3</span></p>
+          <button class="btn tip small" data-tip="tipStil" style="margin-top:6px">Tipp</button>
+          <div class="tipbox" id="tipStil">Suche Verben wie „teilte mit“ oder „berichtete“. Auch wer etwas sieht oder sagt, wird sachlich beschrieben.</div>
+          <div class="fb" id="stilFb"></div>
+          <h4>b) Sachlich oder wertend?</h4>
+          <div id="wertBox"></div>
+          <h4>c) Enthält Text A Wertungen?</h4>
+          <div class="choice" id="wertungQ"><button data-v="ja">Ja</button><button data-v="nein">Nein</button></div>
+          <div class="fb" id="wertungFb"></div>
+          <p class="hint" style="margin:10px 0 4px">Begründe mit einem Textbeleg (Mustersatz):</p>
+          <input type="text" data-save="stilBeleg" placeholder="Text A ist sachlich, denn in Z. … heißt es: „…“">
+        </div>
+      </div>
+
+      <div class="sub" data-sub="zeit">
+        <div class="card">
+          <h3 style="color:var(--zeit)">④ Prüfe die Zeitform</h3>
+          <h4>a) Markiere in Text A fünf Verben in der Vergangenheit.</h4>
+          <p class="hint" style="margin:0">Tippe die Verben direkt im Text an. Gefunden: <span class="counter" id="zeitCount">0/5</span></p>
+          <button class="btn tip small" data-tip="tipZeit" style="margin-top:6px">Tipp</button>
+          <div class="tipbox" id="tipZeit">Suche Verben in der Vergangenheit, z. B. Wörter, die auf <b>-te</b> enden: stürzte, …</div>
+          <div class="fb" id="zeitFb"></div>
+          <h4>b) Wie heißt diese Zeitform?</h4>
+          <div class="choice" id="tempusQ"><button data-v="Präsens">Präsens</button><button data-v="Perfekt">Perfekt</button><button data-v="Präteritum">Präteritum</button><button data-v="Futur">Futur</button></div>
+          <div class="fb" id="tempusFb"></div>
+        </div>
+      </div>
+
+      <div class="sub" data-sub="star">
+        <div class="card challenge">
+          <h3>Für schnelle Paare</h3>
+          <p style="margin-top:0">Welche W-Frage beantwortet Text A nur <b>unvollständig</b>?</p>
+          <div class="choice" id="starQ"><button data-v="Wer">Wer?</button><button data-v="Wann">Wann?</button><button data-v="Wo">Wo?</button><button data-v="Folgen">Welche Folgen?</button></div>
+          <div class="fb" id="starFb"></div>
+          <p class="hint" style="margin:10px 0 4px">Was fehlt genau?</p>
+          <input type="text" data-save="starWas" placeholder="Es fehlt …">
+        </div>
+      </div>
+      <div class="req" data-req="2"></div>
+<div class="nextbar"><button class="btn sec" data-go="1">← Zurück</button><button class="btn" data-go="3">Weiter: Vergleichen →</button></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STATION 3: VERGLEICH ============ -->
+<section class="station" data-st="3">
+  <div class="st-head"><h2>Text A mit Skizze und Tabelle vergleichen</h2><span class="badge">20–30 Min · Vierergruppe</span></div>
+  <div class="layout two">
+    <div class="mat"><div class="card" id="matHost3"></div></div>
+    <div>
+      <div class="card operator" style="padding:10px 14px">
+        <b>Operator vergleichen:</b> Arbeite Gemeinsamkeiten und Unterschiede zwischen Text A und M1/M2 heraus. Text A ist ein <b>kontinuierlicher Text</b>, M1 und M2 sind <b>nichtkontinuierliche Texte</b>.
+      </div>
+      <div class="card">
+        <h3>1 · Wo steht die Information?</h3>
+        <p class="hint" style="margin-top:0">Tippe eine Karte an und dann die passende Spalte. Nutze oben die Reiter <b>Text A</b>, <b>M1</b> und <b>M2</b>.</p>
+        <div class="pool" id="pool"></div>
+        <div class="cols">
+          <div class="col" data-k="a"><h4>nur in Text A</h4></div>
+          <div class="col" data-k="b"><h4>in Text A <u>und</u> M1/M2</h4></div>
+          <div class="col" data-k="m"><h4>nur in M1/M2</h4></div>
+        </div>
+        <div class="row" style="margin-top:10px"><button class="btn" id="sortCheck">Prüfen</button><button class="btn sec small" id="sortReset">Zurücksetzen</button><button class="btn tip small" data-tip="tipSort">Tipp</button></div>
+        <div class="tipbox" id="tipSort">Lies jede Karte und suche sie zuerst in Text A. Findest du sie dort nicht, steht sie nur in M1 oder M2.</div>
+        <div class="fb" id="sortFb"></div>
+      </div>
+      <div class="card">
+        <h3>2 · Gibt es einen Widerspruch?</h3>
+        <p class="hint" style="margin-top:0">Ein Widerspruch: Zwei Quellen sagen etwas Unterschiedliches über dieselbe Sache.</p>
+        <div class="choice" id="widerQ" style="flex-direction:column;align-items:stretch">
+          <button data-v="knoechel">Text A: rechter Knöchel · M2: linker Knöchel</button>
+          <button data-v="klasse">Text A: Klasse 7b · M2: Klasse 7a</button>
+          <button data-v="helfer">Text A: Frau Richter half · M2: der Hausmeister half</button>
+        </div>
+        <div class="fb" id="widerFb"></div>
+      </div>
+      <div class="card">
+        <h3>3 · Beurteile: Was würdest du in den Bericht aufnehmen?</h3>
+        <p class="hint" style="margin-top:0">Wähle eine Information, die nur in M1 oder M2 steht, und begründe mit einem Beleg.</p>
+        <select id="pickInfo" data-save="pickInfo" style="width:100%;margin-bottom:8px"><option value="">Information wählen …</option></select>
+        <textarea data-save="begruendung" placeholder="Ich würde … aufnehmen, weil … In M2 steht: „…“"></textarea>
+        <div class="row" style="margin-top:8px"><button class="btn sec small" data-model="modelBeg">Beispiel ansehen</button></div>
+        <div class="model" id="modelBeg">Ich würde die genaue Uhrzeit aufnehmen, weil Text A die W-Frage <i>Wann?</i> nur ungenau beantwortet. In M2 steht: „Uhrzeit: 9:47 Uhr“.</div>
+      </div>
+      <div class="card challenge no-basis">
+        <h3>Für schnelle Gruppen: Ablaufplan M3</h3>
+        <p style="margin-top:0">Öffne oben den Reiter <b>M3</b>. Welche Information aus M3 fehlt in Text A? Schreibe einen <b>sachlichen Satz im Präteritum</b>, der Text A ergänzt.</p>
+        <textarea data-save="m3Satz" placeholder="Um … Uhr …"></textarea>
+        <div class="row" style="margin-top:8px"><button class="btn sec small" data-model="modelM3">Beispiel ansehen</button></div>
+        <div class="model" id="modelM3">Um 10:05 Uhr stellte der Hausmeister ein Warnschild mit der Aufschrift „Vorsicht, nasse Stufe“ auf.</div>
+      </div>
+      <div class="req" data-req="3"></div>
+<div class="nextbar"><button class="btn sec" data-go="2">← Zurück</button><button class="btn" data-go="4">Weiter: Direkte Rede →</button></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STATION 4: DIREKTE REDE ============ -->
+<section class="station" data-st="4">
+  <div class="st-head"><h2>Direkte Rede entdecken</h2><span class="badge">30–36 Min · Plenum</span></div>
+  <div class="layout two">
+    <div class="mat"><div class="card" id="matHost4"></div></div>
+    <div>
+      <div class="card operator" style="padding:10px 14px">
+        <b>Begriffe im Einsatz:</b> <span class="q-rede">Redezeichen</span> zeigen, was wörtlich gesagt wurde. Der <span class="q-begl">Begleitsatz</span> sagt, wer spricht.
+      </div>
+      <div class="card">
+        <h3>1 · Markiere die Zeugenaussagen von Jonas T. und Frau Richter</h3>
+        <p class="hint" style="margin-top:0">Wähle einen Stift und tippe im Text an.</p>
+        <div class="choice" id="penQ">
+          <button data-v="rede" class="picked" style="color:var(--rede)">✎ Redezeichen</button>
+          <button data-v="begl" style="color:#0e7490">✎ Begleitsatz</button>
+        </div>
+        <p style="margin:10px 0 0">Redezeichen: <span class="counter" id="redeCount">0/4</span> · Begleitsatz-Wörter: <span class="counter" id="beglCount">0/5</span></p>
+        <button class="btn tip small" data-tip="tipRede" style="margin-top:6px">Tipp</button>
+        <div class="tipbox" id="tipRede">Redezeichen stehen <b>unten</b> am Anfang („) und <b>oben</b> am Ende (“) der Aussage. Begleitsätze enthalten ein Verb wie <i>sagte</i> oder <i>berichtete</i>.</div>
+        <div class="fb" id="redeFb"></div>
+      </div>
+      <div class="card">
+        <h3>2 · Was fällt dir auf?</h3>
+        <div class="stmt"><span>Bei <b>Jonas T.</b> steht der Begleitsatz …</span><div class="choice" id="posJ"><button data-v="vor">davor</button><button data-v="nach">danach</button></div></div>
+        <div class="stmt"><span>Bei <b>Frau Richter</b> steht der Begleitsatz …</span><div class="choice" id="posR"><button data-v="vor">davor</button><button data-v="nach">danach</button></div></div>
+        <div class="stmt"><span>Bei Jonas T. steht nach dem Begleitsatz ein …</span><div class="choice" id="zeichenJ"><button data-v="punkt">Punkt</button><button data-v="doppel">Doppelpunkt</button><button data-v="komma">Komma</button></div></div>
+        <div class="fb" id="posFb"></div>
+        <p class="hint" style="margin:10px 0 4px">Unsere Vermutung (noch keine Regel):</p>
+        <textarea data-save="redeVermutung" placeholder="Wir vermuten: Wenn der Begleitsatz vor der Aussage steht, …"></textarea>
+        <div class="tipbox show" style="background:#eff6ff;border-color:#bfdbfe">Die genauen Regeln der Zeichensetzung erarbeiten wir in Stunde 3.</div>
+      </div>
+      <div class="req" data-req="4"></div>
+<div class="nextbar"><button class="btn sec" data-go="3">← Zurück</button><button class="btn" data-go="5">Weiter: Sicherung →</button></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STATION 5: SICHERUNG ============ -->
+<section class="station" data-st="5">
+  <div class="st-head"><h2>Sicherung: Merkblatt „Analyse eines Berichts“</h2><span class="badge">36–42 Min · Einzelarbeit, dann Partnerabgleich</span></div>
+  <div class="card">
+    <h3>1 · Vervollständige das Merkblatt</h3>
+    <p class="hint" style="margin-top:0">Tippe eine Lücke an und wähle dann ein Wort aus dem Wortspeicher.</p>
+    <div class="cloze" id="cloze"></div>
+    <div class="bank" id="bank"></div>
+    <div class="row" style="margin-top:10px"><button class="btn" id="clozeCheck">Prüfen</button></div>
+    <div class="fb" id="clozeFb"></div>
+  </div>
+  <div class="card">
+    <h3>2 · Dein eigener Beispielsatz mit Textbeleg</h3>
+    <input type="text" data-save="eigenBeleg" placeholder="Der Bericht ist …, denn in Z. … heißt es: „…“">
+    <p class="hint" style="margin:6px 0 0">Du kannst deinen Mustersatz aus der Station „Begriffe“ verbessern.</p>
+  </div>
+  <div class="card">
+    <h3>3 · Schreibe einen Satz mit direkter Rede aus Text A ab</h3>
+    <p class="hint" style="margin-top:0">Achte auf jedes Zeichen. Die Redezeichen „ und “ findest du auch hier: <button class="btn sec small" data-ins="„">„</button> <button class="btn sec small" data-ins="“">“</button></p>
+    <textarea id="abschrift" data-save="abschrift" placeholder="Er sagte: „…“"></textarea>
+    <div class="row" style="margin-top:8px"><button class="btn" id="abCheck">Prüfen und markieren</button></div>
+    <div class="fb" id="abFb"></div>
+    <div class="preview" id="abPrev" style="display:none"></div>
+  </div>
+  <div class="card">
+    <h3>4 · Partnerabgleich</h3>
+    <p class="hint" style="margin-top:0">Vergleicht eure Einträge. Hakt ab, was ihr geprüft habt.</p>
+    <label style="display:block"><input type="checkbox" data-save="pa1"> Bedeutung von „analysieren“ und „vergleichen“</label>
+    <label style="display:block"><input type="checkbox" data-save="pa2"> Die vier Prüfkriterien für einen Bericht</label>
+    <label style="display:block"><input type="checkbox" data-save="pa3"> Eigener Beispielsatz mit Textbeleg</label>
+    <label style="display:block"><input type="checkbox" data-save="pa4"> Satz mit direkter Rede, Redezeichen und Begleitsatz markiert</label>
+  </div>
+  <div class="card goal">
+    <h3>5 · Ab in den Hefter</h3>
+    <p style="margin-top:0">Übertrage das Merkblatt in deinen Hefter <b>oder</b> drucke deinen Eintrag aus und klebe ihn ein.</p>
+    <div class="row">
+      <input type="text" data-save="name" placeholder="Dein Name" style="max-width:260px">
+      <button class="btn" id="printBtn">Hefter-Eintrag drucken / als PDF</button>
+    </div>
+  </div>
+  <div class="req" data-req="5"></div>
+<div class="nextbar"><button class="btn sec" data-go="4">← Zurück</button><button class="btn" data-go="6">Weiter: Abschluss →</button></div>
+</section>
+
+<!-- ============ STATION 6: ABSCHLUSS ============ -->
+<section class="station" data-st="6">
+  <div class="st-head"><h2>Abschluss und Ausblick</h2><span class="badge">42–45 Min · Plenum</span></div>
+  <div class="card">
+    <h3>1 · Vorstellen</h3>
+    <p style="margin-top:0">Nennt eine Information, die <b>nur</b> in M1 oder M2 steht.</p>
+    <input type="text" data-save="vorstellen" placeholder="Nur in M2 steht, dass …">
+  </div>
+  <div class="card">
+    <h3>2 · Daumenabfrage: Wie sicher bist du?</h3>
+    <div id="thumbBox"></div>
+  </div>
+  <div class="card">
+    <h3>3 · Ausblick auf Stunde 3</h3>
+    <p style="margin:0">Wir planen mit einem Schreibplan unseren eigenen Bericht und lernen die Regeln für Redezeichen kennen.</p>
+    <h4>Hausaufgabe (freiwillig)</h4>
+    <p style="margin:0">Suche in einem Zeitungs- oder Online-Artikel drei Sätze mit direkter Rede. Markiere Redezeichen und Begleitsatz.</p>
+  </div>
+  <div class="card goal">
+    <h3>4 · Lernstand an die Lehrkraft</h3>
+    <p style="margin-top:0">Zeige deinen Lernstand-Code, wenn deine Lehrkraft dich darum bittet. Er enthält nur dein Kürzel und deinen Fortschritt.</p>
+    <button class="btn" data-showcode>Lernstand-Code anzeigen</button>
+  </div>
+  <div class="card" id="summary"></div>
+  <div class="req" data-req="6"></div>
+<div class="nextbar"><button class="btn sec" data-go="5">← Zurück</button><span></span></div>
+</section>
+
+</main>
+
+<!-- Material-Vorlagen -->
+<template id="tplMat">
+  <div class="mtabs">
+    <button data-m="A" class="active">Text A</button>
+    <button data-m="M1">M1 Skizze</button>
+    <button data-m="M2">M2 Tabelle</button>
+    <button data-m="M3" class="m3tab">M3 Ablauf ★</button>
+  </div>
+  <div class="modebar"></div>
+  <div class="mpane active" data-m="A"><div class="textA"></div></div>
+  <div class="mpane" data-m="M1"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 400" font-family="Arial, Helvetica, sans-serif" role="img" aria-label="M1 Unfallskizze Treppenhaus B">
+  <rect x="0" y="0" width="640" height="400" fill="#ffffff"/>
+  <text x="20" y="28" font-size="17" font-weight="bold" fill="#1f2937">M1 · Unfallskizze Treppenhaus B (Ansicht von oben)</text>
+  <!-- Treppenhaus Umriss -->
+  <rect x="20" y="45" width="400" height="300" fill="#f8fafc" stroke="#334155" stroke-width="3"/>
+  <!-- Obergeschoss-Flur -->
+  <rect x="20" y="45" width="400" height="55" fill="#e2e8f0" stroke="#334155" stroke-width="2"/>
+  <text x="34" y="78" font-size="14" fill="#1f2937">1. Obergeschoss (Flur)</text>
+  <!-- Erdgeschoss -->
+  <rect x="20" y="290" width="400" height="55" fill="#e2e8f0" stroke="#334155" stroke-width="2"/>
+  <text x="34" y="324" font-size="14" fill="#1f2937">Erdgeschoss</text>
+  <!-- Treppe: 10 Stufen von y=100 bis y=290 (19 px je Stufe) -->
+  <rect x="190" y="100" width="130" height="190" fill="#ffffff" stroke="#334155" stroke-width="2"/>
+  <g stroke="#64748b" stroke-width="1.5">
+    <line x1="190" y1="119" x2="320" y2="119"/>
+    <line x1="190" y1="138" x2="320" y2="138"/>
+    <line x1="190" y1="157" x2="320" y2="157"/>
+    <line x1="190" y1="176" x2="320" y2="176"/>
+    <line x1="190" y1="195" x2="320" y2="195"/>
+    <line x1="190" y1="214" x2="320" y2="214"/>
+    <line x1="190" y1="233" x2="320" y2="233"/>
+    <line x1="190" y1="252" x2="320" y2="252"/>
+    <line x1="190" y1="271" x2="320" y2="271"/>
+  </g>
+  <!-- nasse Stufe: 3. von unten (233–252) -->
+  <rect x="191" y="233" width="128" height="19" fill="#60a5fa" fill-opacity="0.75" stroke="#1d4ed8" stroke-width="2"/>
+  <!-- Geländer -->
+  <line x1="322" y1="100" x2="322" y2="290" stroke="#92400e" stroke-width="5"/>
+  <text x="330" y="150" font-size="12" fill="#92400e">Geländer</text>
+  <!-- Laufrichtung -->
+  <line x1="170" y1="110" x2="170" y2="275" stroke="#475569" stroke-width="2" stroke-dasharray="5 4"/>
+  <polygon points="163,272 177,272 170,286" fill="#475569"/>
+  <text x="96" y="170" font-size="12" fill="#475569">Laufrichtung</text>
+  <text x="108" y="185" font-size="12" fill="#475569">nach unten</text>
+  <!-- Fundort Mia -->
+  <g stroke="#dc2626" stroke-width="5" stroke-linecap="round">
+    <line x1="238" y1="298" x2="258" y2="318"/>
+    <line x1="258" y1="298" x2="238" y2="318"/>
+  </g>
+  <!-- Jonas T. auf der Treppe, 4 Stufen oberhalb -->
+  <circle cx="225" cy="166" r="13" fill="#16a34a"/>
+  <text x="225" y="171" font-size="14" font-weight="bold" fill="#ffffff" text-anchor="middle">J</text>
+  <!-- Frau Richter an der Tür -->
+  <circle cx="392" cy="317" r="13" fill="#7c3aed"/>
+  <text x="392" y="322" font-size="14" font-weight="bold" fill="#ffffff" text-anchor="middle">R</text>
+  <!-- Ausgang Pausenhof -->
+  <rect x="413" y="300" width="14" height="36" fill="#ffffff" stroke="#334155" stroke-width="2"/>
+  <text x="434" y="314" font-size="12" fill="#1f2937">Ausgang</text>
+  <text x="434" y="329" font-size="12" fill="#1f2937">Pausenhof</text>
+  <!-- Sekretariat -->
+  <line x1="120" y1="336" x2="30" y2="336" stroke="#475569" stroke-width="2"/>
+  <polygon points="32,330 32,342 20,336" fill="#475569"/>
+  <text x="40" y="361" font-size="12" fill="#475569">zum Sekretariat</text>
+  <!-- Legende -->
+  <rect x="440" y="45" width="190" height="200" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5" rx="6"/>
+  <text x="452" y="68" font-size="13" font-weight="bold" fill="#1f2937">Legende</text>
+  <rect x="452" y="80" width="26" height="14" fill="#60a5fa" stroke="#1d4ed8" stroke-width="1.5"/>
+  <text x="486" y="91" font-size="12" fill="#1f2937">nasse Stufe</text>
+  <text x="486" y="105" font-size="11" fill="#475569">(3. Stufe von unten)</text>
+  <g stroke="#dc2626" stroke-width="4" stroke-linecap="round">
+    <line x1="456" y1="118" x2="470" y2="132"/>
+    <line x1="470" y1="118" x2="456" y2="132"/>
+  </g>
+  <text x="486" y="130" font-size="12" fill="#1f2937">Fundort Mia K.</text>
+  <circle cx="463" cy="155" r="10" fill="#16a34a"/>
+  <text x="463" y="159" font-size="11" font-weight="bold" fill="#fff" text-anchor="middle">J</text>
+  <text x="486" y="153" font-size="12" fill="#1f2937">Jonas T.</text>
+  <text x="486" y="167" font-size="11" fill="#475569">(Zeuge, auf der Treppe)</text>
+  <circle cx="463" cy="190" r="10" fill="#7c3aed"/>
+  <text x="463" y="194" font-size="11" font-weight="bold" fill="#fff" text-anchor="middle">R</text>
+  <text x="486" y="188" font-size="12" fill="#1f2937">Frau Richter</text>
+  <text x="486" y="202" font-size="11" fill="#475569">(Pausenaufsicht, Tür)</text>
+  <text x="452" y="232" font-size="11" fill="#475569">Treppe B: 10 Stufen</text>
+  <text x="20" y="388" font-size="11" fill="#64748b">Skizze nicht maßstabsgetreu</text>
+</svg>
+</div>
+  <div class="mpane m2" data-m="M2">
+    <h3 style="margin:0 0 8px;font-size:17px">M2 · Eckdaten zum Unfall</h3>
+    <table>
+      <tr><th>Datum</th><td>Dienstag, 11. November</td></tr>
+      <tr><th>Uhrzeit</th><td>9:47 Uhr (erste große Pause)</td></tr>
+      <tr><th>Ort</th><td>Treppenhaus B, Treppe zwischen 1. Obergeschoss und Erdgeschoss, 3. Stufe von unten</td></tr>
+      <tr><th>Beteiligte</th><td>Mia K. (Klasse 7b), verletzt<br>Zeuge: Jonas T. (Klasse 7b)<br>Zeugin: Frau Richter (Lehrerin, Pausenaufsicht)</td></tr>
+      <tr><th>Verletzung</th><td>Prellung am linken Knöchel</td></tr>
+      <tr><th>Maßnahmen</th><td>Kühlung durch Frau Richter<br>10:00 Uhr: Eltern telefonisch informiert<br>Abholung durch die Mutter</td></tr>
+    </table>
+  </div>
+  <div class="mpane m3" data-m="M3">
+    <h3 style="margin:0 0 8px;font-size:17px">M3 · Ablauf des Vormittags</h3>
+    <ol>
+      <li><b>9:30 Uhr</b>Eine Reinigungskraft wischt die Treppe B.</li>
+      <li><b>9:35 Uhr</b>Beginn der ersten großen Pause</li>
+      <li><b>9:47 Uhr</b>Mia K. stürzt auf der Treppe.</li>
+      <li><b>9:49 Uhr</b>Frau Richter kühlt den Knöchel.</li>
+      <li><b>9:55 Uhr</b>Mia K. ist im Sekretariat.</li>
+      <li><b>10:00 Uhr</b>Das Sekretariat ruft die Eltern an.</li>
+      <li><b>10:05 Uhr</b>Der Hausmeister stellt ein Warnschild „Vorsicht, nasse Stufe“ auf.</li>
+      <li><b>10:30 Uhr</b>Die Mutter holt Mia K. ab.</li>
+    </ol>
+  </div>
+</template>
+
+<!-- Lehrkraft-Modal -->
+<div class="modal" id="teacher">
+  <div class="box">
+    <div class="row" style="justify-content:space-between"><h2 style="margin:0">Für Lehrkräfte</h2><button class="btn sec" id="teacherClose">Schließen</button></div>
+    <div id="tGate" style="margin-top:12px">
+      <p style="margin:0 0 8px">Bitte PIN eingeben.</p>
+      <div class="row"><input type="password" id="tPin" inputmode="numeric" autocomplete="off" style="max-width:180px"><button class="btn" id="tPinBtn">Öffnen</button></div>
+      <div class="fb" id="tPinFb"></div>
+    </div>
+    <div id="tContent" style="display:none">
+    <h3>Dieses Gerät</h3>
+    <div class="row">
+      <button class="btn sec" id="tBasis">Hilfen auf diesem Gerät: aus</button>
+      <button class="btn sec" id="tUnlock">Sperren auf diesem Gerät: aktiv</button>
+    </div>
+    <p class="hint">Hilfen: reduziertes Analyseraster mit vier W-Fragen, Satzanfänge sichtbar, Zusatzaufgaben ausgeblendet. Sperren aufheben schaltet alle Stationen frei (z. B. wenn die Zeit drängt).</p>
+    <h3>Ablauf (45 Minuten)</h3>
+    <table>
+      <tr><th>Zeit</th><th>Station</th><th>Sozialform</th><th>Inhalt</th></tr>
+      <tr><td>0–5</td><td>Start</td><td>Plenum</td><td>Blitzrunde „Drei Merkmale eines Berichts“, Skizze M1 als stummer Impuls, Stundenziel</td></tr>
+      <tr><td>5–8</td><td>Begriffe</td><td>Plenum</td><td>Operatoren und Fachbegriffe klären (Karten, Zuordnung), Mustersatz mit Textbeleg</td></tr>
+      <tr><td>8–20</td><td>Analyse</td><td>Partnerarbeit</td><td>Analyseraster digital: W-Fragen mit Zeilenbeleg, Aufbau, Sprachstil, Zeitform; ★ unvollständige W-Frage</td></tr>
+      <tr><td>20–30</td><td>Vergleich</td><td>Vierergruppe</td><td>Informationen Text A / M1 / M2 zuordnen, Widerspruch finden, Auswahl begründen (AFB III); ★ M3</td></tr>
+      <tr><td>30–36</td><td>Direkte Rede</td><td>Plenum</td><td>Redezeichen und Begleitsatz markieren, Stellung beobachten, Vermutung notieren (keine Regel)</td></tr>
+      <tr><td>36–42</td><td>Sicherung</td><td>EA, Partnerabgleich</td><td>Merkblatt als Lückentext, eigener Beleg-Satz, direkte Rede abschreiben, Hefter-Eintrag drucken oder übertragen</td></tr>
+      <tr><td>42–45</td><td>Abschluss</td><td>Plenum</td><td>Zwei Gruppen stellen vor, Daumenabfrage zu den Lernzielen, Ausblick, freiwillige Hausaufgabe</td></tr>
+    </table>
+    <h3>Erwartungshorizont (Kurzfassung)</h3>
+    <table>
+      <tr><th>Kriterium</th><th>Erwartung</th></tr>
+      <tr><td>Wer?</td><td>Mia K. (Z. 1–2), Zeugen Jonas T. (Z. 8) und Frau Richter (Z. 10–11)</td></tr>
+      <tr><td>Was?</td><td>Mia K. rutschte auf einer nassen Stufe aus und stürzte (Z. 1, 3)</td></tr>
+      <tr><td>Wann?</td><td>Dienstagvormittag, erste große Pause (Z. 1–2); Datum und Uhrzeit nur in M2</td></tr>
+      <tr><td>Wo?</td><td>Im Treppenhaus der Schule (Z. 2–3)</td></tr>
+      <tr><td>Wie/Warum?</td><td>Nasse Stufe, kurz zuvor gewischt, kein Warnhinweis (Z. 3, 6–8)</td></tr>
+      <tr><td>Folgen?</td><td>Leichte Verletzung am Knöchel, Kühlung durch Frau Richter, Eltern informiert, Arzt, neue Wischzeiten (Z. 4, 13–18)</td></tr>
+      <tr><td>Aufbau</td><td>Einleitung Z. 1–4 (Kernaussage), Hauptteil Z. 5–14 (Ablauf, Zeugenaussagen), Schluss Z. 15–18 (Folgen, Maßnahmen)</td></tr>
+      <tr><td>Sprachstil</td><td>Sachliche Verben: beobachtete, sagte, berichtete, informierte, teilte mit; keine Wertungen</td></tr>
+      <tr><td>Zeitform</td><td>Präteritum (stürzte, rutschte, verletzte, kam, kühlte …); Perfekt nur in der direkten Rede von Jonas T.</td></tr>
+      <tr><td>Direkte Rede</td><td>Jonas T.: Begleitsatz davor, Doppelpunkt (Z. 9–10); Frau Richter: Begleitsatz danach, Komma (Z. 12–13)</td></tr>
+      <tr><td>Vergleich</td><td>Nur M1/M2: Datum, Uhrzeit 9:47, 3. Stufe von unten, Standorte der Zeugen, Uhrzeit des Anrufs. Widerspruch: rechter (Text A) / linker Knöchel (M2)</td></tr>
+      <tr><td>★ unvollständig</td><td>Wann? (kein Datum, keine Uhrzeit)</td></tr>
+    </table>
+    <h3>Hinweise</h3>
+    <ul>
+      <li><b>Freischaltung:</b> Jede Station öffnet sich erst, wenn alle Aufgaben der vorherigen richtig gelöst sind. Teilaufgaben öffnen sich der Reihe nach.</li>
+      <li><b>Rateschutz:</b> Nach jedem Fehlversuch sperrt die Aufgabe kurz (5 s, 10 s, 15 s … höchstens 30 s). Drei Fehlklicks hintereinander beim Markieren sperren den Text ebenso. Musterlösungen erscheinen erst nach der eigenen richtigen Lösung.</li>
+      <li><b>Freie Antworten</b> werden auf Mindestlänge und Pflichtbestandteile geprüft (z. B. „denn“ + Zeilenangabe oder Zitat). Inhaltlich ersetzt das nicht den Blick der Lehrkraft.</li>
+      <li><b>Timer</b>: zeigt die geplante Zeit der aktuellen Phase. Antippen startet oder pausiert ihn.</li>
+      <li>Alle Eingaben bleiben nur auf diesem Gerät (Browser-Speicher). Es werden keine Daten übertragen.</li>
+      <li>Hefter-Eintrag: Druck oder „Als PDF speichern“. Ohne Drucker übertragen die Schüler:innen das Merkblatt in den Hefter.</li>
+    </ul>
+    <div class="row"><button class="btn sec" id="resetAll">Alle Eingaben auf diesem Gerät löschen</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- Lernstand-Code -->
+<div class="modal" id="codeModal">
+  <div class="box" style="max-width:560px;text-align:center">
+    <div class="row" style="justify-content:space-between"><h2 style="margin:0">Lernstand-Code</h2><button class="btn sec" id="codeClose">Schließen</button></div>
+    <p id="codeWho" style="font-size:18px;margin:10px 0 4px;font-weight:700"></p>
+    <p id="codeState" class="hint" style="margin:0 0 10px"></p>
+    <div id="qrBox" style="background:#fff;padding:12px;display:inline-block;border-radius:12px;border:1px solid var(--line)"></div>
+    <p class="hint" style="margin:10px 0 4px">Halte den Code vor die Kamera deiner Lehrkraft. Ohne Kamera kann sie den Text abtippen:</p>
+    <code id="codeText" style="display:block;word-break:break-all;font-size:14px;background:#f1f5f9;border-radius:8px;padding:8px"></code>
+  </div>
+</div>
+
+<!-- Druckansicht -->
+<div id="hefter"></div>
+
+<script>
+/* QR Code Generator for JavaScript – Copyright (c) 2009 Kazuhiko Arase – MIT License – https://github.com/kazuhikoarase/qrcode-generator */
+var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],f={},c=function(t,r){o=function(t){for(var r=new Array(t),e=0;e<t;e+=1){r[e]=new Array(t);for(var n=0;n<t;n+=1)r[e][n]=null}return r}(i=4*e+17),l(0,0),l(i-7,0),l(0,i-7),s(),h(),d(t,r),e>=7&&v(t),null==a&&(a=p(e,n,u)),w(a,r)},l=function(t,r){for(var e=-1;e<=7;e+=1)if(!(t+e<=-1||i<=t+e))for(var n=-1;n<=7;n+=1)r+n<=-1||i<=r+n||(o[t+e][r+n]=0<=e&&e<=6&&(0==n||6==n)||0<=n&&n<=6&&(0==e||6==e)||2<=e&&e<=4&&2<=n&&n<=4)},h=function(){for(var t=8;t<i-8;t+=1)null==o[t][6]&&(o[t][6]=t%2==0);for(var r=8;r<i-8;r+=1)null==o[6][r]&&(o[6][r]=r%2==0)},s=function(){for(var t=B.getPatternPosition(e),r=0;r<t.length;r+=1)for(var n=0;n<t.length;n+=1){var i=t[r],a=t[n];if(null==o[i][a])for(var u=-2;u<=2;u+=1)for(var f=-2;f<=2;f+=1)o[i+u][a+f]=-2==u||2==u||-2==f||2==f||0==u&&0==f}},v=function(t){for(var r=B.getBCHTypeNumber(e),n=0;n<18;n+=1){var a=!t&&1==(r>>n&1);o[Math.floor(n/3)][n%3+i-8-3]=a}for(n=0;n<18;n+=1){a=!t&&1==(r>>n&1);o[n%3+i-8-3][Math.floor(n/3)]=a}},d=function(t,r){for(var e=n<<3|r,a=B.getBCHTypeInfo(e),u=0;u<15;u+=1){var f=!t&&1==(a>>u&1);u<6?o[u][8]=f:u<8?o[u+1][8]=f:o[i-15+u][8]=f}for(u=0;u<15;u+=1){f=!t&&1==(a>>u&1);u<8?o[8][i-u-1]=f:u<9?o[8][15-u-1+1]=f:o[8][15-u-1]=f}o[i-8][8]=!t},w=function(t,r){for(var e=-1,n=i-1,a=7,u=0,f=B.getMaskFunction(r),c=i-1;c>0;c-=2)for(6==c&&(c-=1);;){for(var g=0;g<2;g+=1)if(null==o[n][c-g]){var l=!1;u<t.length&&(l=1==(t[u]>>>a&1)),f(n,c-g)&&(l=!l),o[n][c-g]=l,-1==(a-=1)&&(u+=1,a=7)}if((n+=e)<0||i<=n){n-=e,e=-e;break}}},p=function(t,r,e){for(var n=A.getRSBlocks(t,r),o=b(),i=0;i<e.length;i+=1){var a=e[i];o.put(a.getMode(),4),o.put(a.getLength(),B.getLengthInBits(a.getMode(),t)),a.write(o)}var u=0;for(i=0;i<n.length;i+=1)u+=n[i].dataCount;if(o.getLengthInBits()>8*u)throw"code length overflow. ("+o.getLengthInBits()+">"+8*u+")";for(o.getLengthInBits()+4<=8*u&&o.put(0,4);o.getLengthInBits()%8!=0;)o.putBit(!1);for(;!(o.getLengthInBits()>=8*u||(o.put(236,8),o.getLengthInBits()>=8*u));)o.put(17,8);return function(t,r){for(var e=0,n=0,o=0,i=new Array(r.length),a=new Array(r.length),u=0;u<r.length;u+=1){var f=r[u].dataCount,c=r[u].totalCount-f;n=Math.max(n,f),o=Math.max(o,c),i[u]=new Array(f);for(var g=0;g<i[u].length;g+=1)i[u][g]=255&t.getBuffer()[g+e];e+=f;var l=B.getErrorCorrectPolynomial(c),h=k(i[u],l.getLength()-1).mod(l);for(a[u]=new Array(l.getLength()-1),g=0;g<a[u].length;g+=1){var s=g+h.getLength()-a[u].length;a[u][g]=s>=0?h.getAt(s):0}}var v=0;for(g=0;g<r.length;g+=1)v+=r[g].totalCount;var d=new Array(v),w=0;for(g=0;g<n;g+=1)for(u=0;u<r.length;u+=1)g<i[u].length&&(d[w]=i[u][g],w+=1);for(g=0;g<o;g+=1)for(u=0;u<r.length;u+=1)g<a[u].length&&(d[w]=a[u][g],w+=1);return d}(o,n)};f.addData=function(t,r){var e=null;switch(r=r||"Byte"){case"Numeric":e=M(t);break;case"Alphanumeric":e=x(t);break;case"Byte":e=m(t);break;case"Kanji":e=L(t);break;default:throw"mode:"+r}u.push(e),a=null},f.isDark=function(t,r){if(t<0||i<=t||r<0||i<=r)throw t+","+r;return o[t][r]},f.getModuleCount=function(){return i},f.make=function(){if(e<1){for(var t=1;t<40;t++){for(var r=A.getRSBlocks(t,n),o=b(),i=0;i<u.length;i++){var a=u[i];o.put(a.getMode(),4),o.put(a.getLength(),B.getLengthInBits(a.getMode(),t)),a.write(o)}var g=0;for(i=0;i<r.length;i++)g+=r[i].dataCount;if(o.getLengthInBits()<=8*g)break}e=t}c(!1,function(){for(var t=0,r=0,e=0;e<8;e+=1){c(!0,e);var n=B.getLostPoint(f);(0==e||t>n)&&(t=n,r=e)}return r}())},f.createTableTag=function(t,r){t=t||2;var e="";e+='<table style="',e+=" border-width: 0px; border-style: none;",e+=" border-collapse: collapse;",e+=" padding: 0px; margin: "+(r=void 0===r?4*t:r)+"px;",e+='">',e+="<tbody>";for(var n=0;n<f.getModuleCount();n+=1){e+="<tr>";for(var o=0;o<f.getModuleCount();o+=1)e+='<td style="',e+=" border-width: 0px; border-style: none;",e+=" border-collapse: collapse;",e+=" padding: 0px; margin: 0px;",e+=" width: "+t+"px;",e+=" height: "+t+"px;",e+=" background-color: ",e+=f.isDark(n,o)?"#000000":"#ffffff",e+=";",e+='"/>';e+="</tr>"}return e+="</tbody>",e+="</table>"},f.createSvgTag=function(t,r,e,n){var o={};"object"==typeof arguments[0]&&(t=(o=arguments[0]).cellSize,r=o.margin,e=o.alt,n=o.title),t=t||2,r=void 0===r?4*t:r,(e="string"==typeof e?{text:e}:e||{}).text=e.text||null,e.id=e.text?e.id||"qrcode-description":null,(n="string"==typeof n?{text:n}:n||{}).text=n.text||null,n.id=n.text?n.id||"qrcode-title":null;var i,a,u,c,g=f.getModuleCount()*t+2*r,l="";for(c="l"+t+",0 0,"+t+" -"+t+",0 0,-"+t+"z ",l+='<svg version="1.1" xmlns="http://www.w3.org/2000/svg"',l+=o.scalable?"":' width="'+g+'px" height="'+g+'px"',l+=' viewBox="0 0 '+g+" "+g+'" ',l+=' preserveAspectRatio="xMinYMin meet"',l+=n.text||e.text?' role="img" aria-labelledby="'+y([n.id,e.id].join(" ").trim())+'"':"",l+=">",l+=n.text?'<title id="'+y(n.id)+'">'+y(n.text)+"</title>":"",l+=e.text?'<description id="'+y(e.id)+'">'+y(e.text)+"</description>":"",l+='<rect width="100%" height="100%" fill="white" cx="0" cy="0"/>',l+='<path d="',a=0;a<f.getModuleCount();a+=1)for(u=a*t+r,i=0;i<f.getModuleCount();i+=1)f.isDark(a,i)&&(l+="M"+(i*t+r)+","+u+c);return l+='" stroke="transparent" fill="black"/>',l+="</svg>"},f.createDataURL=function(t,r){t=t||2,r=void 0===r?4*t:r;var e=f.getModuleCount()*t+2*r,n=r,o=e-r;return I(e,e,function(r,e){if(n<=r&&r<o&&n<=e&&e<o){var i=Math.floor((r-n)/t),a=Math.floor((e-n)/t);return f.isDark(a,i)?0:1}return 1})},f.createImgTag=function(t,r,e){t=t||2,r=void 0===r?4*t:r;var n=f.getModuleCount()*t+2*r,o="";return o+="<img",o+=' src="',o+=f.createDataURL(t,r),o+='"',o+=' width="',o+=n,o+='"',o+=' height="',o+=n,o+='"',e&&(o+=' alt="',o+=y(e),o+='"'),o+="/>"};var y=function(t){for(var r="",e=0;e<t.length;e+=1){var n=t.charAt(e);switch(n){case"<":r+="&lt;";break;case">":r+="&gt;";break;case"&":r+="&amp;";break;case'"':r+="&quot;";break;default:r+=n}}return r};return f.createASCII=function(t,r){if((t=t||1)<2)return function(t){t=void 0===t?2:t;var r,e,n,o,i,a=1*f.getModuleCount()+2*t,u=t,c=a-t,g={"██":"█","█ ":"▀"," █":"▄","  ":" "},l={"██":"▀","█ ":"▀"," █":" ","  ":" "},h="";for(r=0;r<a;r+=2){for(n=Math.floor((r-u)/1),o=Math.floor((r+1-u)/1),e=0;e<a;e+=1)i="█",u<=e&&e<c&&u<=r&&r<c&&f.isDark(n,Math.floor((e-u)/1))&&(i=" "),u<=e&&e<c&&u<=r+1&&r+1<c&&f.isDark(o,Math.floor((e-u)/1))?i+=" ":i+="█",h+=t<1&&r+1>=c?l[i]:g[i];h+="\n"}return a%2&&t>0?h.substring(0,h.length-a-1)+Array(a+1).join("▀"):h.substring(0,h.length-1)}(r);t-=1,r=void 0===r?2*t:r;var e,n,o,i,a=f.getModuleCount()*t+2*r,u=r,c=a-r,g=Array(t+1).join("██"),l=Array(t+1).join("  "),h="",s="";for(e=0;e<a;e+=1){for(o=Math.floor((e-u)/t),s="",n=0;n<a;n+=1)i=1,u<=n&&n<c&&u<=e&&e<c&&f.isDark(o,Math.floor((n-u)/t))&&(i=0),s+=i?g:l;for(o=0;o<t;o+=1)h+=s+"\n"}return h.substring(0,h.length-1)},f.renderTo2dContext=function(t,r){r=r||2;for(var e=f.getModuleCount(),n=0;n<e;n++)for(var o=0;o<e;o++)t.fillStyle=f.isDark(n,o)?"black":"white",t.fillRect(o*r,n*r,r,r)},f};t.stringToBytes=(t.stringToBytesFuncs={default:function(t){for(var r=[],e=0;e<t.length;e+=1){var n=t.charCodeAt(e);r.push(255&n)}return r}}).default,t.createStringToBytes=function(t,r){var e=function(){for(var e=S(t),n=function(){var t=e.read();if(-1==t)throw"eof";return t},o=0,i={};;){var a=e.read();if(-1==a)break;var u=n(),f=n()<<8|n();i[String.fromCharCode(a<<8|u)]=f,o+=1}if(o!=r)throw o+" != "+r;return i}(),n="?".charCodeAt(0);return function(t){for(var r=[],o=0;o<t.length;o+=1){var i=t.charCodeAt(o);if(i<128)r.push(i);else{var a=e[t.charAt(o)];"number"==typeof a?(255&a)==a?r.push(a):(r.push(a>>>8),r.push(255&a)):r.push(n)}}return r}};var r,e,n,o,i,a=1,u=2,f=4,c=8,g={L:1,M:0,Q:3,H:2},l=0,h=1,s=2,v=3,d=4,w=5,p=6,y=7,B=(r=[[],[6,18],[6,22],[6,26],[6,30],[6,34],[6,22,38],[6,24,42],[6,26,46],[6,28,50],[6,30,54],[6,32,58],[6,34,62],[6,26,46,66],[6,26,48,70],[6,26,50,74],[6,30,54,78],[6,30,56,82],[6,30,58,86],[6,34,62,90],[6,28,50,72,94],[6,26,50,74,98],[6,30,54,78,102],[6,28,54,80,106],[6,32,58,84,110],[6,30,58,86,114],[6,34,62,90,118],[6,26,50,74,98,122],[6,30,54,78,102,126],[6,26,52,78,104,130],[6,30,56,82,108,134],[6,34,60,86,112,138],[6,30,58,86,114,142],[6,34,62,90,118,146],[6,30,54,78,102,126,150],[6,24,50,76,102,128,154],[6,28,54,80,106,132,158],[6,32,58,84,110,136,162],[6,26,54,82,110,138,166],[6,30,58,86,114,142,170]],e=1335,n=7973,i=function(t){for(var r=0;0!=t;)r+=1,t>>>=1;return r},(o={}).getBCHTypeInfo=function(t){for(var r=t<<10;i(r)-i(e)>=0;)r^=e<<i(r)-i(e);return 21522^(t<<10|r)},o.getBCHTypeNumber=function(t){for(var r=t<<12;i(r)-i(n)>=0;)r^=n<<i(r)-i(n);return t<<12|r},o.getPatternPosition=function(t){return r[t-1]},o.getMaskFunction=function(t){switch(t){case l:return function(t,r){return(t+r)%2==0};case h:return function(t,r){return t%2==0};case s:return function(t,r){return r%3==0};case v:return function(t,r){return(t+r)%3==0};case d:return function(t,r){return(Math.floor(t/2)+Math.floor(r/3))%2==0};case w:return function(t,r){return t*r%2+t*r%3==0};case p:return function(t,r){return(t*r%2+t*r%3)%2==0};case y:return function(t,r){return(t*r%3+(t+r)%2)%2==0};default:throw"bad maskPattern:"+t}},o.getErrorCorrectPolynomial=function(t){for(var r=k([1],0),e=0;e<t;e+=1)r=r.multiply(k([1,C.gexp(e)],0));return r},o.getLengthInBits=function(t,r){if(1<=r&&r<10)switch(t){case a:return 10;case u:return 9;case f:case c:return 8;default:throw"mode:"+t}else if(r<27)switch(t){case a:return 12;case u:return 11;case f:return 16;case c:return 10;default:throw"mode:"+t}else{if(!(r<41))throw"type:"+r;switch(t){case a:return 14;case u:return 13;case f:return 16;case c:return 12;default:throw"mode:"+t}}},o.getLostPoint=function(t){for(var r=t.getModuleCount(),e=0,n=0;n<r;n+=1)for(var o=0;o<r;o+=1){for(var i=0,a=t.isDark(n,o),u=-1;u<=1;u+=1)if(!(n+u<0||r<=n+u))for(var f=-1;f<=1;f+=1)o+f<0||r<=o+f||0==u&&0==f||a==t.isDark(n+u,o+f)&&(i+=1);i>5&&(e+=3+i-5)}for(n=0;n<r-1;n+=1)for(o=0;o<r-1;o+=1){var c=0;t.isDark(n,o)&&(c+=1),t.isDark(n+1,o)&&(c+=1),t.isDark(n,o+1)&&(c+=1),t.isDark(n+1,o+1)&&(c+=1),0!=c&&4!=c||(e+=3)}for(n=0;n<r;n+=1)for(o=0;o<r-6;o+=1)t.isDark(n,o)&&!t.isDark(n,o+1)&&t.isDark(n,o+2)&&t.isDark(n,o+3)&&t.isDark(n,o+4)&&!t.isDark(n,o+5)&&t.isDark(n,o+6)&&(e+=40);for(o=0;o<r;o+=1)for(n=0;n<r-6;n+=1)t.isDark(n,o)&&!t.isDark(n+1,o)&&t.isDark(n+2,o)&&t.isDark(n+3,o)&&t.isDark(n+4,o)&&!t.isDark(n+5,o)&&t.isDark(n+6,o)&&(e+=40);var g=0;for(o=0;o<r;o+=1)for(n=0;n<r;n+=1)t.isDark(n,o)&&(g+=1);return e+=Math.abs(100*g/r/r-50)/5*10},o),C=function(){for(var t=new Array(256),r=new Array(256),e=0;e<8;e+=1)t[e]=1<<e;for(e=8;e<256;e+=1)t[e]=t[e-4]^t[e-5]^t[e-6]^t[e-8];for(e=0;e<255;e+=1)r[t[e]]=e;var n={glog:function(t){if(t<1)throw"glog("+t+")";return r[t]},gexp:function(r){for(;r<0;)r+=255;for(;r>=256;)r-=255;return t[r]}};return n}();function k(t,r){if(void 0===t.length)throw t.length+"/"+r;var e=function(){for(var e=0;e<t.length&&0==t[e];)e+=1;for(var n=new Array(t.length-e+r),o=0;o<t.length-e;o+=1)n[o]=t[o+e];return n}(),n={getAt:function(t){return e[t]},getLength:function(){return e.length},multiply:function(t){for(var r=new Array(n.getLength()+t.getLength()-1),e=0;e<n.getLength();e+=1)for(var o=0;o<t.getLength();o+=1)r[e+o]^=C.gexp(C.glog(n.getAt(e))+C.glog(t.getAt(o)));return k(r,0)},mod:function(t){if(n.getLength()-t.getLength()<0)return n;for(var r=C.glog(n.getAt(0))-C.glog(t.getAt(0)),e=new Array(n.getLength()),o=0;o<n.getLength();o+=1)e[o]=n.getAt(o);for(o=0;o<t.getLength();o+=1)e[o]^=C.gexp(C.glog(t.getAt(o))+r);return k(e,0).mod(t)}};return n}var A=function(){var t=[[1,26,19],[1,26,16],[1,26,13],[1,26,9],[1,44,34],[1,44,28],[1,44,22],[1,44,16],[1,70,55],[1,70,44],[2,35,17],[2,35,13],[1,100,80],[2,50,32],[2,50,24],[4,25,9],[1,134,108],[2,67,43],[2,33,15,2,34,16],[2,33,11,2,34,12],[2,86,68],[4,43,27],[4,43,19],[4,43,15],[2,98,78],[4,49,31],[2,32,14,4,33,15],[4,39,13,1,40,14],[2,121,97],[2,60,38,2,61,39],[4,40,18,2,41,19],[4,40,14,2,41,15],[2,146,116],[3,58,36,2,59,37],[4,36,16,4,37,17],[4,36,12,4,37,13],[2,86,68,2,87,69],[4,69,43,1,70,44],[6,43,19,2,44,20],[6,43,15,2,44,16],[4,101,81],[1,80,50,4,81,51],[4,50,22,4,51,23],[3,36,12,8,37,13],[2,116,92,2,117,93],[6,58,36,2,59,37],[4,46,20,6,47,21],[7,42,14,4,43,15],[4,133,107],[8,59,37,1,60,38],[8,44,20,4,45,21],[12,33,11,4,34,12],[3,145,115,1,146,116],[4,64,40,5,65,41],[11,36,16,5,37,17],[11,36,12,5,37,13],[5,109,87,1,110,88],[5,65,41,5,66,42],[5,54,24,7,55,25],[11,36,12,7,37,13],[5,122,98,1,123,99],[7,73,45,3,74,46],[15,43,19,2,44,20],[3,45,15,13,46,16],[1,135,107,5,136,108],[10,74,46,1,75,47],[1,50,22,15,51,23],[2,42,14,17,43,15],[5,150,120,1,151,121],[9,69,43,4,70,44],[17,50,22,1,51,23],[2,42,14,19,43,15],[3,141,113,4,142,114],[3,70,44,11,71,45],[17,47,21,4,48,22],[9,39,13,16,40,14],[3,135,107,5,136,108],[3,67,41,13,68,42],[15,54,24,5,55,25],[15,43,15,10,44,16],[4,144,116,4,145,117],[17,68,42],[17,50,22,6,51,23],[19,46,16,6,47,17],[2,139,111,7,140,112],[17,74,46],[7,54,24,16,55,25],[34,37,13],[4,151,121,5,152,122],[4,75,47,14,76,48],[11,54,24,14,55,25],[16,45,15,14,46,16],[6,147,117,4,148,118],[6,73,45,14,74,46],[11,54,24,16,55,25],[30,46,16,2,47,17],[8,132,106,4,133,107],[8,75,47,13,76,48],[7,54,24,22,55,25],[22,45,15,13,46,16],[10,142,114,2,143,115],[19,74,46,4,75,47],[28,50,22,6,51,23],[33,46,16,4,47,17],[8,152,122,4,153,123],[22,73,45,3,74,46],[8,53,23,26,54,24],[12,45,15,28,46,16],[3,147,117,10,148,118],[3,73,45,23,74,46],[4,54,24,31,55,25],[11,45,15,31,46,16],[7,146,116,7,147,117],[21,73,45,7,74,46],[1,53,23,37,54,24],[19,45,15,26,46,16],[5,145,115,10,146,116],[19,75,47,10,76,48],[15,54,24,25,55,25],[23,45,15,25,46,16],[13,145,115,3,146,116],[2,74,46,29,75,47],[42,54,24,1,55,25],[23,45,15,28,46,16],[17,145,115],[10,74,46,23,75,47],[10,54,24,35,55,25],[19,45,15,35,46,16],[17,145,115,1,146,116],[14,74,46,21,75,47],[29,54,24,19,55,25],[11,45,15,46,46,16],[13,145,115,6,146,116],[14,74,46,23,75,47],[44,54,24,7,55,25],[59,46,16,1,47,17],[12,151,121,7,152,122],[12,75,47,26,76,48],[39,54,24,14,55,25],[22,45,15,41,46,16],[6,151,121,14,152,122],[6,75,47,34,76,48],[46,54,24,10,55,25],[2,45,15,64,46,16],[17,152,122,4,153,123],[29,74,46,14,75,47],[49,54,24,10,55,25],[24,45,15,46,46,16],[4,152,122,18,153,123],[13,74,46,32,75,47],[48,54,24,14,55,25],[42,45,15,32,46,16],[20,147,117,4,148,118],[40,75,47,7,76,48],[43,54,24,22,55,25],[10,45,15,67,46,16],[19,148,118,6,149,119],[18,75,47,31,76,48],[34,54,24,34,55,25],[20,45,15,61,46,16]],r=function(t,r){var e={};return e.totalCount=t,e.dataCount=r,e},e={};return e.getRSBlocks=function(e,n){var o=function(r,e){switch(e){case g.L:return t[4*(r-1)+0];case g.M:return t[4*(r-1)+1];case g.Q:return t[4*(r-1)+2];case g.H:return t[4*(r-1)+3];default:return}}(e,n);if(void 0===o)throw"bad rs block @ typeNumber:"+e+"/errorCorrectionLevel:"+n;for(var i=o.length/3,a=[],u=0;u<i;u+=1)for(var f=o[3*u+0],c=o[3*u+1],l=o[3*u+2],h=0;h<f;h+=1)a.push(r(c,l));return a},e}(),b=function(){var t=[],r=0,e={getBuffer:function(){return t},getAt:function(r){var e=Math.floor(r/8);return 1==(t[e]>>>7-r%8&1)},put:function(t,r){for(var n=0;n<r;n+=1)e.putBit(1==(t>>>r-n-1&1))},getLengthInBits:function(){return r},putBit:function(e){var n=Math.floor(r/8);t.length<=n&&t.push(0),e&&(t[n]|=128>>>r%8),r+=1}};return e},M=function(t){var r=a,e=t,n={getMode:function(){return r},getLength:function(t){return e.length},write:function(t){for(var r=e,n=0;n+2<r.length;)t.put(o(r.substring(n,n+3)),10),n+=3;n<r.length&&(r.length-n==1?t.put(o(r.substring(n,n+1)),4):r.length-n==2&&t.put(o(r.substring(n,n+2)),7))}},o=function(t){for(var r=0,e=0;e<t.length;e+=1)r=10*r+i(t.charAt(e));return r},i=function(t){if("0"<=t&&t<="9")return t.charCodeAt(0)-"0".charCodeAt(0);throw"illegal char :"+t};return n},x=function(t){var r=u,e=t,n={getMode:function(){return r},getLength:function(t){return e.length},write:function(t){for(var r=e,n=0;n+1<r.length;)t.put(45*o(r.charAt(n))+o(r.charAt(n+1)),11),n+=2;n<r.length&&t.put(o(r.charAt(n)),6)}},o=function(t){if("0"<=t&&t<="9")return t.charCodeAt(0)-"0".charCodeAt(0);if("A"<=t&&t<="Z")return t.charCodeAt(0)-"A".charCodeAt(0)+10;switch(t){case" ":return 36;case"$":return 37;case"%":return 38;case"*":return 39;case"+":return 40;case"-":return 41;case".":return 42;case"/":return 43;case":":return 44;default:throw"illegal char :"+t}};return n},m=function(r){var e=f,n=t.stringToBytes(r),o={getMode:function(){return e},getLength:function(t){return n.length},write:function(t){for(var r=0;r<n.length;r+=1)t.put(n[r],8)}};return o},L=function(r){var e=c,n=t.stringToBytesFuncs.SJIS;if(!n)throw"sjis not supported.";!function(){var t=n("友");if(2!=t.length||38726!=(t[0]<<8|t[1]))throw"sjis not supported."}();var o=n(r),i={getMode:function(){return e},getLength:function(t){return~~(o.length/2)},write:function(t){for(var r=o,e=0;e+1<r.length;){var n=(255&r[e])<<8|255&r[e+1];if(33088<=n&&n<=40956)n-=33088;else{if(!(57408<=n&&n<=60351))throw"illegal char at "+(e+1)+"/"+n;n-=49472}n=192*(n>>>8&255)+(255&n),t.put(n,13),e+=2}if(e<r.length)throw"illegal char at "+(e+1)}};return i},D=function(){var t=[],r={writeByte:function(r){t.push(255&r)},writeShort:function(t){r.writeByte(t),r.writeByte(t>>>8)},writeBytes:function(t,e,n){e=e||0,n=n||t.length;for(var o=0;o<n;o+=1)r.writeByte(t[o+e])},writeString:function(t){for(var e=0;e<t.length;e+=1)r.writeByte(t.charCodeAt(e))},toByteArray:function(){return t},toString:function(){var r="";r+="[";for(var e=0;e<t.length;e+=1)e>0&&(r+=","),r+=t[e];return r+="]"}};return r},S=function(t){var r=t,e=0,n=0,o=0,i={read:function(){for(;o<8;){if(e>=r.length){if(0==o)return-1;throw"unexpected end of file./"+o}var t=r.charAt(e);if(e+=1,"="==t)return o=0,-1;t.match(/^\s$/)||(n=n<<6|a(t.charCodeAt(0)),o+=6)}var i=n>>>o-8&255;return o-=8,i}},a=function(t){if(65<=t&&t<=90)return t-65;if(97<=t&&t<=122)return t-97+26;if(48<=t&&t<=57)return t-48+52;if(43==t)return 62;if(47==t)return 63;throw"c:"+t};return i},I=function(t,r,e){for(var n=function(t,r){var e=t,n=r,o=new Array(t*r),i={setPixel:function(t,r,n){o[r*e+t]=n},write:function(t){t.writeString("GIF87a"),t.writeShort(e),t.writeShort(n),t.writeByte(128),t.writeByte(0),t.writeByte(0),t.writeByte(0),t.writeByte(0),t.writeByte(0),t.writeByte(255),t.writeByte(255),t.writeByte(255),t.writeString(","),t.writeShort(0),t.writeShort(0),t.writeShort(e),t.writeShort(n),t.writeByte(0);var r=a(2);t.writeByte(2);for(var o=0;r.length-o>255;)t.writeByte(255),t.writeBytes(r,o,255),o+=255;t.writeByte(r.length-o),t.writeBytes(r,o,r.length-o),t.writeByte(0),t.writeString(";")}},a=function(t){for(var r=1<<t,e=1+(1<<t),n=t+1,i=u(),a=0;a<r;a+=1)i.add(String.fromCharCode(a));i.add(String.fromCharCode(r)),i.add(String.fromCharCode(e));var f,c,g,l=D(),h=(f=l,c=0,g=0,{write:function(t,r){if(t>>>r!=0)throw"length over";for(;c+r>=8;)f.writeByte(255&(t<<c|g)),r-=8-c,t>>>=8-c,g=0,c=0;g|=t<<c,c+=r},flush:function(){c>0&&f.writeByte(g)}});h.write(r,n);var s=0,v=String.fromCharCode(o[s]);for(s+=1;s<o.length;){var d=String.fromCharCode(o[s]);s+=1,i.contains(v+d)?v+=d:(h.write(i.indexOf(v),n),i.size()<4095&&(i.size()==1<<n&&(n+=1),i.add(v+d)),v=d)}return h.write(i.indexOf(v),n),h.write(e,n),h.flush(),l.toByteArray()},u=function(){var t={},r=0,e={add:function(n){if(e.contains(n))throw"dup key:"+n;t[n]=r,r+=1},size:function(){return r},indexOf:function(r){return t[r]},contains:function(r){return void 0!==t[r]}};return e};return i}(t,r),o=0;o<r;o+=1)for(var i=0;i<t;i+=1)n.setPixel(i,o,e(i,o));var a=D();n.write(a);for(var u=function(){var t=0,r=0,e=0,n="",o={},i=function(t){n+=String.fromCharCode(a(63&t))},a=function(t){if(t<0);else{if(t<26)return 65+t;if(t<52)return t-26+97;if(t<62)return t-52+48;if(62==t)return 43;if(63==t)return 47}throw"n:"+t};return o.writeByte=function(n){for(t=t<<8|255&n,r+=8,e+=1;r>=6;)i(t>>>r-6),r-=6},o.flush=function(){if(r>0&&(i(t<<6-r),t=0,r=0),e%3!=0)for(var o=3-e%3,a=0;a<o;a+=1)n+="="},o.toString=function(){return n},o}(),f=a.toByteArray(),c=0;c<f.length;c+=1)u.writeByte(f[c]);return u.flush(),"data:image/gif;base64,"+u};return t}();qrcode.stringToBytesFuncs["UTF-8"]=function(t){return function(t){for(var r=[],e=0;e<t.length;e++){var n=t.charCodeAt(e);n<128?r.push(n):n<2048?r.push(192|n>>6,128|63&n):n<55296||n>=57344?r.push(224|n>>12,128|n>>6&63,128|63&n):(e++,n=65536+((1023&n)<<10|1023&t.charCodeAt(e)),r.push(240|n>>18,128|n>>12&63,128|n>>6&63,128|63&n))}return r}(t)},function(t){"function"==typeof define&&define.amd?define([],t):"object"==typeof exports&&(module.exports=t())}(function(){return qrcode});
+</script>
+<script>
+/* =========================================================
+   EINSTELLUNGEN
+   ========================================================= */
+const LEHRER_PIN = "1234";   // PIN für den Lehrkraft-Bereich – bitte ändern
+
+/* =========================================================
+   INHALTE – hier lassen sich Text A und Lösungen anpassen
+   ========================================================= */
+const TITLE_A = "Unfall im Treppenhaus: Schülerin leicht verletzt";
+const LINES = [
+  "Am Dienstagvormittag stürzte die Schülerin Mia K. aus der",
+  "Klasse 7b während der ersten großen Pause im Treppenhaus",
+  "der Schule. Sie rutschte auf einer nassen Stufe aus und",
+  "verletzte sich leicht am rechten Knöchel.",
+  "Mia K. wollte mit mehreren Mitschülern aus dem ersten",
+  "Stock in den Pausenhof gehen. Kurz zuvor wischte eine",
+  "Reinigungskraft die Treppe. Ein Warnhinweis stand zu diesem",
+  "Zeitpunkt nicht dort. Ihr Mitschüler Jonas T. beobachtete",
+  "den Vorfall. Er sagte: „Mia ist auf der Stufe weggerutscht",
+  "und wollte sich noch am Geländer festhalten.“ Die Lehrerin",
+  "Frau Richter hatte Pausenaufsicht und kam sofort hinzu.",
+  "„Die Schülerin war ansprechbar und konnte selbst aufstehen“,",
+  "berichtete Frau Richter. Sie kühlte den Knöchel und",
+  "begleitete Mia K. ins Sekretariat.",
+  "Das Sekretariat informierte die Eltern. Die Mutter holte",
+  "Mia K. ab und ließ den Fuß ärztlich untersuchen. Die",
+  "Schulleitung teilte mit, dass die Treppe künftig nur noch",
+  "während der Unterrichtszeit gewischt wird."
+];
+const PARAS = [[1,4],[5,14],[15,18]];
+
+const GOALS = [
+  "Ich kann Text A anhand eines Analyserasters untersuchen und meine Ergebnisse mit Textbelegen angeben.",
+  "Ich kann Informationen aus einer Skizze und einer Tabelle entnehmen und mit Text A vergleichen.",
+  "Ich kann die Operatoren „analysieren“ und „vergleichen“ unterscheiden und anwenden.",
+  "Ich finde in den Zeugenaussagen von Jonas T. und Frau Richter die Redezeichen und den Begleitsatz."
+];
+
+const TERMS = [
+  {t:"analysieren",k:"Operator",d:"Einen Text nach Kriterien genau untersuchen und die Ergebnisse mit Textbelegen begründen."},
+  {t:"vergleichen",k:"Operator",d:"Gemeinsamkeiten und Unterschiede nach Kriterien herausarbeiten."},
+  {t:"Kriterium",k:"Fachbegriff",d:"Ein Prüfpunkt, nach dem man einen Text untersucht, z. B. W-Fragen, Aufbau, Sprachstil, Zeitform."},
+  {t:"Textbeleg",k:"Fachbegriff",d:"Ein Zitat oder eine Zeilenangabe (Z. 3), die ein Ergebnis aus dem Text begründet."},
+  {t:"kontinuierlicher Text",k:"Textart",d:"Zusammenhängender Text aus Sätzen und Absätzen, z. B. Text A."},
+  {t:"nichtkontinuierlicher Text",k:"Textart",d:"Text mit Bildern, Tabellen, Skizzen oder Diagrammen, z. B. M1 und M2."},
+  {t:"direkte Rede",k:"Fachbegriff",d:"Eine wörtlich wiedergegebene Aussage in Redezeichen („ … “)."},
+  {t:"Begleitsatz",k:"Fachbegriff",d:"Der Satz, der angibt, wer spricht, z. B. „sagte Jonas T.“."}
+];
+const MATCH = [
+  {d:"Gemeinsamkeiten und Unterschiede nach Kriterien herausarbeiten",a:"vergleichen"},
+  {d:"Einen Text nach Kriterien untersuchen und Ergebnisse belegen",a:"analysieren"},
+  {d:"Zitat oder Zeilenangabe, die ein Ergebnis begründet",a:"Textbeleg"},
+  {d:"Text mit Skizze, Tabelle oder Diagramm",a:"nichtkontinuierlicher Text"},
+  {d:"Zusammenhängender Text aus Sätzen und Absätzen",a:"kontinuierlicher Text"},
+  {d:"Gibt an, wer spricht",a:"Begleitsatz"}
+];
+const OPS = [
+  {q:"Untersuche, ob Text A im Präteritum geschrieben ist. Belege mit drei Beispielen.",a:"analysieren"},
+  {q:"Finde heraus, welche Informationen in Text A und in der Tabelle M2 gleich sind und welche sich unterscheiden.",a:"vergleichen"},
+  {q:"Prüfe, ob Text A alle W-Fragen beantwortet. Gib die Zeilen an.",a:"analysieren"}
+];
+
+/* W-Fragen: core = mindestens eine dieser Zeilen; ok = erlaubte Zeilen; kw = Stichwortgruppen fürs Ergebnis (je Gruppe ein Treffer) */
+const WQ = [
+  {id:"wer",q:"Wer?",task:"Wer ist beteiligt?",core:[1],ok:[1,2,8,9,10,11,12,13],basis:true,
+   kw:[["mia"],["jonas","richter"]],kwMsg:"Nenne die verletzte Schülerin und mindestens einen Zeugen.",
+   tip:"Suche Namen von Personen. Es gibt eine verletzte Schülerin und zwei Zeugen.",
+   model:"Mia K. (verletzte Schülerin, Z. 1–2), Zeugen: Jonas T. (Z. 8) und Frau Richter (Z. 10–11)"},
+  {id:"was",q:"Was?",task:"Was ist geschehen?",core:[1,3],ok:[1,2,3,4,9,10],basis:true,
+   kw:[["rutsch","stürz","sturz","gestürzt","fiel","gefallen","hingefallen"]],kwMsg:"Beschreibe in Stichpunkten, was mit Mia K. passiert ist.",
+   tip:"Welches Verb beschreibt den Unfall? Schau in die ersten Zeilen.",
+   model:"Mia K. rutschte auf einer nassen Stufe aus und stürzte (Z. 1, 3)."},
+  {id:"wann",q:"Wann?",task:"Wann ist es geschehen?",core:[1,2],ok:[1,2,6],basis:true,
+   kw:[["dienstag","vormittag","pause"]],kwMsg:"Notiere die Zeitangabe, die im Text steht.",
+   tip:"Achte auf Wochentag, Tageszeit und Pause.",
+   model:"Am Dienstagvormittag, während der ersten großen Pause (Z. 1–2). Die genaue Uhrzeit steht nur in M2."},
+  {id:"wo",q:"Wo?",task:"Wo ist es geschehen?",core:[2,3],ok:[1,2,3,5,6],basis:true,
+   kw:[["treppe"]],kwMsg:"Notiere den Ort, an dem der Unfall geschah.",
+   tip:"Suche einen Ort im Schulgebäude.",
+   model:"Im Treppenhaus der Schule (Z. 2–3)."},
+  {id:"warum",q:"Wie / Warum?",task:"Wie kam es dazu? Was war die Ursache?",core:[3,6,7,8],ok:[3,5,6,7,8,9,10],basis:false,
+   kw:[["nass","gewischt","wisch"]],kwMsg:"Notiere die Ursache des Unfalls.",
+   tip:"Warum war die Stufe gefährlich? Gab es eine Warnung?",
+   model:"Die Stufe war nass, weil kurz zuvor gewischt wurde. Es stand kein Warnhinweis dort (Z. 3, 6–8)."},
+  {id:"folgen",q:"Welche Folgen?",task:"Was geschah danach?",core:[4,13,14,15,16,17],ok:[4,11,12,13,14,15,16,17,18],basis:false,
+   kw:[["verletz","knöchel","prell"],["kühl","eltern","arzt","ärzt","sekretariat","abgeholt","abhol","wisch","mutter"]],kwMsg:"Nenne die Verletzung und mindestens eine weitere Folge.",
+   tip:"Lies den letzten Abschnitt: Was passierte mit Mia K. und was änderte die Schule?",
+   model:"Leichte Verletzung am Knöchel (Z. 4), Kühlung durch Frau Richter (Z. 13), Eltern informiert, Arztbesuch (Z. 15–16), neue Wischzeiten (Z. 17–18)."}
+];
+
+const AUF_PARTS = ["Einleitung","Hauptteil","Schluss"];
+const AUF_CONTENT = ["Folgen und Maßnahmen","Kernaussage: Wer? Was? Wann? Wo?","Ablauf und Zeugenaussagen"];
+const AUF_SOL = [{p:"Einleitung",c:"Kernaussage: Wer? Was? Wann? Wo?"},{p:"Hauptteil",c:"Ablauf und Zeugenaussagen"},{p:"Schluss",c:"Folgen und Maßnahmen"}];
+
+const STIL_OK = ["beobachtete","sagte","berichtete","informierte","teilte"];
+const WERT = [
+  {s:"Mia K. rutschte auf einer nassen Stufe aus.",a:"sachlich"},
+  {s:"Der Sturz war total schlimm und mega gefährlich.",a:"wertend"},
+  {s:"Frau Richter kühlte den Knöchel.",a:"sachlich"},
+  {s:"Die Reinigungskraft hat mal wieder total schlampig gearbeitet.",a:"wertend"}
+];
+
+const PRAET = ["stürzte","rutschte","verletzte","wollte","wischte","stand","beobachtete","sagte","hatte","kam","war","konnte","berichtete","kühlte","begleitete","informierte","holte","ließ","teilte"];
+const ZEIT_MSG = {
+  "ist":"„ist weggerutscht“ ist Perfekt. Jonas spricht in der direkten Rede – dort darf eine andere Zeitform stehen.",
+  "weggerutscht":"„ist weggerutscht“ ist Perfekt. Jonas spricht in der direkten Rede – dort darf eine andere Zeitform stehen.",
+  "wird":"„gewischt wird“ ist Präsens. Hier geht es um die Zukunft.",
+  "gewischt":"„gewischt wird“ ist Präsens. Hier geht es um die Zukunft.",
+  "aus":"Das ist nur der Verbzusatz. Markiere das Verb davor.",
+  "ab":"Das ist nur der Verbzusatz. Markiere das Verb davor.",
+  "mit":"Das ist nur der Verbzusatz. Markiere das Verb davor.",
+  "hinzu":"Das ist nur der Verbzusatz. Markiere das Verb davor.",
+  "festhalten":"Das ist ein Infinitiv (Grundform) – keine Zeitform.",
+  "aufstehen":"Das ist ein Infinitiv (Grundform) – keine Zeitform.",
+  "gehen":"Das ist ein Infinitiv (Grundform) – keine Zeitform.",
+  "untersuchen":"Das ist ein Infinitiv (Grundform) – keine Zeitform."
+};
+
+/* Vergleich: a = nur Text A, b = beide, m = nur M1/M2 */
+const SORT = [
+  {id:"s1",t:"Genaue Uhrzeit des Unfalls",k:"m"},
+  {id:"s2",t:"Datum des Unfalls",k:"m"},
+  {id:"s3",t:"Die nasse Stufe ist die 3. Stufe von unten",k:"m"},
+  {id:"s4",t:"Standorte der beiden Zeugen",k:"m"},
+  {id:"s5",t:"Uhrzeit des Anrufs bei den Eltern",k:"m"},
+  {id:"s6",t:"Mia K. ist in der Klasse 7b",k:"b"},
+  {id:"s7",t:"Frau Richter hatte Pausenaufsicht",k:"b"},
+  {id:"s8",t:"Die Treppe war nass",k:"b"},
+  {id:"s9",t:"Wörtliche Aussage von Jonas T.",k:"a"},
+  {id:"s10",t:"Die Treppe wird künftig nur während der Unterrichtszeit gewischt",k:"a"}
+];
+
+const CLOZE = [
+  "Beim <b>Analysieren</b> untersuche ich einen Text nach ",{g:"k",a:["Kriterien"]}," und belege jedes Ergebnis mit einer ",{g:"ts",a:["Textstelle"]},". ",
+  "Beim <b>Vergleichen</b> arbeite ich ",{g:"gu",a:["Gemeinsamkeiten","Unterschiede"]}," und ",{g:"gu",a:["Gemeinsamkeiten","Unterschiede"]}," heraus. ",
+  "<br>Prüfkriterien für einen Bericht: ",{g:"pk",a:["W-Fragen","Aufbau","Sachlichkeit","Zeitform"]},", ",{g:"pk",a:["W-Fragen","Aufbau","Sachlichkeit","Zeitform"]},", ",{g:"pk",a:["W-Fragen","Aufbau","Sachlichkeit","Zeitform"]},", ",{g:"pk",a:["W-Fragen","Aufbau","Sachlichkeit","Zeitform"]},". ",
+  "<br>Einen Textbeleg gebe ich mit einem ",{g:"zz",a:["Zitat"]}," oder einer ",{g:"zl",a:["Zeilenangabe"]}," an. ",
+  "Direkte Rede steht in ",{g:"rz",a:["Redezeichen"]}," und wird durch einen ",{g:"bs",a:["Begleitsatz"]}," angekündigt. ",
+  "Nichtkontinuierliche Texte wie Skizze oder Tabelle liefern oft zusätzliche ",{g:"inf",a:["Informationen"]},"."
+];
+const BANK = ["Kriterien","Textstelle","Gemeinsamkeiten","Unterschiede","W-Fragen","Aufbau","Sachlichkeit","Zeitform","Zitat","Zeilenangabe","Redezeichen","Begleitsatz","Informationen","Gefühlen","Präsens"];
+
+const SPEECH = [
+  {who:"Jonas T.", text:"Er sagte: „Mia ist auf der Stufe weggerutscht und wollte sich noch am Geländer festhalten.“", begl:"Er sagte"},
+  {who:"Frau Richter", text:"„Die Schülerin war ansprechbar und konnte selbst aufstehen“, berichtete Frau Richter.", begl:"berichtete Frau Richter"}
+];
+
+const STATIONS = [
+  {t:"Start",min:5},{t:"Begriffe",min:3},{t:"Analyse",min:12},{t:"Vergleich",min:10},
+  {t:"Direkte Rede",min:6},{t:"Sicherung",min:6},{t:"Abschluss",min:3}
+];
+
+/* Fehlerstellen (gleiche Liste in Schüler-Datei und Lehrkraft-Übersicht!) – [Schlüssel, Station, Beschreibung, Art]
+   Art "v" = Prüfversuch/Fehlklick, "d" = Detail (welche Verwechslung) */
+const ERR_KEYS = [
+  ["s1:zuordnung",1,"Begriffe zuordnen: falsche Prüfversuche","v"],
+  ["s1:m0",1,"„vergleichen“ nicht erkannt","d"],
+  ["s1:m1",1,"„analysieren“ nicht erkannt","d"],
+  ["s1:m2",1,"„Textbeleg“ nicht erkannt","d"],
+  ["s1:m3",1,"„nichtkontinuierlicher Text“ nicht erkannt","d"],
+  ["s1:m4",1,"„kontinuierlicher Text“ nicht erkannt","d"],
+  ["s1:m5",1,"„Begleitsatz“ nicht erkannt","d"],
+  ["s1:op0",1,"Operator-Check 1 (analysieren) falsch","v"],
+  ["s1:op1",1,"Operator-Check 2 (vergleichen) falsch","v"],
+  ["s1:op2",1,"Operator-Check 3 (analysieren) falsch","v"],
+  ["s2:wer",2,"W-Frage „Wer?“: Beleg oder Ergebnis falsch","v"],
+  ["s2:was",2,"W-Frage „Was?“: Beleg oder Ergebnis falsch","v"],
+  ["s2:wann",2,"W-Frage „Wann?“: Beleg oder Ergebnis falsch","v"],
+  ["s2:wo",2,"W-Frage „Wo?“: Beleg oder Ergebnis falsch","v"],
+  ["s2:warum",2,"W-Frage „Wie/Warum?“: Beleg oder Ergebnis falsch","v"],
+  ["s2:folgen",2,"W-Frage „Welche Folgen?“: Beleg oder Ergebnis falsch","v"],
+  ["s2:aufbau",2,"Aufbau (Einleitung/Hauptteil/Schluss) falsch","v"],
+  ["s2:klick-stil",2,"Sachliche Verben: Fehlklicks","v"],
+  ["s2:wert0",2,"„Mia K. rutschte …“ als wertend eingestuft","v"],
+  ["s2:wert1",2,"„total schlimm und mega gefährlich“ als sachlich eingestuft","v"],
+  ["s2:wert2",2,"„Frau Richter kühlte …“ als wertend eingestuft","v"],
+  ["s2:wert3",2,"„total schlampig gearbeitet“ als sachlich eingestuft","v"],
+  ["s2:wertung",2,"Behauptet, Text A enthalte Wertungen","v"],
+  ["s2:klick-zeit",2,"Präteritum markieren: Fehlklicks","v"],
+  ["s2:z-perf",2,"Perfekt der direkten Rede („ist weggerutscht“) als Präteritum markiert","d"],
+  ["s2:z-praes",2,"Präsens („gewischt wird“) als Präteritum markiert","d"],
+  ["s2:z-part",2,"Verbzusatz (aus, ab, mit, hinzu) statt Verb markiert","d"],
+  ["s2:z-inf",2,"Infinitiv als Präteritum markiert","d"],
+  ["s2:tempus",2,"Zeitform falsch benannt","v"],
+  ["s2:star",2,"★ Unvollständige W-Frage falsch","v"],
+  ["s3:sortieren",3,"Informationen zuordnen: falsche Prüfversuche","v"],
+  ["s3:c-s1",3,"Falsch zugeordnet: genaue Uhrzeit (nur M2)","d"],
+  ["s3:c-s2",3,"Falsch zugeordnet: Datum (nur M2)","d"],
+  ["s3:c-s3",3,"Falsch zugeordnet: 3. Stufe von unten (nur M1/M2)","d"],
+  ["s3:c-s4",3,"Falsch zugeordnet: Standorte der Zeugen (nur M1)","d"],
+  ["s3:c-s5",3,"Falsch zugeordnet: Uhrzeit des Anrufs (nur M2)","d"],
+  ["s3:c-s6",3,"Falsch zugeordnet: Klasse 7b (beide)","d"],
+  ["s3:c-s7",3,"Falsch zugeordnet: Pausenaufsicht (beide)","d"],
+  ["s3:c-s8",3,"Falsch zugeordnet: Treppe nass (beide)","d"],
+  ["s3:c-s9",3,"Falsch zugeordnet: Aussage Jonas T. (nur Text A)","d"],
+  ["s3:c-s10",3,"Falsch zugeordnet: neue Wischzeiten (nur Text A)","d"],
+  ["s3:wider",3,"Widerspruch nicht erkannt","v"],
+  ["s4:klick-rede",4,"Redezeichen markieren: Fehlklicks","v"],
+  ["s4:klick-begl",4,"Begleitsatz markieren: Fehlklicks","v"],
+  ["s4:posJ",4,"Stellung Begleitsatz Jonas T. falsch","v"],
+  ["s4:posR",4,"Stellung Begleitsatz Frau Richter falsch","v"],
+  ["s4:zeichenJ",4,"Zeichen nach Begleitsatz (Doppelpunkt) falsch","v"],
+  ["s5:merkblatt",5,"Merkblatt: falsche Prüfversuche","v"],
+  ["s5:g-k",5,"Merkblatt-Lücke „Kriterien“ falsch","d"],
+  ["s5:g-ts",5,"Merkblatt-Lücke „Textstelle“ falsch","d"],
+  ["s5:g-gu",5,"Merkblatt-Lücken „Gemeinsamkeiten/Unterschiede“ falsch","d"],
+  ["s5:g-pk",5,"Merkblatt: Prüfkriterien falsch","d"],
+  ["s5:g-zz",5,"Merkblatt-Lücke „Zitat“ falsch","d"],
+  ["s5:g-zl",5,"Merkblatt-Lücke „Zeilenangabe“ falsch","d"],
+  ["s5:g-rz",5,"Merkblatt-Lücke „Redezeichen“ falsch","d"],
+  ["s5:g-bs",5,"Merkblatt-Lücke „Begleitsatz“ falsch","d"],
+  ["s5:g-inf",5,"Merkblatt-Lücke „Informationen“ falsch","d"],
+  ["s5:abschrift",5,"Direkte Rede abschreiben: Fehlversuche","v"]
+];
+
+const BLITZ_KW = ["präteritum","prateritum","praeteritum","vergangenheit","zeitform","sachlich","neutral","w-frage","wfrage","w frage","w-fragen","wer","wann","warum","reihenfolge","chronolog","aufbau","einleitung","hauptteil","schluss","gefühl","gefuehl","wertung","meinung","genau","knapp","kurz","wörtlich","rede","zeuge","information","fakten","tatsache","ohne","keine","überschrift","ablauf"];
+
+/* =========================================================
+   Zustand (lokal im Browser)
+   ========================================================= */
+const KEY = "bericht-stunde2-v2";
+let S = {};
+try{ S = JSON.parse(localStorage.getItem(KEY)) || {}; }catch(e){ S = {}; }
+["f","wq","marks","sort","cloze","choice","flip","thumb","err","lock","miss","time","lockN"].forEach(k=>S[k]=S[k]||{});
+let gateQueued=false;
+function save(){
+  S.updated = Date.now();
+  try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){}
+  if(!gateQueued){ gateQueued=true; requestAnimationFrame(()=>{ gateQueued=false; refreshGate(); }); }
+}
+const $ = (s,r=document)=>r.querySelector(s);
+const $$ = (s,r=document)=>[...r.querySelectorAll(s)];
+function fb(el,type,html){ if(!el) return; el.className = "fb show "+type; el.innerHTML = html; }
+function norm(s){ return (s||"").toLowerCase().replace(/[^a-zäöüß]/g,""); }
+function words(s){ return (s||"").trim().split(/\s+/).filter(w=>/[a-zäöüß]{2,}/i.test(w)).length; }
+function countMarks(c){ return Object.values(S.marks).filter(v=>v.includes(c)).length; }
+
+/* =========================================================
+   Rateschutz: Wartezeit nach Fehlversuchen
+   ========================================================= */
+function lockLeft(key){ return Math.max(0, Math.ceil(((S.lock[key]||0)-Date.now())/1000)); }
+function penalize(key){
+  S.err[key]=(S.err[key]||0)+1;
+  const secs=Math.min(5*S.err[key],30);
+  S.lock[key]=Date.now()+secs*1000; save(); return secs;
+}
+function lockUI(key, els, fbEl){
+  const tick=()=>{
+    const l=lockLeft(key);
+    els.forEach(e=>{ if(l>0) e.disabled=true; else if(e.dataset.keepDisabled!=="1") e.disabled=false; });
+    let cd = fbEl && fbEl.querySelector(".cd");
+    if(l>0){
+      if(fbEl){ if(!cd){ cd=document.createElement("div"); cd.className="cd"; fbEl.appendChild(cd); fbEl.classList.add("show"); } cd.textContent=`⏳ Rateschutz: Lies noch einmal genau nach. Weiter in ${l} s.`; }
+      setTimeout(tick,500);
+    } else if(cd) cd.remove();
+  };
+  tick();
+}
+
+/* =========================================================
+   Prüfregeln für freie Antworten
+   ========================================================= */
+function belegOk(s){
+  s=s||"";
+  const z=/\bz\.?\s*\d/i.test(s)||/zeile\s*\d/i.test(s);
+  const q=/[„"“»«].{3,}[“"«»]/.test(s);
+  return /\b(denn|weil)\b/i.test(s) && (z||q) && words(s)>=7;
+}
+const VAL = {
+  vermutung: v=> words(v)>=6 ? [true,"Vermutung notiert."] : [false,"Schreibe einen ganzen Satz (mindestens 6 Wörter)."],
+  mustersatz: v=> belegOk(v) ? [true,"Mustersatz mit Textbeleg."] : [false,"Ergebnis + „denn“ + Textbeleg (Z. … oder Zitat in „…“), mindestens 7 Wörter."],
+  stilBeleg: v=> belegOk(v) ? [true,"Begründung mit Textbeleg."] : [false,"Ergebnis + „denn“ + Textbeleg (Z. … oder Zitat in „…“), mindestens 7 Wörter."],
+  begruendung: v=> (words(v)>=10 && /\bweil\b/i.test(v) && /(m\s?[12])|[„"“]/i.test(v)) ? [true,"Begründung vollständig."] : [false,"Mindestens 10 Wörter, mit „weil“ und einem Beleg aus M1 oder M2 (z. B. „In M2 steht …“)."],
+  redeVermutung: v=> words(v)>=8 ? [true,"Vermutung notiert."] : [false,"Schreibt eure Vermutung als ganzen Satz (mindestens 8 Wörter)."],
+  eigenBeleg: v=> belegOk(v) ? [true,"Beispielsatz mit Textbeleg."] : [false,"Ergebnis + „denn“ + Textbeleg (Z. … oder Zitat in „…“), mindestens 7 Wörter."],
+  vorstellen: v=> words(v)>=5 ? [true,"Notiert."] : [false,"Schreibe einen ganzen Satz (mindestens 5 Wörter)."],
+  m3Satz: v=> (words(v)>=6 && /\d/.test(v)) ? [true,"Satz notiert."] : [false,"Ein ganzer Satz mit Uhrzeit aus M3."]
+};
+function blitzOk(v){ v=(v||"").toLowerCase(); return v.trim().length>=4 && BLITZ_KW.some(k=>v.includes(k)); }
+function blitzAllOk(){ const a=["blitz1","blitz2","blitz3"].map(k=>S.f[k]||""); return a.every(blitzOk) && new Set(a.map(norm)).size===3; }
+
+/* =========================================================
+   Anforderungen je Station (Freischaltung)
+   ========================================================= */
+const wqList = ()=>WQ.filter(w=>!S.basis||w.basis);
+const opsOk = ()=>OPS.every((o,i)=>S.choice["op"+i]===o.a);
+const sortRight = ()=>SORT.every(s=>S.sort[s.id]===s.k);
+const sortOk = ()=>!!S.sortChecked && sortRight();
+const begOk = ()=>!!S.f.pickInfo && VAL.begruendung(S.f.begruendung)[0];
+const redeMarked = ()=>countMarks("rede")===4 && countMarks("begl")===5;
+function subDone(k){
+  if(k==="wf") return wqList().every(w=>S.wq[w.id]?.ok);
+  if(k==="auf") return !!S.aufOk;
+  if(k==="stil") return countMarks("stil")>=3 && WERT.every((w,i)=>S.choice["wert"+i]===w.a) && S.choice.wertung==="nein" && VAL.stilBeleg(S.f.stilBeleg)[0];
+  if(k==="zeit") return countMarks("zeit")>=5 && S.choice.tempus==="Präteritum";
+  if(k==="star") return S.choice.star==="Wann";
+  return false;
+}
+const SUBS=["wf","auf","stil","zeit","star"];
+function subOpen(k){ if(S.unlockAll) return true; const i=SUBS.indexOf(k); for(let j=0;j<Math.min(i,4);j++) if(!subDone(SUBS[j])) return false; return true; }
+
+const kOk = ()=>(S.f.kuerzel||"").trim().length>=2;
+const REQ = [
+  ()=>[["Kürzel eingetragen", kOk()],
+       ["Drei verschiedene Merkmale eines Berichts (Blitzrunde)", blitzAllOk()],
+       ["Vermutung zur Skizze M1 notiert", VAL.vermutung(S.f.vermutung)[0]]],
+  ()=>[[`Alle ${TERMS.length} Begriffskarten gelesen`, Object.keys(S.flip).length>=TERMS.length],
+       ["Zuordnung vollständig richtig", !!S.matchOk],
+       ["Operator-Check richtig", opsOk()],
+       ["Eigener Mustersatz mit Textbeleg", VAL.mustersatz(S.f.mustersatz)[0]]],
+  ()=>[["① W-Fragen belegt", subDone("wf")],["② Aufbau bestimmt", subDone("auf")],
+       ["③ Sprachstil geprüft", subDone("stil")],["④ Zeitform geprüft", subDone("zeit")]],
+  ()=>[["Alle Informationskarten richtig zugeordnet", sortOk()],
+       ["Widerspruch gefunden", S.choice.wider==="knoechel"],
+       ["Information gewählt und begründet", begOk()]],
+  ()=>[["Alle Redezeichen markiert (4)", countMarks("rede")===4],
+       ["Begleitsätze markiert (5 Wörter)", countMarks("begl")===5],
+       ["Beobachtungen richtig angekreuzt", S.choice.posJ==="vor"&&S.choice.posR==="nach"&&S.choice.zeichenJ==="doppel"],
+       ["Vermutung notiert", VAL.redeVermutung(S.f.redeVermutung)[0]]],
+  ()=>[["Merkblatt vollständig richtig", !!S.clozeOk],
+       ["Eigener Beispielsatz mit Textbeleg", VAL.eigenBeleg(S.f.eigenBeleg)[0]],
+       ["Direkte Rede fehlerfrei abgeschrieben", !!S.abOk],
+       ["Partnerabgleich abgehakt", ["pa1","pa2","pa3","pa4"].every(k=>S.f[k])]],
+  ()=>[["Information für die Vorstellung notiert", VAL.vorstellen(S.f.vorstellen)[0]],
+       ["Daumenabfrage zu allen Lernzielen", GOALS.every((g,i)=>S.thumb[i])]]
+];
+function reqDone(i){ return REQ[i]().every(r=>r[1]); }
+function stDone(i){ return S.unlockAll || reqDone(i); }
+function maxOpen(){ let i=0; while(i<STATIONS.length-1 && stDone(i)) i++; return i; }
+
+/* Teilbereiche, die erst nach einem vorherigen Schritt aufgehen */
+function cardOf(st, h3start){ const h=$$(`section[data-st='${st}'] h3`).find(x=>x.textContent.trim().startsWith(h3start)); return h?h.closest(".card"):null; }
+const NEEDS = [
+  [0,"1 · Blitzrunde",()=>kOk(),"Trage zuerst dein Kürzel ein."],
+  [0,"2 · Betrachte",()=>blitzAllOk(),"Notiere zuerst drei verschiedene Merkmale eines Berichts."],
+  [1,"2 · Ordne zu",()=>Object.keys(S.flip).length>=TERMS.length,"Öffne zuerst alle Begriffskarten und lies die Erklärungen."],
+  [1,"3 · Analysieren oder",()=>!!S.matchOk,"Löse zuerst die Zuordnung richtig."],
+  [1,"4 · Unser Mustersatz",()=>opsOk(),"Löse zuerst den Operator-Check."],
+  [3,"2 · Gibt es einen",()=>sortOk(),"Ordne zuerst alle Informationskarten richtig zu."],
+  [3,"3 · Beurteile",()=>S.choice.wider==="knoechel","Finde zuerst den Widerspruch."],
+  [3,"Für schnelle Gruppen",()=>begOk(),"Erst Aufgabe 3 vollständig lösen."],
+  [4,"2 · Was fällt",()=>redeMarked(),"Markiere zuerst alle Redezeichen und Begleitsätze."],
+  [5,"2 · Dein eigener",()=>!!S.clozeOk,"Vervollständige zuerst das Merkblatt richtig."],
+  [5,"3 · Schreibe einen",()=>VAL.eigenBeleg(S.f.eigenBeleg)[0],"Schreibe zuerst deinen Beispielsatz mit Textbeleg."],
+  [5,"4 · Partnerabgleich",()=>!!S.abOk,"Schreibe zuerst den Satz mit direkter Rede fehlerfrei ab."],
+  [5,"5 · Ab in den",()=>reqDone(5),"Erst alle Aufgaben der Sicherung lösen."],
+  [6,"2 · Daumenabfrage",()=>VAL.vorstellen(S.f.vorstellen)[0],"Notiere zuerst eine Information für die Vorstellung."]
+];
+
+function refreshGate(){
+  const mo = maxOpen();
+  // Navigation
+  $$("#nav button").forEach((b,i)=>{
+    const locked = i>mo;
+    b.disabled = locked;
+    b.classList.toggle("locked-st",locked);
+    b.classList.toggle("done", stDone(i) && !S.unlockAll);
+  });
+  // Weiter-Buttons
+  $$("[data-go]").forEach(b=>{ const to=+b.dataset.go; const from=+b.closest(".station").dataset.st; if(to>from) b.disabled=!stDone(from); });
+  // Checklisten
+  $$(".req").forEach(el=>{
+    const i=+el.dataset.req; const r=REQ[i](); const open=r.filter(x=>!x[1]);
+    if(S.unlockAll){ el.className="req ok"; el.innerHTML="Lehrkraft hat alle Stationen freigeschaltet."; return; }
+    el.className="req"+(open.length?"":" ok");
+    el.innerHTML = open.length
+      ? `<b>Erst wenn alles erledigt ist, geht es weiter:</b><ul>${r.map(x=>`<li class="${x[1]?"y":"n"}">${x[1]?"✓":"○"} ${x[0]}</li>`).join("")}</ul>`
+      : (i===6 ? "<b>✓ Geschafft!</b> Du hast alle Aufgaben dieser Stunde gelöst." : "<b>✓ Alles erledigt.</b> Du kannst weitergehen.");
+  });
+  // Teilbereiche
+  NEEDS.forEach(([st,h,fn,msg])=>{ const c=cardOf(st,h); if(!c) return; const lk=!S.unlockAll && !fn(); c.classList.toggle("locked",lk); c.dataset.needmsg=msg; c.inert = lk; });
+  // Analyse-Reiter
+  $$("#anaTabs button").forEach(b=>{ const k=b.dataset.sub; const open=subOpen(k); b.disabled=!open; b.classList.toggle("done",subDone(k)); b.title=open?"":"Erst den vorherigen Schritt lösen"; });
+  // Beispiel-Buttons
+  const mb=$("[data-model=modelBeg]"); if(mb){ mb.disabled = !begOk(); }
+  const m3=$("[data-model=modelM3]"); if(m3){ m3.disabled = !VAL.m3Satz(S.f.m3Satz)[0]; }
+  // Basis-Badge
+  const bb=$("#basisBadge"); if(bb) bb.style.display=S.basis?"":"none";
+  if(cur===6) buildSummary();
+}
+
+/* ---------- Navigation ---------- */
+let cur = Math.min(S.cur||0, 6);
+function buildNav(){
+  const nav = $("#nav"); nav.innerHTML = "";
+  STATIONS.forEach((s,i)=>{
+    const b = document.createElement("button");
+    b.innerHTML = `<span class="n">Station ${i}</span><span class="t">${s.t}</span>`;
+    b.onclick = ()=>go(i);
+    if(i===cur) b.classList.add("active");
+    nav.appendChild(b);
+  });
+  refreshGate();
+}
+function go(i){
+  if(i>maxOpen()) return;
+  cur = i; S.cur = i; S.reached = Math.max(S.reached||0, i); save();
+  $$(".station").forEach(s=>s.classList.toggle("active", +s.dataset.st===i));
+  buildNav(); resetTimer(); placeMaterial(i);
+  if(i===6) buildSummary();
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+$$("[data-go]").forEach(b=>b.onclick=()=>go(+b.dataset.go));
+
+/* ---------- Zeit je Station (für die Lernstandsübersicht) ---------- */
+setInterval(()=>{ if(document.visibilityState==="visible"){ S.time[cur]=(S.time[cur]||0)+5; save(); } },5000);
+
+/* ---------- Timer ---------- */
+let tLeft=0,tRun=false,tInt=null;
+function fmt(s){ const neg=s<0; s=Math.abs(s); return (neg?"−":"")+Math.floor(s/60)+":"+String(s%60).padStart(2,"0"); }
+function paintTimer(){ const t=$("#timer"); t.textContent="⏱ "+fmt(tLeft)+(tRun?"":" ▸"); t.classList.toggle("warn",tLeft<=60&&tLeft>0); t.classList.toggle("over",tLeft<=0); }
+function resetTimer(){ clearInterval(tInt); tRun=false; tLeft=STATIONS[cur].min*60; paintTimer(); }
+$("#timer").onclick=()=>{ if(tRun){ clearInterval(tInt); tRun=false; } else { tRun=true; tInt=setInterval(()=>{tLeft--;paintTimer();},1000);} paintTimer(); };
+
+/* ---------- Hilfen (nur über Lehrkraft-Bereich) ---------- */
+function paintBasis(){ document.body.classList.toggle("basis",!!S.basis); const b=$("#tBasis"); if(b) b.textContent="Hilfen auf diesem Gerät: "+(S.basis?"an":"aus"); }
+
+/* ---------- Tipps / Modelle ---------- */
+document.addEventListener("click",e=>{
+  const t=e.target.closest("[data-tip]"); if(t){ $("#"+t.dataset.tip).classList.toggle("show"); S.tips=(S.tips||0)+1; save(); }
+  const m=e.target.closest("[data-model]"); if(m && !m.disabled){ $("#"+m.dataset.model).classList.toggle("show"); }
+});
+
+/* ---------- Freie Felder speichern + Live-Prüfung ---------- */
+function paintVal(el){
+  const k=el.dataset.save; if(!VAL[k]) return;
+  let v=el.nextElementSibling; if(!v||!v.classList.contains("val")){ v=document.createElement("div"); v.className="val"; el.after(v); }
+  const val=el.value.trim(); if(!val){ v.textContent=""; v.className="val"; return; }
+  const [ok,msg]=VAL[k](el.value); v.className="val "+(ok?"ok":"no"); v.textContent=(ok?"✓ ":"✎ ")+msg;
+}
+function bindSaves(){
+  $$("[data-save]").forEach(el=>{
+    const k=el.dataset.save;
+    if(el.type==="checkbox"){ el.checked=!!S.f[k]; el.onchange=()=>{S.f[k]=el.checked;save();}; }
+    else {
+      if(S.f[k]!=null) el.value=S.f[k];
+      const h=()=>{ S.f[k]=el.value; save(); paintVal(el); };
+      el.addEventListener("input",h); el.addEventListener("change",h); paintVal(el);
+    }
+  });
+}
+
+$("#goalList").innerHTML = GOALS.map(g=>`<li>${g}</li>`).join("");
+
+/* =========================================================
+   Material-Panel
+   ========================================================= */
+const matEl = document.createElement("div");
+matEl.appendChild($("#tplMat").content.cloneNode(true));
+const textA = $(".textA",matEl);
+let MODE = "none";
+let activeWQ = null;
+let pen = S.choice.pen || "rede";
+let anaSub = "wf";
+
+function tokenize(line){
+  const raw = line.match(/„|“|[^\s„“,:]+|[,:]/g) || [];
+  const out=[];
+  raw.forEach(w=>{ if(w.length>1 && /[.]$/.test(w) && !/^[A-ZÄÖÜ]\.$/.test(w)){ out.push(w.slice(0,-1)); out.push("."); } else out.push(w); });
+  return out;
+}
+function renderTextA(){
+  let h = `<h3>Text A · ${TITLE_A}</h3>`;
+  LINES.forEach((ln,i)=>{
+    const n=i+1, toks=tokenize(ln); let inner="";
+    toks.forEach((t,j)=>{ const ns = j>0 && (/^[.,:“]$/.test(t) || toks[j-1]==="„"); inner += (j>0&&!ns?" ":"") + `<span class="tok" data-id="${n}-${j}" data-w="${t}">${t}</span>`; });
+    const gap = PARAS.some(p=>p[1]===n && n!==LINES.length) ? " gap":"";
+    h += `<div class="tline${gap}" data-l="${n}"><span class="ln">${n}</span><span>${inner}</span></div>`;
+  });
+  textA.innerHTML = h; paintMarks();
+}
+function paintMarks(){
+  $$(".tok",textA).forEach(t=>{ t.classList.remove("zeit","stil","rede","begl"); const m=S.marks[t.dataset.id]; if(m) m.forEach(c=>{ if(c===MODE||(MODE==="rede"&&c==="begl")) t.classList.add(c); }); });
+  $$(".tline",textA).forEach(l=>{
+    l.classList.remove("sel","para1","para2","para3");
+    if(MODE==="lines" && activeWQ && (S.wq[activeWQ]?.lines||[]).includes(+l.dataset.l)) l.classList.add("sel");
+    if(S.aufOk && cur===2 && anaSub==="auf"){ const n=+l.dataset.l; PARAS.forEach((p,i)=>{ if(n>=p[0]&&n<=p[1]) l.classList.add("para"+(i+1)); }); }
+  });
+}
+function setMode(m,msg){
+  MODE=m;
+  textA.classList.toggle("mode-lines",m==="lines");
+  textA.classList.toggle("mode-words",["stil","zeit","rede"].includes(m));
+  const bar=$(".modebar",matEl); bar.classList.toggle("show",!!msg); bar.innerHTML=msg||"";
+  if(m!=="none") showMat("A");
+  paintMarks();
+}
+function showMat(k){
+  $$(".mtabs button",matEl).forEach(b=>b.classList.toggle("active",b.dataset.m===k));
+  $$(".mpane",matEl).forEach(p=>p.classList.toggle("active",p.dataset.m===k));
+}
+$$(".mtabs button",matEl).forEach(b=>b.onclick=()=>showMat(b.dataset.m));
+
+/* Fehlklick-Sperre beim Markieren: 3 Fehlklicks hintereinander => Wartezeit */
+function wordFbEl(){ return MODE==="zeit"?$("#zeitFb"):MODE==="stil"?$("#stilFb"):$("#redeFb"); }
+function errKeyClick(){ return "s"+cur+":klick-"+(MODE==="rede"?pen:MODE); }
+function wordMiss(){
+  const ek=errKeyClick(), lk="s"+cur+":klick-"+MODE;
+  S.err[ek]=(S.err[ek]||0)+1;
+  S.miss[MODE]=(S.miss[MODE]||0)+1;
+  if(S.miss[MODE]>=3){ S.miss[MODE]=0; S.lockN[lk]=(S.lockN[lk]||0)+1; S.lock[lk]=Date.now()+Math.min(10*S.lockN[lk],30)*1000; lockUI(lk,[],wordFbEl()); textLockTick(lk); }
+  save();
+}
+function textLockTick(key){
+  const l=lockLeft(key); textA.classList.toggle("wlocked",l>0);
+  if(l>0) setTimeout(()=>textLockTick(key),500);
+}
+
+textA.addEventListener("click",e=>{
+  if(MODE==="lines"){
+    const l=e.target.closest(".tline"); if(!l||!activeWQ) return;
+    const st=S.wq[activeWQ]=S.wq[activeWQ]||{lines:[]}; if(st.ok) return;
+    const n=+l.dataset.l;
+    st.lines = st.lines.includes(n) ? st.lines.filter(x=>x!==n) : [...st.lines,n].sort((a,b)=>a-b);
+    save(); paintMarks(); updateWQ(activeWQ); return;
+  }
+  const t=e.target.closest(".tok"); if(!t) return;
+  if(lockLeft("s"+cur+":klick-"+MODE)>0) return;
+  const id=t.dataset.id, w=t.dataset.w, lw=w.toLowerCase();
+  const has=c=>(S.marks[id]||[]).includes(c);
+  const toggle=c=>{ const a=S.marks[id]||[]; S.marks[id]=a.includes(c)?a.filter(x=>x!==c):[...a,c]; if(!S.marks[id].length) delete S.marks[id]; save(); paintMarks(); };
+  const hit=()=>{ S.miss[MODE]=0; };
+  const wrong=(msg,el)=>{ t.classList.add("wrong"); setTimeout(()=>t.classList.remove("wrong"),400); fb(el,"no",msg); wordMiss(); };
+  if(MODE==="zeit"){
+    if(has("zeit")) toggle("zeit");
+    else if(PRAET.includes(lw)){ hit(); toggle("zeit"); fb($("#zeitFb"),"ok",`Richtig: „${w}“ ist Präteritum.`); }
+    else {
+      const det = ["ist","weggerutscht"].includes(lw)?"z-perf":["wird","gewischt"].includes(lw)?"z-praes":["aus","ab","mit","hinzu"].includes(lw)?"z-part":["festhalten","aufstehen","gehen","untersuchen"].includes(lw)?"z-inf":null;
+      if(det) S.err["s2:"+det]=(S.err["s2:"+det]||0)+1;
+      wrong(ZEIT_MSG[lw] || `„${w}“ ist kein Verb in der Vergangenheit.`, $("#zeitFb"));
+    }
+    countZeit();
+  } else if(MODE==="stil"){
+    if(has("stil")) toggle("stil");
+    else if(STIL_OK.includes(lw)){ hit(); toggle("stil"); fb($("#stilFb"),"ok",`Gut: „${w}${lw==="teilte"?" … mit":""}“ teilt sachlich mit, was jemand beobachtet oder gesagt hat.`); }
+    else wrong(`„${w}“ ist kein Verb des Mitteilens oder Beobachtens.`, $("#stilFb"));
+    countStil();
+  } else if(MODE==="rede"){
+    const isQ=(w==="„"||w==="“"); const [ln,ix]=id.split("-").map(Number);
+    const isB=(ln===9&&(w==="Er"||w==="sagte"))||(ln===13&&ix<=2&&w!==".");
+    if(pen==="rede"){
+      if(has("rede")) toggle("rede");
+      else if(isQ){ hit(); toggle("rede"); fb($("#redeFb"),"ok","Redezeichen gefunden."); }
+      else wrong("Das ist kein Redezeichen. Achte auf die kleinen Zeichen „ und “.",$("#redeFb"));
+    } else {
+      if(has("begl")) toggle("begl");
+      else if(isB){ hit(); toggle("begl"); fb($("#redeFb"),"ok",`„${w}“ gehört zum Begleitsatz.`); }
+      else if(isQ) wrong("Das ist ein Redezeichen. Nimm dafür den roten Stift.",$("#redeFb"));
+      else wrong("Dieses Wort gehört nicht zu einem Begleitsatz. Der Begleitsatz sagt, wer spricht.",$("#redeFb"));
+    }
+    countRede();
+  }
+});
+
+function placeMaterial(i){
+  const host = {2:"#matHost2",3:"#matHost3",4:"#matHost4"}[i];
+  if(!host) return;
+  $(host).appendChild(matEl);
+  $(".m3tab",matEl).style.display = (i===3)?"":"none";
+  $(".mtabs",matEl).style.display = (i===2||i===4)?"none":"";
+  if(i===2){ showMat("A"); applyAnaMode(); }
+  if(i===3){ setMode("none",""); showMat("M1"); }
+  if(i===4){ setMode("rede", penMsg()); }
+  textLockTick("s"+i+":klick-"+MODE);
+}
+
+/* ---------- Auswahl-Buttons mit Rateschutz ---------- */
+function bindChoice(container,key,correct,fbEl,msgOk,msgNo){
+  const btns=$$("button",container);
+  const stn=container.closest(".station")?.dataset.st;
+  const lk="s"+stn+":"+key;
+  const paint=()=>{
+    const v=S.choice[key], ok=v===correct;
+    btns.forEach(b=>{ b.classList.remove("picked","ok","no"); if(b.dataset.v===v) b.classList.add(ok?"ok":"no"); });
+    if(ok) btns.forEach(b=>{ b.disabled=true; b.dataset.keepDisabled="1"; });
+  };
+  btns.forEach(b=>b.onclick=()=>{
+    if(lockLeft(lk)>0 || S.choice[key]===correct) return;
+    S.choice[key]=b.dataset.v; const ok=b.dataset.v===correct;
+    if(ok) fb(fbEl,"ok",msgOk);
+    else { penalize(lk); fb(fbEl,"no",msgNo); lockUI(lk,btns,fbEl); }
+    save(); paint();
+  });
+  paint();
+  if(S.choice[key]===correct) fb(fbEl,"ok",msgOk);
+  else if(lockLeft(lk)>0) lockUI(lk,btns,fbEl);
+}
+
+/* =========================================================
+   Station 1: Begriffe
+   ========================================================= */
+function buildFlip(){
+  const g=$("#flipgrid"); g.innerHTML="";
+  TERMS.forEach((t,i)=>{
+    const b=document.createElement("button"); b.className="flip"+(S.flip[i]?" seen":"");
+    b.innerHTML=`<span class="kind">${t.k}</span><span class="term">${t.t}</span><div class="def">${t.d}</div>`;
+    b.onclick=()=>{ b.classList.toggle("open"); S.flip[i]=true; b.classList.add("seen"); save(); $("#flipCount").textContent=Object.keys(S.flip).length+"/"+TERMS.length; };
+    g.appendChild(b);
+  });
+  $("#flipCount").textContent=Object.keys(S.flip).length+"/"+TERMS.length;
+}
+function buildMatch(){
+  const opts=[...new Set(MATCH.map(m=>m.a))].sort();
+  $("#matchBox").innerHTML = MATCH.map((m,i)=>`<div class="match-row" id="mr${i}"><span>${m.d}</span><select data-save="match${i}"><option value="">Begriff wählen …</option>${opts.map(o=>`<option>${o}</option>`).join("")}</select></div>`).join("");
+}
+function paintMatchDone(){ if(S.matchOk){ MATCH.forEach((m,i)=>{ const r=$("#mr"+i); r.classList.add("ok"); $("select",r).disabled=true; }); $("#matchCheck").disabled=true; $("#matchCheck").dataset.keepDisabled="1"; fb($("#matchFb"),"ok","Alles richtig! Die Begriffe sitzen."); } }
+$("#matchCheck").onclick=()=>{
+  const key="s1:zuordnung"; if(lockLeft(key)>0) return;
+  const vals=MATCH.map((m,i)=>$(`#mr${i} select`).value);
+  if(vals.some(v=>!v)){ fb($("#matchFb"),"info","Wähle zuerst zu jeder Erklärung einen Begriff."); return; }
+  let ok=0;
+  MATCH.forEach((m,i)=>{ const r=$("#mr"+i); const good=vals[i]===m.a; r.classList.toggle("ok",good); r.classList.toggle("no",!good); if(good) ok++; });
+  if(ok===MATCH.length){ S.matchOk=true; save(); paintMatchDone(); return; }
+  MATCH.forEach((m,i)=>{ if(vals[i]!==m.a) S.err["s1:m"+i]=(S.err["s1:m"+i]||0)+1; });
+  penalize(key);
+  fb($("#matchFb"),"no",`${ok} von ${MATCH.length} richtig. Die falschen Felder werden geleert – lies die Karten oben noch einmal.`);
+  lockUI(key,[$("#matchCheck")],$("#matchFb"));
+  setTimeout(()=>{ MATCH.forEach((m,i)=>{ const r=$("#mr"+i), s=$("select",r); if(s.value!==m.a){ s.value=""; S.f["match"+i]=""; r.classList.remove("no"); } }); save(); },1500);
+};
+function buildOps(){
+  $("#opBox").innerHTML = OPS.map((o,i)=>`<div class="stmt"><span>${o.q}</span><div class="choice" data-op="${i}"><button data-v="analysieren">analysieren</button><button data-v="vergleichen">vergleichen</button></div></div>`).join("")+`<div class="fb" id="opFb"></div>`;
+  $$("[data-op]").forEach(c=>{ const i=+c.dataset.op; const a=OPS[i].a;
+    bindChoice(c,"op"+i,a,$("#opFb"), a==="vergleichen"?"Richtig: Es geht um Gemeinsamkeiten und Unterschiede.":"Richtig: Ein Text wird nach einem Kriterium untersucht und belegt.",
+      "Noch nicht: Werden zwei Dinge gegenübergestellt (vergleichen) oder wird ein Text genau untersucht (analysieren)?"); });
+}
+
+/* =========================================================
+   Station 2: Analyse
+   ========================================================= */
+$$("#anaTabs button").forEach(b=>b.onclick=()=>{ if(b.disabled) return; anaSub=b.dataset.sub; $$("#anaTabs button").forEach(x=>x.classList.toggle("active",x===b)); $$("[data-st='2'] .sub").forEach(s=>s.classList.toggle("active",s.dataset.sub===anaSub)); applyAnaMode(); });
+function applyAnaMode(){
+  if(cur!==2) return;
+  if(anaSub==="wf") setMode(activeWQ?"lines":"none", activeWQ ? `<b style="color:var(--wf)">Beleg wählen für „${WQ.find(w=>w.id===activeWQ).q}“:</b> Tippe auf die passende(n) Zeile(n).` : "Wähle rechts bei einer W-Frage „Beleg wählen“.");
+  else if(anaSub==="stil") setMode("stil",`<b style="color:var(--stil)">Stift: sachliche Verben</b> – tippe Wörter im Text an.`);
+  else if(anaSub==="zeit") setMode("zeit",`<b style="color:var(--zeit)">Stift: Präteritum</b> – tippe Verben im Text an.`);
+  else setMode("none","");
+  textLockTick("s2:klick-"+MODE);
+}
+function lineLabel(arr){
+  if(!arr||!arr.length) return "–";
+  const r=[]; let s=arr[0],p=arr[0];
+  for(let i=1;i<=arr.length;i++){ if(arr[i]===p+1){p=arr[i];continue;} r.push(s===p?`${s}`:`${s}–${p}`); s=p=arr[i]; }
+  return "Z. "+r.join(", ");
+}
+function buildWQ(){
+  const box=$("#wqBox"); box.innerHTML="";
+  wqList().forEach(w=>{
+    const st=S.wq[w.id]||{lines:[]};
+    const d=document.createElement("div"); d.className="wq"+(activeWQ===w.id?" active":"")+(st.ok?" ok":""); d.id="wq-"+w.id;
+    d.innerHTML=`<div class="wq-head"><span><b>${w.q}</b> ${w.task}</span>${st.ok?'<span class="badge" style="background:var(--ok-bg);color:var(--ok)">✓ gelöst</span>':'<button class="btn small sec" data-pick>Beleg wählen</button>'}</div>
+      <div style="margin:6px 0">Beleg: <span class="beleg">${lineLabel(st.lines)}</span></div>
+      <input type="text" placeholder="Ergebnis in Stichpunkten" ${st.ok?"readonly":""} value="${(st.txt||"").replace(/"/g,"&quot;")}">
+      <div class="row" style="margin-top:8px">${st.ok?"":'<button class="btn small" data-chk>Prüfen</button><button class="btn tip small" data-t>Tipp</button>'}${st.ok?'<button class="btn sec small" data-m>Mit Erwartung vergleichen</button>':""}</div>
+      <div class="tipbox">${w.tip}</div><div class="fb"></div><div class="model">${w.model}</div>`;
+    const pick=$("[data-pick]",d); if(pick) pick.onclick=()=>{ activeWQ = activeWQ===w.id?null:w.id; buildWQ(); applyAnaMode(); };
+    $("input",d).oninput=e=>{ (S.wq[w.id]=S.wq[w.id]||{lines:[]}).txt=e.target.value; save(); };
+    const tb=$("[data-t]",d); if(tb) tb.onclick=()=>{ $(".tipbox",d).classList.toggle("show"); S.tips=(S.tips||0)+1; save(); };
+    const mb=$("[data-m]",d); if(mb) mb.onclick=()=>$(".model",d).classList.toggle("show");
+    const cb=$("[data-chk]",d); if(cb){ cb.onclick=()=>checkWQ(w,d); if(lockLeft("s2:"+w.id)>0) lockUI("s2:"+w.id,[cb],$(".fb",d)); }
+    box.appendChild(d);
+  });
+}
+function updateWQ(id){ const d=$("#wq-"+id); if(d) $(".beleg",d).textContent=lineLabel(S.wq[id].lines); }
+function checkWQ(w,d){
+  const key="s2:"+w.id; if(lockLeft(key)>0) return;
+  const st=S.wq[w.id]=S.wq[w.id]||{lines:[]}; const L=st.lines, f=$(".fb",d), txt=(st.txt||"").toLowerCase();
+  const fail=msg=>{ penalize(key); fb(f,"no",msg); lockUI(key,[$("[data-chk]",d)],f); };
+  if(!L.length){ fb(f,"info","Wähle zuerst mit „Beleg wählen“ mindestens eine Zeile aus."); return; }
+  if(!txt.trim()){ fb(f,"info","Notiere zuerst dein Ergebnis in Stichpunkten."); return; }
+  if(!L.some(n=>w.core.includes(n))) return fail("Die wichtigste Textstelle fehlt noch. Lies den Text noch einmal genau.");
+  if(L.some(n=>!w.ok.includes(n))) return fail(`Nicht alle Zeilen passen: ${lineLabel(L.filter(n=>!w.ok.includes(n)))} beantwortet diese W-Frage nicht.`);
+  if(!w.kw.every(g=>g.some(k=>txt.includes(k)))) return fail("Der Beleg stimmt, aber dein Ergebnis passt noch nicht. "+w.kwMsg);
+  st.ok=true; save();
+  if(activeWQ===w.id) activeWQ=null;
+  buildWQ(); applyAnaMode();
+  fb($(".fb",$("#wq-"+w.id)),"ok",`Richtig belegt (${lineLabel(L)}).`);
+  if(subDone("wf")) fb($("#wqAll"),"ok","Alle W-Fragen belegt! Weiter mit ② Aufbau.");
+}
+
+function buildAuf(){
+  $("#aufBox").innerHTML = PARAS.map((p,i)=>`<div class="stmt" style="grid-template-columns:110px minmax(0,1fr)"><b>Z. ${p[0]}–${p[1]}</b>
+    <div class="row"><select data-save="aufP${i}"><option value="">Teil …</option>${AUF_PARTS.map(o=>`<option>${o}</option>`).join("")}</select>
+    <select data-save="aufC${i}"><option value="">Inhalt …</option>${AUF_CONTENT.map(o=>`<option>${o}</option>`).join("")}</select></div></div>`).join("");
+}
+function paintAufDone(){ if(!S.aufOk) return; $$("#aufBox select").forEach(s=>{s.disabled=true;s.style.borderColor="var(--ok)";}); const b=$("#aufCheck"); b.disabled=true; b.dataset.keepDisabled="1"; fb($("#aufFb"),"ok","Richtig! Die drei Teile sind jetzt in Text A grün markiert."); }
+$("#aufCheck").onclick=()=>{
+  const key="s2:aufbau"; if(lockLeft(key)>0) return;
+  const sels=AUF_SOL.map((s,i)=>[$(`[data-save=aufP${i}]`),$(`[data-save=aufC${i}]`)]);
+  if(sels.flat().some(s=>!s.value)){ fb($("#aufFb"),"info","Wähle zuerst für alle drei Abschnitte Teil und Inhalt."); return; }
+  let ok=0;
+  AUF_SOL.forEach((s,i)=>{ const [p,c]=sels[i]; p.style.borderColor=p.value===s.p?"var(--ok)":"var(--no)"; c.style.borderColor=c.value===s.c?"var(--ok)":"var(--no)"; if(p.value===s.p) ok++; if(c.value===s.c) ok++; });
+  if(ok===6){ S.aufOk=true; save(); paintMarks(); paintAufDone(); return; }
+  penalize(key); fb($("#aufFb"),"no",`${ok} von 6 richtig. Rot umrandete Felder noch einmal prüfen.`); lockUI(key,[$("#aufCheck")],$("#aufFb"));
+};
+
+function countStil(){ const n=countMarks("stil"); $("#stilCount").textContent=Math.min(n,3)+"/3"+(n>3?" (+"+(n-3)+")":""); if(n>=3) fb($("#stilFb"),"ok","Drei sachliche Verben gefunden!"); }
+function countZeit(){ const n=countMarks("zeit"); $("#zeitCount").textContent=Math.min(n,5)+"/5"+(n>5?" (+"+(n-5)+")":""); if(n>=5) fb($("#zeitFb"),"ok","Fünf Verben im Präteritum gefunden!"); }
+function buildWert(){
+  $("#wertBox").innerHTML = WERT.map((w,i)=>`<div class="stmt"><span>${w.s}</span><div class="choice" data-wert="${i}"><button data-v="sachlich">sachlich</button><button data-v="wertend">wertend</button></div></div>`).join("")+`<div class="fb" id="wertFb"></div>`;
+  $$("[data-wert]").forEach(c=>{ const i=+c.dataset.wert; bindChoice(c,"wert"+i,WERT[i].a,$("#wertFb"),"Richtig eingeordnet.", WERT[i].a==="wertend"?"Achte auf Wörter wie „total“, „mega“ oder „schlampig“.":"Hier steht nur, was passiert ist – ohne Meinung."); });
+}
+/* =========================================================
+   Station 3: Vergleich
+   ========================================================= */
+let pickedCard=null;
+function buildSort(){
+  const pool=$("#pool"); $$(".col").forEach(c=>$$(".icard",c).forEach(x=>x.remove())); pool.innerHTML="";
+  const done=sortOk();
+  SORT.forEach(s=>{
+    const b=document.createElement("button"); b.className="icard"+(done?" ok":""); b.textContent=s.t; b.dataset.id=s.id;
+    b.onclick=(e)=>{ e.stopPropagation(); if(sortOk()) return; pickedCard = pickedCard===s.id?null:s.id; paintSortPick(); };
+    (S.sort[s.id] ? $(`.col[data-k=${S.sort[s.id]}]`) : pool).appendChild(b);
+  });
+  paintSortPick();
+  if(done){ ["#sortCheck","#sortReset"].forEach(x=>{ $(x).disabled=true; $(x).dataset.keepDisabled="1"; }); fb($("#sortFb"),"ok","Alles richtig zugeordnet! Skizze und Tabelle liefern vor allem genaue Zeit- und Ortsangaben."); }
+}
+function paintSortPick(){ $$(".icard").forEach(b=>b.classList.toggle("picked",b.dataset.id===pickedCard)); $$(".col").forEach(c=>c.classList.toggle("target",!!pickedCard)); }
+$$(".col").forEach(c=>c.onclick=()=>{ if(!pickedCard) return; S.sort[pickedCard]=c.dataset.k; pickedCard=null; save(); buildSort(); });
+$("#pool").onclick=()=>{ if(!pickedCard) return; delete S.sort[pickedCard]; pickedCard=null; save(); buildSort(); };
+$("#sortReset").onclick=()=>{ if(sortOk()) return; S.sort={}; save(); buildSort(); $("#sortFb").className="fb"; };
+$("#sortCheck").onclick=()=>{
+  const key="s3:sortieren"; if(lockLeft(key)>0) return;
+  const placed=SORT.filter(s=>S.sort[s.id]).length;
+  if(placed<SORT.length){ fb($("#sortFb"),"info",`Ordne zuerst alle Karten zu (${SORT.length-placed} fehlen noch).`); return; }
+  let ok=0;
+  SORT.forEach(s=>{ const b=$(`.icard[data-id=${s.id}]`); const r=S.sort[s.id]===s.k; b.classList.add(r?"ok":"no"); if(r) ok++; });
+  if(ok===SORT.length){ S.sortChecked=true; save(); buildSort(); return; }
+  SORT.forEach(s=>{ if(S.sort[s.id]!==s.k) S.err["s3:c-"+s.id]=(S.err["s3:c-"+s.id]||0)+1; });
+  penalize(key);
+  fb($("#sortFb"),"no",`${ok} von ${SORT.length} richtig. Die roten Karten kommen zurück in den Stapel. Prüfe sie in Text A, M1 und M2.`);
+  lockUI(key,[$("#sortCheck")],$("#sortFb"));
+  setTimeout(()=>{ SORT.forEach(s=>{ if(S.sort[s.id]!==s.k) delete S.sort[s.id]; }); save(); buildSort(); },1600);
+};
+function buildPick(){ const s=$("#pickInfo"); SORT.filter(x=>x.k==="m").forEach(x=>{ const o=document.createElement("option"); o.textContent=x.t; s.appendChild(o); }); }
+
+/* =========================================================
+   Station 4: Direkte Rede
+   ========================================================= */
+function penMsg(){ return pen==="rede" ? `<b style="color:var(--rede)">Roter Stift: Redezeichen</b> – tippe „ und “ an.` : `<b style="color:#0e7490">Blauer Stift: Begleitsatz</b> – tippe die Wörter an, die sagen, wer spricht.`; }
+function bindPen(){
+  const btns=$$("#penQ button");
+  const paint=()=>btns.forEach(b=>b.classList.toggle("picked",b.dataset.v===pen));
+  btns.forEach(b=>b.onclick=()=>{ pen=b.dataset.v; S.choice.pen=pen; save(); paint(); if(cur===4) setMode("rede",penMsg()); });
+  paint();
+}
+function countRede(){
+  const r=countMarks("rede"), b=countMarks("begl");
+  $("#redeCount").textContent=r+"/4"; $("#beglCount").textContent=b+"/5";
+  if(r===4&&b===5) fb($("#redeFb"),"ok","Alle Redezeichen und Begleitsätze markiert!");
+}
+
+/* =========================================================
+   Station 5: Sicherung
+   ========================================================= */
+let activeBlank=0; const blanks=[];
+function buildCloze(){
+  let h="", bi=0;
+  CLOZE.forEach(p=>{ if(typeof p==="string") h+=p; else { blanks.push(p); h+=`<button class="blank" data-b="${bi}">${S.cloze[bi]||"&nbsp;"}</button>`; bi++; } });
+  $("#cloze").innerHTML=h;
+  $("#bank").innerHTML=BANK.map(w=>`<button data-w="${w}">${w}</button>`).join("");
+  $$(".blank").forEach(b=>b.onclick=()=>{ if(S.clozeOk) return; const i=+b.dataset.b; if(S.cloze[i] && activeBlank===i){ delete S.cloze[i]; save(); } activeBlank=i; paintCloze(); });
+  $$("#bank button").forEach(b=>b.onclick=()=>{
+    if(activeBlank==null || S.clozeOk) return;
+    S.cloze[activeBlank]=b.dataset.w; save();
+    const next=blanks.findIndex((x,i)=>!S.cloze[i]); activeBlank=next<0?null:next; paintCloze();
+  });
+  const first=blanks.findIndex((x,i)=>!S.cloze[i]); activeBlank=first<0?null:first; paintCloze();
+  if(S.clozeOk) clozeDone();
+}
+function paintCloze(){
+  $$(".blank").forEach(b=>{ const i=+b.dataset.b; b.innerHTML=S.cloze[i]||"&nbsp;"; b.classList.remove("ok","no"); b.classList.toggle("act",i===activeBlank); });
+  const used=Object.values(S.cloze); $$("#bank button").forEach(b=>b.classList.toggle("used",used.includes(b.dataset.w)));
+}
+function clozeResult(){
+  const usedInGroup={}; return blanks.map((p,i)=>{ const v=S.cloze[i]; const u=usedInGroup[p.g]=usedInGroup[p.g]||[]; const r=v&&p.a.includes(v)&&!u.includes(v); if(r) u.push(v); return r; });
+}
+function clozeDone(){ $$(".blank").forEach(b=>{ b.classList.add("ok"); b.classList.remove("act"); }); const c=$("#clozeCheck"); c.disabled=true; c.dataset.keepDisabled="1"; fb($("#clozeFb"),"ok","Dein Merkblatt ist vollständig und richtig!"); }
+$("#clozeCheck").onclick=()=>{
+  const key="s5:merkblatt"; if(lockLeft(key)>0) return;
+  if(blanks.some((p,i)=>!S.cloze[i])){ fb($("#clozeFb"),"info","Fülle zuerst alle Lücken."); return; }
+  const res=clozeResult(); const ok=res.filter(Boolean).length;
+  res.forEach((r,i)=>{ const b=$(`.blank[data-b="${i}"]`); b.classList.add(r?"ok":"no"); b.classList.remove("act"); });
+  if(ok===blanks.length){ S.clozeOk=true; save(); clozeDone(); return; }
+  [...new Set(blanks.filter((p,i)=>!res[i]).map(p=>p.g))].forEach(g=>{ S.err["s5:g-"+g]=(S.err["s5:g-"+g]||0)+1; });
+  penalize(key);
+  fb($("#clozeFb"),"no",`${ok} von ${blanks.length} Lücken richtig. Die falschen Lücken werden geleert.`);
+  lockUI(key,[$("#clozeCheck")],$("#clozeFb"));
+  setTimeout(()=>{ res.forEach((r,i)=>{ if(!r) delete S.cloze[i]; }); const f=blanks.findIndex((x,i)=>!S.cloze[i]); activeBlank=f<0?null:f; save(); paintCloze(); },1600);
+};
+$$("[data-ins]").forEach(b=>b.onclick=()=>{ const ta=$("#abschrift"); if(ta.readOnly) return; const p=ta.selectionStart??ta.value.length; ta.value=ta.value.slice(0,p)+b.dataset.ins+ta.value.slice(ta.selectionEnd??p); ta.focus(); ta.selectionStart=ta.selectionEnd=p+1; S.f.abschrift=ta.value; save(); });
+/* Abschreiben heißt selbst schreiben: Einfügen ist gesperrt */
+["paste","drop"].forEach(ev=>$("#abschrift").addEventListener(ev,e=>{ e.preventDefault(); fb($("#abFb"),"info","Einfügen ist hier gesperrt. Schreibe den Satz selbst ab."); }));
+function colorSpeech(sp){ return sp.text.replace(sp.begl,`<span class="q-begl">${sp.begl}</span>`).replace(/[„“]/g,m=>`<span class="q-rede">${m}</span>`); }
+function strictNorm(s){ return s.replace(/\s+/g," ").trim(); }
+function abShow(sp,msg,type){ fb($("#abFb"),type,msg); const prev=$("#abPrev"); prev.style.display="block"; prev.innerHTML=colorSpeech(sp)+`<div class="hint" style="margin-top:6px"><span class="q-rede">rot</span> = Redezeichen · <span class="q-begl">blau</span> = Begleitsatz</div>`; }
+$("#abCheck").onclick=()=>{
+  const v=$("#abschrift").value.trim(); const prev=$("#abPrev");
+  const sp=SPEECH.find(s=>norm(s.text)===norm(v));
+  if(!v){ fb($("#abFb"),"no","Schreibe zuerst einen Satz ab."); prev.style.display="none"; return; }
+  if(!sp){ S.err["s5:abschrift"]=(S.err["s5:abschrift"]||0)+1; save(); fb($("#abFb"),"no","Die Wörter stimmen noch nicht mit Text A überein. Vergleiche Wort für Wort (Z. 9–10 oder Z. 12–13)."); prev.style.display="none"; return; }
+  S.f.abWho=SPEECH.indexOf(sp);
+  if(strictNorm(v)===strictNorm(sp.text)){ S.abOk=true; save(); abLock(); abShow(sp,"Fehlerfrei abgeschrieben! So sieht dein Satz mit Markierungen aus:","ok"); }
+  else { S.err["s5:abschrift"]=(S.err["s5:abschrift"]||0)+1; save(); fb($("#abFb"),"no","Die Wörter stimmen, aber mindestens ein Zeichen fehlt oder ist falsch (Redezeichen „ “, Doppelpunkt, Komma oder Punkt). Prüfe Zeichen für Zeichen in Text A."); prev.style.display="none"; }
+};
+function abLock(){ $("#abschrift").readOnly=true; const b=$("#abCheck"); b.disabled=true; b.dataset.keepDisabled="1"; }
+
+$("#printBtn").onclick=()=>{
+  let bi=0, cl=""; CLOZE.forEach(p=>{ if(typeof p==="string") cl+=p; else { cl+=`<u>&nbsp;${S.cloze[bi]||"&nbsp;".repeat(16)}&nbsp;</u>`; bi++; } });
+  const sp = S.f.abWho!=null ? SPEECH[S.f.abWho] : null;
+  const esc = s=>(s||"").replace(/[<>&]/g,c=>({"<":"&lt;",">":"&gt;","&":"&amp;"}[c]));
+  $("#hefter").innerHTML = `<h1>Merkblatt: Analyse eines Berichts</h1>
+    <div style="font-size:10pt">${esc(S.f.name||S.f.kuerzel)||"Name: ______________"} · Deutsch Klasse 7 · Datum: __________</div>
+    <div class="hbox"><b>1 + 2 · Operatoren und Prüfkriterien</b><p style="line-height:1.8">${cl}</p></div>
+    <div class="hbox"><b>3 · Mein Beispielsatz mit Textbeleg</b><p>${esc(S.f.eigenBeleg)||"<br>_____________________________________________________________"}</p></div>
+    <div class="hbox"><b>4 · Direkte Rede aus Text A</b><p>${sp?colorSpeech(sp):(esc(S.f.abschrift)||"<br>_____________________________________________________________")}</p>
+    <p style="font-size:10pt">Redezeichen <span class="q-rede">rot</span> · Begleitsatz <span class="q-begl">blau</span> (Farben bei Bedarf von Hand nachziehen)</p></div>`;
+  window.print();
+};
+
+/* =========================================================
+   Station 6: Abschluss
+   ========================================================= */
+function buildThumbs(){
+  $("#thumbBox").innerHTML = GOALS.map((g,i)=>`<div class="goalrow"><span>${g}</span><div class="thumbs" data-th="${i}"><button data-v="up" aria-label="sicher">👍</button><button data-v="mid" aria-label="teilweise">👌</button><button data-v="down" aria-label="unsicher">👎</button></div></div>`).join("");
+  $$("[data-th]").forEach(c=>{ const i=c.dataset.th; const paint=()=>$$("button",c).forEach(b=>b.classList.toggle("picked",S.thumb[i]===b.dataset.v)); $$("button",c).forEach(b=>b.onclick=()=>{ S.thumb[i]=b.dataset.v; save(); paint(); }); paint(); });
+}
+function errOf(st){ return ERR_KEYS.filter(k=>k[1]===st&&k[3]==="v").reduce((a,k)=>a+(S.err[k[0]]||0),0); }
+function buildSummary(){
+  const items=STATIONS.map((s,i)=>[`Station ${i}: ${s.t}`, reqDone(i), errOf(i)]);
+  $("#summary").innerHTML=`<h3>Dein Stand</h3>`+items.map(([t,ok,e])=>`<div>${ok?"✅":"⬜"} ${t}${e?` <span class="hint">· ${e} Fehlversuch${e>1?"e":""}</span>`:""}</div>`).join("");
+}
+
+/* =========================================================
+   Lehrkraft-Bereich (PIN)
+   ========================================================= */
+$("#teacherBtn").onclick=()=>{ $("#teacher").classList.add("show"); $("#tPin").value=""; $("#tGate").style.display=""; $("#tContent").style.display="none"; setTimeout(()=>$("#tPin").focus(),50); };
+$("#teacherClose").onclick=()=>$("#teacher").classList.remove("show");
+$("#teacher").onclick=e=>{ if(e.target.id==="teacher") $("#teacher").classList.remove("show"); };
+function tryPin(){ if($("#tPin").value.trim()===LEHRER_PIN){ $("#tGate").style.display="none"; $("#tContent").style.display=""; paintTeacher(); } else { fb($("#tPinFb"),"no","Falsche PIN."); } }
+$("#tPinBtn").onclick=tryPin;
+$("#tPin").addEventListener("keydown",e=>{ if(e.key==="Enter") tryPin(); });
+function paintTeacher(){
+  paintBasis();
+  $("#tUnlock").textContent="Sperren auf diesem Gerät: "+(S.unlockAll?"aufgehoben":"aktiv");
+}
+$("#tBasis").onclick=()=>{ S.basis=!S.basis; save(); paintBasis(); buildWQ(); paintTeacher(); };
+$("#tUnlock").onclick=()=>{ S.unlockAll=!S.unlockAll; save(); paintTeacher(); refreshGate(); };
+$("#resetAll").onclick=()=>{ if(confirm("Wirklich alle Eingaben auf diesem Gerät löschen?")){ try{localStorage.removeItem(KEY);}catch(e){} location.reload(); } };
+
+/* =========================================================
+   Lernstand-Code (QR) für die Lehrkraft-Übersicht
+   Format: B7S2|v2|kürzel|zeit|station|erledigt|teilschritte|fehlerstellen (1 Zeichen je ERR_KEYS-Eintrag)|minuten|daumen|tipps|flags|prüfsumme
+   ========================================================= */
+function chk(s){ let h=5381; for(let i=0;i<s.length;i++){ h=((h<<5)+h+s.charCodeAt(i))>>>0; } return (h%1679616).toString(36).padStart(4,"0"); }
+function makeCode(){
+  const done=STATIONS.map((s,i)=>reqDone(i)?"1":"0").join("");
+  const sub=["wf","auf","stil","zeit","star"].map(k=>subDone(k)?"1":"0").join("");
+  const err=ERR_KEYS.map(k=>Math.min(S.err[k[0]]||0,35).toString(36)).join("");
+  const min=STATIONS.map((s,i)=>Math.round((S.time[i]||0)/60)).join(".");
+  const th=GOALS.map((g,i)=>({up:"u",mid:"m",down:"d"}[S.thumb[i]]||"-")).join("");
+  const flags=(S.basis?"b":"")+(S.unlockAll?"u":"")||"-";
+  const body=["B7S2","v2",encodeURIComponent((S.f.kuerzel||"ohne Kürzel").trim()),Math.floor(Date.now()/60000).toString(36),cur,done,sub,err,min,th,S.tips||0,flags].join("|");
+  return body+"|"+chk(body);
+}
+function showCode(){
+  const code=makeCode();
+  const q=qrcode(0,"M"); q.addData(code,"Byte"); q.make();
+  $("#qrBox").innerHTML=q.createSvgTag({cellSize:7,margin:2,scalable:true});
+  const svg=$("#qrBox svg"); if(svg){ svg.style.width="min(70vw,340px)"; svg.style.height="auto"; }
+  $("#codeText").textContent=code;
+  $("#codeWho").textContent=(S.f.kuerzel||"").trim()||"Noch kein Kürzel eingetragen";
+  const d=STATIONS.filter((s,i)=>reqDone(i)).length;
+  $("#codeState").textContent=`Station ${cur} (${STATIONS[cur].t}) · ${d} von ${STATIONS.length} Stationen erledigt · ${new Date().toLocaleTimeString("de-DE",{hour:"2-digit",minute:"2-digit"})} Uhr`;
+  $("#codeModal").classList.add("show");
+}
+$("#codeBtn").onclick=showCode;
+document.addEventListener("click",e=>{ if(e.target.closest("[data-showcode]")) showCode(); });
+$("#codeClose").onclick=()=>$("#codeModal").classList.remove("show");
+$("#codeModal").onclick=e=>{ if(e.target.id==="codeModal") $("#codeModal").classList.remove("show"); };
+
+/* ---------- Start ---------- */
+renderTextA(); buildFlip(); buildMatch(); buildOps(); buildWQ(); buildAuf(); buildWert(); buildSort(); buildPick(); buildCloze(); buildThumbs();
+bindChoice($("#wertungQ"),"wertung","nein",$("#wertungFb"),"Richtig: Text A enthält keine Gefühlswörter oder Wertungen wie „mega“ oder „schlimm“.","Prüfe noch einmal: Findest du in Text A Wörter wie „schlimm“, „total“ oder „mega“?");
+bindChoice($("#tempusQ"),"tempus","Präteritum",$("#tempusFb"),"Richtig: Berichte stehen im Präteritum. Nur in der direkten Rede darf eine andere Zeitform stehen.","Das stimmt nicht. Die Verben auf -te zeigen dir die Zeitform.");
+bindChoice($("#starQ"),"star","Wann",$("#starFb"),"Genau: Text A nennt nur „Dienstagvormittag“ und „Pause“ – kein Datum und keine Uhrzeit.","Diese W-Frage wird vollständig beantwortet. Welche Angabe ist nur ungenau?");
+bindChoice($("#widerQ"),"wider","knoechel",$("#widerFb"),"Richtig erkannt! Bei einem Widerspruch müsste man nachfragen, bevor man den Bericht schreibt.","Vergleiche diese Angabe noch einmal in Text A und M2 – sie stimmt überein.");
+bindChoice($("#posJ"),"posJ","vor",$("#posFb"),"Richtig beobachtet.","Schau noch einmal genau in Z. 9.");
+bindChoice($("#posR"),"posR","nach",$("#posFb"),"Richtig beobachtet.","Schau noch einmal genau in Z. 12–13.");
+bindChoice($("#zeichenJ"),"zeichenJ","doppel",$("#posFb"),"Richtig: Nach „Er sagte“ steht ein Doppelpunkt.","Schau genau hin: Welches Zeichen steht direkt nach „sagte“?");
+bindPen();
+bindSaves(); paintBasis();
+paintMatchDone(); paintAufDone(); if(S.abOk){ abLock(); if(S.f.abWho!=null) abShow(SPEECH[S.f.abWho],"Fehlerfrei abgeschrieben!","ok"); }
+countStil(); countZeit(); countRede();
+if(cur>maxOpen()) cur=maxOpen();
+$$(".station").forEach(s=>s.classList.toggle("active", +s.dataset.st===cur));
+buildNav(); resetTimer(); placeMaterial(cur);
+if(cur===6) buildSummary();
+</script>
+</body>
+</html>
