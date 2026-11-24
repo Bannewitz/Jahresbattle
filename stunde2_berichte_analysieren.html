@@ -800,12 +800,12 @@ nav.stations button.locked-st .n::after{content:" 🔒"}
 
 <!-- Lernstand-Code -->
 <div class="modal" id="codeModal">
-  <div class="box" style="max-width:560px;text-align:center">
+  <div class="box" style="max-width:620px;text-align:center">
     <div class="row" style="justify-content:space-between"><h2 style="margin:0">Lernstand-Code</h2><button class="btn sec" id="codeClose">Schließen</button></div>
     <p id="codeWho" style="font-size:18px;margin:10px 0 4px;font-weight:700"></p>
     <p id="codeState" class="hint" style="margin:0 0 10px"></p>
     <div id="qrBox" style="background:#fff;padding:12px;display:inline-block;border-radius:12px;border:1px solid var(--line)"></div>
-    <p class="hint" style="margin:10px 0 4px">Halte den Code vor die Kamera deiner Lehrkraft. Ohne Kamera kann sie den Text abtippen:</p>
+    <p class="hint" style="margin:10px 0 4px">Bildschirm hell stellen und ruhig vor die Kamera deiner Lehrkraft halten. Ohne Kamera kann sie den Text abtippen:</p>
     <code id="codeText" style="display:block;word-break:break-all;font-size:14px;background:#f1f5f9;border-radius:8px;padding:8px"></code>
   </div>
 </div>
@@ -1684,9 +1684,9 @@ function makeCode(){
 }
 function showCode(){
   const code=makeCode();
-  const q=qrcode(0,"M"); q.addData(code,"Byte"); q.make();
-  $("#qrBox").innerHTML=q.createSvgTag({cellSize:7,margin:2,scalable:true});
-  const svg=$("#qrBox svg"); if(svg){ svg.style.width="min(70vw,340px)"; svg.style.height="auto"; }
+  const q=qrcode(0,"L"); q.addData(code,"Byte"); q.make();
+  $("#qrBox").innerHTML=q.createSvgTag({cellSize:8,margin:4,scalable:true});
+  const svg=$("#qrBox svg"); if(svg){ svg.style.width="min(86vw,62vh,520px)"; svg.style.height="auto"; svg.style.shapeRendering="crispEdges"; }
   $("#codeText").textContent=code;
   $("#codeWho").textContent=(S.f.kuerzel||"").trim()||"Noch kein Kürzel eingetragen";
   const d=STATIONS.filter((s,i)=>reqDone(i)).length;
