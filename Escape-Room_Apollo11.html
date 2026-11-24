@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Escape Room Apollo 11</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+/* VOICE  occasion: a classroom game, playful but historically exact
+   IDEA   the launch control console at Cape Kennedy, 16 July 1969: status lamps, a countdown clock, a Saturn V on the pad
+   PICTURE the Saturn V on its pad under a night sky; four lamps light up as the teams solve stations; at the end it lifts off
+   COLOUR night sky #0c1330 ground, panel #172152, rocket white, launch red #e8412c, lamp green #39d98a; worksheet colour code on panel edges
+   TYPE   Canva Sans where installed, otherwise Figtree (closest free match)
+   LAYOUT laptop: rocket column left (sticky), station console right; phone: header, rocket band, station */
+:root{color-scheme:dark;--bg:#0c1330;--panel:#172152;--panel2:#1e2a63;--ink:#f3f5ff;--mute:#aeb8e6;--red:#e8412c;--green:#39d98a;--szene:#6f9bff;--dilemma:#ff6b5e;--material:#9aa6c8;--aufgabe:#4fd08a;--code:#ffcf4a}
+*{box-sizing:border-box;min-width:0}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:17px/1.55 "Canva Sans","Figtree",system-ui,sans-serif;overflow-x:clip}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--code);outline-offset:2px}
+header{display:flex;flex-wrap:wrap;align-items:center;gap:12px 20px;padding:14px max(4vw,16px);background:#080d24;border-bottom:1px solid #26326e}
+header h1{margin:0;font-size:clamp(22px,3vw,30px);line-height:1.1;letter-spacing:-.02em;font-weight:800;flex:1 1 260px}
+header h1 small{display:block;font-size:14px;font-weight:600;color:var(--mute);letter-spacing:0}
+.clock{font-variant-numeric:tabular-nums;font-weight:800;font-size:28px;background:#000;color:var(--red);padding:4px 14px;border-radius:8px;border:1px solid #3a1a1a;white-space:nowrap}
+.clock.ok{color:var(--code)}
+.meta{font-size:14px;color:var(--mute);white-space:nowrap}
+main{display:grid;grid-template-columns:minmax(260px,340px) minmax(0,1fr);gap:24px;padding:24px max(4vw,16px) 48px;max-width:1320px;margin:0 auto}
+.pad{position:sticky;top:16px;align-self:start;background:linear-gradient(#0a1030,#1b2560);border-radius:16px;overflow:hidden;border:1px solid #26326e}
+.pad svg{display:block;width:100%;height:auto}
+.lamps{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:12px;background:#0a0f2a}
+.lamp{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--mute);line-height:1.2}
+.lamp i{flex:none;width:16px;height:16px;border-radius:50%;background:#3a2020;box-shadow:inset 0 0 0 2px #5a2a2a}
+.lamp.on{color:var(--ink)}
+.lamp.on i{background:var(--green);box-shadow:0 0 10px var(--green)}
+.tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+.tab{border:1px solid #33408a;background:var(--panel);border-radius:999px;padding:8px 16px;font-size:15px;font-weight:600;min-height:44px}
+.tab[aria-current=true]{background:var(--ink);color:var(--bg)}
+.tab:disabled{opacity:.45;cursor:not-allowed}
+.tab.done::after{content:" ✓";color:var(--green)}
+.box{background:var(--panel);border-radius:12px;border-left:6px solid var(--c);padding:14px 18px;margin-bottom:14px}
+.box>b.lab{display:block;font-size:13px;font-weight:800;color:var(--c);margin-bottom:4px}
+.box p{margin:0 0 8px}.box p:last-child{margin:0}
+.szene{--c:var(--szene)}.dilemma{--c:var(--dilemma)}.material{--c:var(--material)}.aufgabe{--c:var(--aufgabe)}.code{--c:var(--code)}
+h2{font-size:clamp(28px,3.4vw,40px);line-height:1.05;letter-spacing:-.02em;margin:0 0 14px}
+.grid{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(min(100%,190px),1fr))}
+.card{background:var(--panel2);border-radius:10px;padding:10px 12px;font-size:15px;line-height:1.4}
+.card h4{margin:0 0 4px;font-size:17px}
+.card .k{font-weight:700}
+.usa{background:#1d3a74}.ussr{background:#5c2230}
+.let{display:inline-grid;place-items:center;width:30px;height:30px;border-radius:6px;background:#fff;color:#0c1330;font-weight:800;margin-right:8px}
+.note{background:#f4ecd2;color:#2b2414;border-radius:6px;padding:10px 14px;margin-top:10px;font-size:15px;transform:rotate(-.4deg)}
+.q{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px;align-items:center;padding:8px 0;border-top:1px solid #2c3878}
+.tag{background:#fff;color:#0c1330;font-weight:800;font-size:13px;padding:3px 8px;border-radius:5px;white-space:nowrap}
+.cell{width:52px;height:56px;text-align:center;font-size:26px;font-weight:800;border-radius:8px;border:2px solid #4a58a8;background:#0a0f2a;text-transform:uppercase}
+.cell:focus{border-color:var(--code)}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.btn{min-height:48px;padding:10px 22px;border-radius:10px;border:0;background:var(--code);color:#1a1400;font-weight:800;font-size:17px}
+.btn.alt{background:transparent;color:var(--ink);border:1px solid #4a58a8;font-weight:600}
+.msg{min-height:1.6em;font-weight:700;margin-top:10px}
+.msg.bad{color:var(--dilemma)}.msg.good{color:var(--green)}
+.shake{animation:sh .4s}
+@keyframes sh{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.hint{margin-top:10px;font-size:15px;color:var(--mute)}
+.hint summary{cursor:pointer;font-weight:700;color:var(--ink);min-height:32px}
+.mc{position:relative;text-align:left;border:2px solid transparent;cursor:pointer;width:100%}
+.mc[data-n]::after{content:attr(data-n);position:absolute;top:-10px;right:-8px;width:30px;height:30px;border-radius:50%;background:var(--code);color:#1a1400;font-weight:800;display:grid;place-items:center}
+.mc[data-n]{border-color:var(--code)}
+.stain{background:#7a5532;color:#f5e3c8;font-style:italic;padding:0 4px;border-radius:3px}
+.slots{display:flex;flex-wrap:wrap;gap:6px}
+.slots span{display:grid;place-items:center;width:44px;height:52px;border-radius:8px;border:2px solid #4a58a8;background:#0a0f2a;font-weight:800;font-size:22px}
+.slots small{display:block}
+.cables{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.cable{border:3px solid transparent;border-radius:10px;padding:10px 6px;font-weight:800;font-size:15px;line-height:1.2;min-height:64px}
+.cable small{display:block;font-weight:600;font-size:13px;opacity:.9}
+.cable.sel{border-color:#fff;box-shadow:0 0 0 3px var(--code)}
+.sockets{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));gap:8px}
+.sock{display:flex;gap:10px;align-items:flex-start;text-align:left;background:var(--panel2);border:2px dashed #4a58a8;border-radius:10px;padding:10px;font-size:15px;line-height:1.35;min-height:64px}
+.sock b{flex:none;display:grid;place-items:center;width:34px;height:34px;border-radius:6px;background:#0a0f2a;font-size:20px}
+.sock.plug{border-style:solid;border-color:var(--pc)}
+.sock.plug b{background:var(--pc)}
+.final{text-align:center}
+.big{font-size:clamp(64px,14vw,140px);font-weight:800;line-height:1;color:var(--red);font-variant-numeric:tabular-nums}
+.codes{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,130px),1fr));gap:8px;margin:12px 0}
+.codes div{background:var(--panel2);border-radius:8px;padding:8px}
+.codes b{display:block;font-size:22px;letter-spacing:.08em}
+.intro input{width:min(100%,360px);min-height:48px;border-radius:10px;border:2px solid #4a58a8;background:#0a0f2a;padding:8px 12px;font-size:17px}
+footer{text-align:center;font-size:13px;color:var(--mute);padding:0 16px 24px}
+footer button{background:none;border:0;color:var(--mute);text-decoration:underline;min-height:44px}
+#rocket{transition:transform 4s cubic-bezier(.5,0,.9,.4)}
+#rocket.go{transform:translateY(-640px)}
+#flame{opacity:0;transition:opacity .4s}
+.launched #flame{opacity:1}
+@media(prefers-reduced-motion:reduce){#rocket{transition:none}.shake{animation:none}}
+@media(max-width:820px){main{grid-template-columns:minmax(0,1fr)}.pad{position:static;display:grid;grid-template-columns:120px minmax(0,1fr)}.pad svg{height:220px}.lamps{grid-template-columns:1fr;align-content:center}}
+@media(max-width:600px){.cables{grid-template-columns:repeat(2,minmax(0,1fr))}.cell{width:44px;height:50px;font-size:22px}.q{grid-template-columns:minmax(0,1fr) auto}.q .tag{grid-column:1/-1;justify-self:start}}
+</style>
+</head>
+<body>
+<header>
+  <h1>Apollo 11 – Countdown in Gefahr<small id="teamline">Escape Room · Klasse 6/7 · 45 Minuten</small></h1>
+  <span class="meta" id="hintcount">Hilfekarten: 0</span>
+  <span class="clock ok" id="clock" aria-live="off">45:00</span>
+</header>
+<main>
+  <aside class="pad" aria-label="Startrampe">
+    <svg viewBox="0 0 300 520" preserveAspectRatio="xMidYMax meet" role="img" aria-label="Saturn-V-Rakete auf der Startrampe">
+      <defs>
+        <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#070b22"/><stop offset="1" stop-color="#25307a"/></linearGradient>
+        <linearGradient id="body" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#c9cfdc"/><stop offset=".45" stop-color="#ffffff"/><stop offset="1" stop-color="#9aa3b8"/></linearGradient>
+        <radialGradient id="fl" cx=".5" cy="0" r="1"><stop offset="0" stop-color="#fff6c2"/><stop offset=".4" stop-color="#ffb020"/><stop offset="1" stop-color="#e8412c" stop-opacity="0"/></radialGradient>
+      </defs>
+      <rect width="300" height="520" fill="url(#sky)"/>
+      <g id="stars" fill="#fff"></g>
+      <circle cx="240" cy="70" r="26" fill="#eef0f8"/><circle cx="232" cy="64" r="5" fill="#cfd4e4"/><circle cx="248" cy="80" r="4" fill="#cfd4e4"/><circle cx="244" cy="60" r="3" fill="#cfd4e4"/>
+      <path d="M0 470 Q150 440 300 470 V520 H0Z" fill="#141b45"/>
+      <g stroke="#c0392b" stroke-width="3" fill="none">
+        <path d="M188 120 V470 M212 120 V470"/>
+        <path id="lat" d="M188 140 L212 160 M212 140 L188 160"/>
+      </g>
+      <g id="latt" stroke="#c0392b" stroke-width="2"></g>
+      <path d="M188 230 H160 M188 330 H160" stroke="#c0392b" stroke-width="4"/>
+      <rect x="80" y="462" width="160" height="12" fill="#3b4677"/>
+      <g id="rocket">
+        <ellipse id="flame" cx="150" cy="490" rx="26" ry="60" fill="url(#fl)"/>
+        <path d="M150 96 L158 120 H142Z" fill="#e8e8ee"/>
+        <rect x="148.5" y="70" width="3" height="28" fill="#e8e8ee"/>
+        <path d="M140 120 H160 L166 150 H134Z" fill="url(#body)"/>
+        <rect x="134" y="150" width="32" height="70" fill="url(#body)"/>
+        <path d="M134 220 L128 250 H172 L166 220Z" fill="url(#body)"/>
+        <rect x="128" y="250" width="44" height="70" fill="url(#body)"/>
+        <rect x="128" y="262" width="44" height="8" fill="#1b1f2e"/>
+        <rect x="128" y="320" width="44" height="140" fill="url(#body)"/>
+        <rect x="128" y="320" width="11" height="40" fill="#1b1f2e"/><rect x="150" y="320" width="11" height="40" fill="#1b1f2e"/>
+        <rect x="139" y="420" width="11" height="40" fill="#1b1f2e"/><rect x="161" y="420" width="11" height="40" fill="#1b1f2e"/>
+        <text x="150" y="398" font-size="11" font-weight="800" fill="#1b1f2e" text-anchor="middle" writing-mode="tb" letter-spacing="1">USA</text>
+        <path d="M128 440 L116 462 H128Z M172 440 L184 462 H172Z" fill="#1b1f2e"/>
+      </g>
+    </svg>
+    <div class="lamps" id="lamps"></div>
+  </aside>
+  <section id="app" aria-live="polite"></section>
+</main>
+<footer>Historische Daten: NASA, Mission Apollo 11. Die Rahmenhandlung (Partynacht, Pannen) ist erfunden. <button id="reset" type="button">Neue Runde starten</button></footer>
+
+<script>
+{
+const ST = [
+ { title:'Weckalarm im Astronautenquartier', lamp:'Crew geweckt', code:'4382',
+   scene:['Es ist der 16. Juli 1969 – und der Start der Rakete der Weltraummission Apollo 11 ist in Gefahr! Buzz Aldrin, Neil Armstrong und Michael Collins haben gestern eine Nacht durchgefeiert. Eigentlich sollten sie schon längst aufgestanden sein und in ihren Weltraumanzügen stecken. Aber sie schlafen noch – und schnarchen um die Wette.','<b>Wecke die Astronauten der Mission, damit sie rechtzeitig abfliegen können!</b>'],
+   dilemma:'Ohne die drei Astronauten kann die Startvorbereitung nicht beginnen. Die Weckanlage hat vier Zahlenräder. Sie funktioniert nur, wenn ihr den historischen Zahlencode findet. Die Antworten stecken in den Steckbriefen und im Flugplan.',
+   task:'Beantwortet die vier Fragen. Jede Antwort ist eine Ziffer für ein Zahlenrad der Weckanlage.',
+   check:'Die Summe der vier Ziffern ist 17.',
+   hint:'Nur zwei Astronauten steigen in die Mondfähre. Und beim Kalender: Zählt vom 16. bis zum 20. Juli – wie viele Tage sind das?' },
+ { title:'Der verschlossene Spind', lamp:'Anzüge gefunden', code:'NRUTAS',
+   scene:['Die Astronauten sind endlich wach. Neil Armstrong reibt sich die Augen, Buzz Aldrin sucht hektisch seine Checkliste, und Michael Collins schaut auf die Uhr.','Doch dann kommt die nächste schlechte Nachricht aus der Vorbereitungshalle: Die Raumanzüge sind verschwunden! Ohne Schutzanzüge können die Astronauten nicht zur Startrampe. Im Anzugraum steht nur ein verschlossener Spind. Auf dem Spind klebt ein Zettel:','<b><i>„Nur wer die Geschichte der Raumfahrt kennt, findet den richtigen Anzugcode.“</i></b>'],
+   dilemma:'Der Spind öffnet sich nur, wenn ihr die Hinweise zu den Raumfahrtprogrammen richtig zuordnet. Jeder richtige Hinweis liefert einen Buchstaben für den Anzugcode.',
+   task:'Welches Land? Welche Zeit? Wer war an Bord? Sucht zu jedem Hinweis die passende Programmkarte und tragt ihren Buchstaben ein. Vorsicht: Zwei Karten passen zu keinem Hinweis!',
+   check:'Der Anzugcode ist auch der Name eines Planeten.',
+   hint:'Achtet auf die Jahreszahl und darauf, wie viele Menschen an Bord waren. Gagarin flog 1961 allein – welche UdSSR-Karte passt zu 1961 und einer Person?' },
+ { title:'Rote Lampe im Kontrollraum', lamp:'Treibstoff frei', code:'EBAGIERF',
+   scene:['Die Astronauten tragen ihre Raumanzüge und werden zur Startrampe gebracht. Die Saturn-V-Rakete ragt riesig in den Himmel – sie ist über 100 Meter hoch. Alles scheint bereit.','Doch plötzlich blinkt im Kontrollraum eine rote Warnlampe: <b style="background:#e8412c;padding:0 6px;border-radius:4px">TREIBSTOFFFREIGABE GESPERRT</b>','Ein Techniker ruft: <i>„Die Missionskarten sind durcheinandergeraten! Ohne die richtige Reihenfolge kann die Tankmannschaft die Freigabe nicht erteilen.“</i>'],
+   dilemma:'Ihr müsst wichtige Stationen der Apollo-Geschichte ordnen. Nur dann kann der Treibstoff freigegeben werden. Dummerweise hat jemand Kaffee über einige Karten gekippt – dort ist das Datum nicht mehr lesbar.',
+   task:'Tippt die Karten in der richtigen zeitlichen Reihenfolge an – vom frühesten Ereignis bis heute. Ein zweites Antippen nimmt eine Karte wieder heraus.',
+   check:'Das Lösungswort ist genau das, was die Tankmannschaft jetzt braucht.',
+   hint:'Sortiert zuerst nur die Karten mit lesbarem Datum. Die verschmierten Apollo-Flüge haben Nummern – sie stehen in der Zahlenreihe dazwischen.' },
+ { title:'Funkstille im Countdown', lamp:'Funk steht', code:'7061',
+   scene:['Die Rakete ist betankt. Neil Armstrong, Buzz Aldrin und Michael Collins sitzen angeschnallt in der Kapsel. Im Kontrollzentrum läuft der Countdown.','Doch dann wird es still. Die Sprechanlage ist ausgefallen. Eine Stromverbindung wurde unterbrochen. Ohne Funkkontakt kann die Bodenstation keine Startfreigabe senden.','Auf dem Kontrollpult leuchten vier Kabel. Jedes Kabel trägt einen Begriff aus der Geschichte von Apollo 11.'],
+   dilemma:'Ihr müsst die Funkverbindung wiederherstellen, indem ihr die Begriffe richtig zuordnet und daraus den Funkcode bildet. Steckt ihr ein Kabel falsch ein, bleibt der Funk tot.',
+   task:'Tippt erst ein Kabel an, dann den passenden Steckplatz. Die Nummer des Steckplatzes ist eure Ziffer. Der Funkcode entsteht in der Reihenfolge rot – blau – gelb – grün.',
+   check:'Der Funkcode ist ein Datum, das ihr heute schon oft gelesen habt.',
+   hint:'Florida ist der Startort. Gesprochen wird aber mit dem Kontrollzentrum. Wer wartet allein in der Umlaufbahn – und mit welchem Raumschiff?' }
+];
+const rev = s => s.split('').reverse().join('');
+
+const CREW = [
+ ['Neil Armstrong','5. August 1930 in Wapakoneta (USA)','Ingenieur und Testpilot','flog 1966 mit Gemini 8 ins All','Kommandant. Er soll als erster Mensch den Mond betreten.'],
+ ['Buzz Aldrin','20. Januar 1930 in Glen Ridge (USA)','Kampfpilot, Doktor der Raumfahrttechnik','stieg 1966 bei Gemini 12 aus der Kapsel ins freie All','Pilot der Mondfähre „Eagle“. Er soll als Zweiter den Mond betreten.'],
+ ['Michael Collins','31. Oktober 1930 in Rom (Italien)','Testpilot','flog 1966 mit Gemini 10 ins All','Pilot der Kommandokapsel „Columbia“. Er bleibt in der Umlaufbahn um den Mond und wartet dort auf die beiden anderen.']
+];
+const Q1 = [['MOND','Wie viele der drei Astronauten sollen den Mond betreten?'],['GEBURTSTAG','In welchem Monat hat Neil Armstrong Geburtstag? Schreibt den Monat als Zahl (Januar = 1, Februar = 2 …).'],['RAKETE','Aus wie vielen Stufen besteht die Saturn V?'],['KALENDER','Wie viele Tage liegen zwischen dem Start und der geplanten Mondlandung?']];
+const PROG = [['T','Mercury','USA','1961–1963','Je 1 Astronaut an Bord'],['R','Luna','UdSSR','ab 1959','Sonden ohne Menschen, die zum Mond fliegen'],['O','Vanguard','USA','1957–1959','Satelliten ohne Menschen an Bord'],['U','Gemini','USA','1965–1966','Je 2 Astronauten an Bord'],['S','Sputnik','UdSSR','1957–1958','Satelliten ohne Menschen an Bord'],['E','Woschod','UdSSR','1964–1965','2 bis 3 Kosmonauten an Bord'],['N','Apollo','USA','bemannt seit 1968','3 Astronauten an Bord – Ziel: der Mond'],['A','Wostok','UdSSR','1961–1963','Je 1 Kosmonaut an Bord']];
+const HINTS2 = ['4. Oktober 1957: Die Sowjetunion startet den ersten künstlichen Satelliten der Welt.','12. April 1961: Juri Gagarin umkreist als erster Mensch die Erde – ganz allein in seiner Kapsel.','Mai 1961: Alan Shepard fliegt als erster Amerikaner ins All. Auch er sitzt allein in seiner Kapsel.','1965/66: Amerikanische Astronauten üben zu zweit, Raumschiffe im All aneinanderzukoppeln. Das braucht man später für den Mondflug.','1959: Eine sowjetische Sonde ohne Menschen an Bord trifft als erster Flugkörper von der Erde den Mond.','Präsident John F. Kennedy will Menschen auf den Mond bringen. Heute soll dieses Programm sein großes Ziel erreichen.'];
+const SM = 'unleserlich (Kaffeefleck)';
+const MC = [['G','Apollo 8','Weihnachten 1968','Zum ersten Mal fliegen Menschen um den Mond herum. Die Crew fotografiert, wie die Erde hinter dem Mond aufgeht.'],['R','Apollo 1','Januar 1967','Bei einem Test auf der Startrampe bricht in der Kapsel ein Feuer aus. Die drei Astronauten sterben. Danach wird die Kapsel sicherer gebaut.'],['E','Apollo 11','16. Juli 1969','Start zur ersten Mondlandung – das ist heute!'],['F','Kennedys Rede','25. Mai 1961','Präsident Kennedy verkündet: Noch vor Ende des Jahrzehnts soll ein Amerikaner auf dem Mond landen und sicher zurückkehren.'],['B','Apollo 10','Mai 1969','Die Generalprobe: Die Mondfähre fliegt bis auf etwa 15 Kilometer an den Mond heran – landet aber nicht.'],['E','Apollo 4',SM,'Die riesige Saturn-V-Rakete fliegt zum ersten Mal – noch ohne Menschen an Bord, nur als Test.'],['A','Apollo 9',SM+', aber „1969“ ist noch zu erkennen','Drei Astronauten testen in der Umlaufbahn um die Erde zum ersten Mal die Mondfähre im All.'],['I','Apollo 7',SM,'Erster Apollo-Flug mit Menschen an Bord. Drei Astronauten umkreisen elf Tage lang die Erde.']];
+const CABLES = [['rot','EAGLE','#c62828','#fff'],['blau','COLUMBIA','#1565c0','#fff'],['gelb','HOUSTON','#f9a825','#1a1400'],['grün','MEER DER RUHE','#2e7d32','#fff']];
+const SOCK = [[3,'Von hier startet die Saturn V.'],[0,'Hier sitzen die Fachleute, die per Funk mit der Crew sprechen.'],[6,'Mit diesem Raumschiff umkreist ein Astronaut allein den Mond.'],[9,'Die dreistufige Rakete, die alles ins All bringt.'],[1,'Mit diesem Raumschiff sollen zwei Astronauten auf dem Mond landen.'],[7,'Hier auf dem Mond soll die Landung stattfinden.']];
+
+const KEY = 'apollo11-escape';
+const fresh = () => ({ team:'', started:0, cur:0, view:0, solved:[false,false,false,false], hints:[false,false,false,false], in1:['','','',''], in2:['','','','','',''], order:[], plug:{}, sel:null, launched:false });
+let S = fresh();
+const load = d => { if (d && d.solved) S = Object.assign(fresh(), d); };
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e) {} };
+window.claude?.hot?.snapshot?.(() => S);
+
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const app = $('#app');
+
+// stars + lattice
+{ let s = 7, g = ''; const r = () => (s = s * 16807 % 2147483647) / 2147483647;
+  for (let i = 0; i < 70; i++) g += `<circle cx="${(r()*300).toFixed(1)}" cy="${(r()*400).toFixed(1)}" r="${(r()*1.3+.3).toFixed(2)}" opacity="${(r()*.6+.4).toFixed(2)}"/>`;
+  $('#stars').innerHTML = g; let l = '';
+  for (let y = 120; y < 470; y += 20) l += `<path d="M188 ${y} L212 ${y+20} M212 ${y} L188 ${y+20}"/>`;
+  $('#latt').innerHTML = l; $('#lat').remove(); }
+
+function lamps() {
+  $('#lamps').innerHTML = ST.map((s,i) => `<div class="lamp${S.solved[i]?' on':''}"><i></i>${s.lamp}</div>`).join('');
+  $('#hintcount').textContent = 'Hilfekarten: ' + S.hints.filter(Boolean).length;
+  $('#teamline').textContent = S.team ? 'Team ' + S.team + ' · Klasse 6/7' : 'Escape Room · Klasse 6/7 · 45 Minuten';
+}
+function tick() {
+  const c = $('#clock');
+  if (!S.started) { c.textContent = '45:00'; return; }
+  const left = Math.max(0, 45*60 - Math.floor((Date.now() - S.started)/1000));
+  c.textContent = String(Math.floor(left/60)).padStart(2,'0') + ':' + String(left%60).padStart(2,'0');
+  c.classList.toggle('ok', left > 300);
+}
+setInterval(tick, 1000);
+
+const box = (cls, lab, html) => `<div class="box ${cls}"><b class="lab">${lab}</b>${html}</div>`;
+const tabs = () => `<nav class="tabs" aria-label="Stationen">${ST.map((s,i) => `<button class="tab${S.solved[i]?' done':''}" data-tab="${i}" ${i>S.cur?'disabled':''} aria-current="${S.view===i}">Station ${i+1}</button>`).join('')}${S.solved[3]?`<button class="tab" data-tab="4" aria-current="${S.view===4}">Start!</button>`:''}</nav>`;
+
+function material(i) {
+  if (i === 0) return `<div class="grid">${CREW.map(c => `<div class="card"><h4>${c[0]}</h4><div><span class="k">Geboren:</span> ${c[1]}</div><div><span class="k">Beruf:</span> ${c[2]}</div><div><span class="k">Erfahrung:</span> ${c[3]}</div><div><span class="k">Bei Apollo 11:</span> ${c[4]}</div></div>`).join('')}</div>
+    <div class="note"><b>Zettel vom Kontrollzentrum – Flugplan Apollo 11</b><br>Start: heute, 16. Juli 1969, mit der Saturn V. Die Rakete besteht aus 3 Stufen, die nacheinander zünden und dann abgeworfen werden. Mondlandung geplant: 20. Juli 1969. Rückkehr zur Erde: 24. Juli 1969.</div>`;
+  if (i === 1) return `<p>Die USA und die Sowjetunion (UdSSR) sind Gegner im Kalten Krieg. Im „Wettlauf ins All“ wollen beide zeigen, wer die bessere Technik hat. In den USA heißen Raumfahrer Astronauten, in der UdSSR Kosmonauten.</p><p><b>An der Spindtür hängen acht Programmkarten</b> (blau = USA, rot = UdSSR):</p>
+    <div class="grid">${PROG.map(p => `<div class="card ${p[2]==='USA'?'usa':'ussr'}"><h4><span class="let">${p[0]}</span>${p[1]}</h4><div><span class="k">${p[2]}</span> · ${p[3]}</div><div>${p[4]}</div></div>`).join('')}</div>`;
+  if (i === 2) return `<div class="grid">${MC.map((m,k) => { const n = S.order.indexOf(k); return `<button class="card mc" data-mc="${k}" ${n>=0?`data-n="${n+1}"`:''} ${S.solved[2]?'disabled':''}><h4><span class="let">${m[0]}</span>${m[1]}</h4><div><span class="k">Datum:</span> ${m[2].startsWith('unleserlich')?`<span class="stain">${m[2]}</span>`:m[2]}</div><div>${m[3]}</div></button>`; }).join('')}</div>
+    <div class="note"><b>Notiz des Technikers:</b> „Die Apollo-Flüge wurden der Reihe nach nummeriert. Und bevor Menschen in eine neue Rakete steigen, wird sie erst ohne Besatzung getestet.“</div>`;
+  return `<p><b>Flugplan Apollo 11 – so soll die Mission ablaufen.</b> Die Saturn V startet vom Raumfahrtzentrum in Florida. Sobald die Rakete den Startturm verlassen hat, übernimmt das Kontrollzentrum in Houston (Texas) die Leitung. Von dort sprechen die Fachleute per Funk mit der Crew. Nach etwa drei Tagen ist das Raumschiff am Mond. Michael Collins bleibt in der Kommandokapsel Columbia und umkreist den Mond. Neil Armstrong und Buzz Aldrin steigen in die Mondfähre Eagle um – das ist Englisch für „Adler“. Sie sollen im Meer der Ruhe landen, einer großen, flachen Ebene ohne Wasser. Frühe Sternforscher hielten die dunklen Flecken auf dem Mond für Meere.</p>
+    <p><b>Die vier Kabel am Kontrollpult:</b></p><div class="cables">${CABLES.map((c,k) => `<button class="cable${S.sel===k?' sel':''}" data-cable="${k}" style="background:${c[2]};color:${c[3]}" ${S.solved[3]?'disabled':''}><small>Kabel ${c[0].toUpperCase()}${S.plug[k]!=null?' → '+S.plug[k]:''}</small>${c[1]}</button>`).join('')}</div>
+    <p style="margin-top:12px"><b>Die sechs Steckplätze – nur vier davon sind richtig:</b></p><div class="sockets">${SOCK.map(s => { const k = Object.keys(S.plug).find(c => S.plug[c] === s[0]); return `<button class="sock${k!=null?' plug':''}" data-sock="${s[0]}" ${k!=null?`style="--pc:${CABLES[k][2]}"`:''} ${S.solved[3]?'disabled':''}><b>${s[0]}</b><span>${s[1]}</span></button>`; }).join('')}</div>`;
+}
+
+function taskUI(i) {
+  if (i === 0) return Q1.map((q,k) => `<div class="q"><span class="tag">${q[0]}</span><label for="d${k}">${q[1]}</label><input class="cell" id="d${k}" data-in1="${k}" inputmode="numeric" maxlength="1" value="${esc(S.in1[k])}" aria-label="Ziffer ${q[0]}" ${S.solved[0]?'disabled':''}></div>`).join('');
+  if (i === 1) return HINTS2.map((h,k) => `<div class="q"><span class="tag">Hinweis ${k+1}</span><label for="l${k}">${h}</label><input class="cell" id="l${k}" data-in2="${k}" maxlength="1" value="${esc(S.in2[k])}" aria-label="Buchstabe zu Hinweis ${k+1}" ${S.solved[1]?'disabled':''}></div>`).join('');
+  return '';
+}
+function codeUI(i) {
+  if (i === 0) return `<div class="slots">${S.in1.map(v => `<span>${esc(v||'·')}</span>`).join('')}</div>`;
+  if (i === 1) return `<div class="slots">${S.in2.map(v => `<span>${esc((v||'·').toUpperCase())}</span>`).join('')}</div>`;
+  if (i === 2) return `<div class="slots">${Array.from({length:8},(_,k) => `<span>${S.order[k]!=null?MC[S.order[k]][0]:'·'}</span>`).join('')}</div>`;
+  return `<div class="slots">${CABLES.map((c,k) => `<span style="border-color:${c[2]}">${S.plug[k]!=null?S.plug[k]:'·'}</span>`).join('')}</div>`;
+}
+const entered = i => i===0 ? S.in1.join('') : i===1 ? S.in2.join('').toUpperCase() : i===2 ? S.order.map(k => MC[k][0]).join('') : CABLES.map((c,k) => S.plug[k]!=null?S.plug[k]:'').join('');
+
+function render() {
+  lamps(); tick();
+  if (!S.started) {
+    app.innerHTML = `<div class="intro">${box('szene','Missionsauftrag',`<h2>Rettet den Start von Apollo 11!</h2><p>Am 16. Juli 1969 soll die erste Mondmission starten. Doch an der Startrampe geht alles schief. Euer Team arbeitet im Hintergrund und löst vier Aufgaben aus der Geschichte der Raumfahrt. Erst wenn alle vier Kontrolllampen grün leuchten, kann die Saturn V abheben.</p><p>Ihr habt <b>45 Minuten</b>. Pro Station dürft ihr eine Hilfekarte öffnen.</p>`)}
+      ${box('aufgabe','Team anmelden',`<label for="team">Euer Teamname</label><div class="row" style="margin-top:6px"><input id="team" maxlength="30" placeholder="z. B. Mondadler" value="${esc(S.team)}"><button class="btn" id="go">Mission starten</button></div>`)}</div>`;
+    return;
+  }
+  const i = S.view;
+  if (i === 4) return renderFinal();
+  const s = ST[i];
+  app.innerHTML = tabs() + `<h2>Station ${i+1}: ${s.title}</h2>` +
+    box('szene','Szene', s.scene.map(p => `<p>${p}</p>`).join('')) +
+    box('dilemma','Euer Dilemma', `<p>${s.dilemma}</p>`) +
+    box('material','Material', material(i)) +
+    box('aufgabe','Eure Aufgabe', `<p>${s.task}</p>${taskUI(i)}`) +
+    box('code','Code', `<div id="codeview">${codeUI(i)}</div><p style="margin-top:8px;font-size:15px"><b>Selbstkontrolle:</b> ${s.check}</p>
+      <div class="row" style="margin-top:10px">${S.solved[i] ? `<button class="btn" id="next">${i<3?'Weiter zu Station '+(i+2):'Zur Startfreigabe'}</button>` : `<button class="btn" id="check">Code prüfen</button>${i>=2?'<button class="btn alt" id="clear">Zurücksetzen</button>':''}`}</div>
+      <div class="msg${S.solved[i]?' good':''}" id="msg">${S.solved[i]?'Code korrekt! '+s.lamp+'.':''}</div>
+      <details class="hint" ${S.hints[i]?'open':''} id="hint"><summary>Hilfekarte öffnen</summary><p>${s.hint}</p></details>`);
+}
+
+function renderFinal() {
+  const codes = [S.in1.join(''), S.in2.join('').toUpperCase(), S.order.map(k => MC[k][0]).join(''), entered(3)];
+  app.innerHTML = tabs() + `<div class="final">${box('code','Startfreigabe',`<h2>Alle Systeme bereit</h2><div class="codes">${['Weckcode','Anzugcode','Freigabe','Funkcode'].map((n,k) => `<div>${n}<b>${esc(codes[k])}</b></div>`).join('')}</div><div class="big" id="count">${S.launched?'0':'10'}</div><div class="row" style="justify-content:center;margin-top:12px">${S.launched?'':'<button class="btn" id="ignite">Countdown starten</button>'}</div>`)}</div>
+    <div id="epi" ${S.launched?'':'hidden'}>${box('szene','Was wirklich geschah',`<p><b>„Zündung! Abheben!“</b> Am 16. Juli 1969 um 9:32 Uhr Ortszeit (in Deutschland 14:32 Uhr) hebt die Saturn V in Florida ab.</p><p>Vier Tage später, am 20. Juli, setzt die Mondfähre Eagle im Meer der Ruhe auf. Armstrong funkt nach Houston: „Der Adler ist gelandet.“</p><p>In Deutschland ist es mitten in der Nacht, als Neil Armstrong am 21. Juli um 3:56 Uhr als erster Mensch den Mond betritt: „Das ist ein kleiner Schritt für einen Menschen, aber ein riesiger Sprung für die Menschheit.“ Buzz Aldrin folgt ihm, Michael Collins wartet in der Columbia. Am 24. Juli landen alle drei sicher im Pazifik.</p><p><b>Ohne euer Team hätte der Start nie geklappt. Mission erfüllt!</b></p>`)}
+    ${box('material','Fakt oder Fiktion?','<p>Erfunden sind die Partynacht, die verschwundenen Anzüge, der Kaffeefleck und das kaputte Funkkabel. In Wirklichkeit wurde die Crew am Starttag gegen 4:15 Uhr Ortszeit planmäßig geweckt. Echt sind alle Namen, Daten, Programme und Missionen.</p>')}</div>`;
+  if (S.launched) $('#rocket').classList.add('go'), document.body.classList.add('launched');
+}
+
+function check(i) {
+  const ok = entered(i) === rev(ST[i].code), m = $('#msg');
+  if (ok) { S.solved[i] = true; if (S.cur === i && i < 3) S.cur = i + 1; save(); render(); return; }
+  m.className = 'msg bad'; m.textContent = 'Negativ, Houston! Der Code stimmt noch nicht. Prüft eure Antworten.';
+  const c = $('#codeview'); c.classList.remove('shake'); void c.offsetWidth; c.classList.add('shake');
+}
+
+app.addEventListener('click', e => {
+  const t = e.target.closest('button'); if (!t) return;
+  if (t.id === 'go') { S.team = $('#team').value.trim(); S.started = Date.now(); save(); render(); return; }
+  if (t.dataset.tab) { S.view = +t.dataset.tab; save(); render(); window.scrollTo({top:0}); return; }
+  if (t.id === 'check') return check(S.view);
+  if (t.id === 'next') { S.view = Math.min(S.view + 1, 4); save(); render(); window.scrollTo({top:0}); return; }
+  if (t.id === 'clear') { if (S.view === 2) S.order = []; else { S.plug = {}; S.sel = null; } save(); render(); return; }
+  if (t.dataset.mc) { const k = +t.dataset.mc, n = S.order.indexOf(k); n >= 0 ? S.order.splice(n,1) : S.order.length < 8 && S.order.push(k); save(); render(); return; }
+  if (t.dataset.cable) { const k = +t.dataset.cable; S.sel = S.sel === k ? null : k; render(); return; }
+  if (t.dataset.sock && S.sel != null) { const n = +t.dataset.sock; for (const c in S.plug) if (S.plug[c] === n) delete S.plug[c]; S.plug[S.sel] = n; S.sel = null; save(); render(); return; }
+  if (t.id === 'ignite') {
+    t.remove(); let n = 10; const el = $('#count');
+    const iv = setInterval(() => { n--; el.textContent = n; if (n <= 0) { clearInterval(iv); S.launched = true; save(); document.body.classList.add('launched'); $('#rocket').classList.add('go'); $('#epi').hidden = false; } }, 700);
+  }
+});
+app.addEventListener('input', e => {
+  const t = e.target;
+  if (t.dataset.in1 != null) { t.value = t.value.replace(/\D/g,''); S.in1[+t.dataset.in1] = t.value; }
+  else if (t.dataset.in2 != null) { t.value = t.value.replace(/[^a-zäöü]/gi,'').toUpperCase(); S.in2[+t.dataset.in2] = t.value; }
+  else return;
+  $('#codeview').innerHTML = codeUI(S.view); save();
+  if (t.value) { const nx = t.closest('.q')?.nextElementSibling?.querySelector('input'); if (nx) nx.focus(); }
+});
+app.addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.matches('.cell') && $('#check')) check(S.view); if (e.key === 'Enter' && e.target.id === 'team') $('#go').click(); });
+app.addEventListener('toggle', e => { if (e.target.id === 'hint' && e.target.open && !S.hints[S.view]) { S.hints[S.view] = true; save(); lamps(); } }, true);
+
+let armed = false;
+$('#reset').addEventListener('click', e => {
+  if (!armed) { armed = true; e.target.textContent = 'Wirklich alles zurücksetzen? Nochmal tippen'; setTimeout(() => { armed = false; e.target.textContent = 'Neue Runde starten'; }, 4000); return; }
+  armed = false; e.target.textContent = 'Neue Runde starten'; S = fresh(); save();
+  $('#rocket').classList.remove('go'); document.body.classList.remove('launched'); render();
+});
+
+function start(d) {
+  if (d && d.solved) load(d); else { try { load(JSON.parse(localStorage.getItem(KEY) || 'null')); } catch(e) {} }
+  render();
+}
+window.claude?.hot?.ready ? window.claude.hot.ready(start) : start(window.claude?.hot?.data ?? {});
+}
+</script>
+</body>
+</html>
